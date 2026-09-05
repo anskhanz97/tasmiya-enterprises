@@ -1,0 +1,54 @@
+I want to work on my project TASMIYA ENTERPRISE whose backend will be completely based on (php) LARAVEL and front end will be based on html and css,
+ and javascript. and for RDBMS will will use mysql and i will test it on XAMMP on my pc until it is complete. and demo is done.
+ then i may get it live on a domain.
+i want to use maximum/most/all features of laravel in the project. and in the process i will learn alot too. for that i will need your help,
+ about how to ? whys ? whats ? whens ? etc with flow charts and reasoning in separate files so that i can learn from it too instead of just
+ having the code ready by you. i want this project to be soo presentable that it should get me a job easily, representing my skills and craft 
+and experiecne.
+Now as the name Enterprises shows that this will be a group of companies... the Tasmiya Enterprises main core represents the CEO Mr Atif Safdar
+ who is related to FBR Taxation field, in pakistan lahore, sale tax, gsts, property tax, general tax etc who gets people filer and saves them
+ from getting over taxed by the governement. i hope you know have an idea... This page, section will have a call to action button of 
+"GET FILER NOW" / "Lets have a Discussion". Tag line Lets Be Money Smart.
+Second idea/sector/portion/Services Dimension of Tasmiya Enterprises would be that also comes under the umbrella of Tasmiya Enterprises 
+but mainly deals in IT exports providing services like Web Apps development, Website Development, Website Desgining, Online/Social Media Marketing,
+ Account Managing, Online Growth/Brand Creation/Promotion Expert, Ai Powered Graphic Photo Maniuplation, Ai Videos Genearation Expert etc led by 
+Mr Waseem Asghar and Ans Khan. This page, section will have a call to action button of "GET a Quote NOW" / "Lets Discuss your Idea" with tag lines:
+ If you can think it, we can build it.
+Third idea/sector/portion/Services Dimension of Tasmiya Enterprises would be that also comes under the umbrella of Tasmiya Enterprises but mainly 
+deals in providing Manual/Physical/Technical Suppoort and services online and offline. Mostly like Installation/Configuration Services. providing 
+services like Cameras/Network/DVR/NVR/Door Locks/Sensor Lights/Bank Alarms/Timers/Sensors/ Electric Wiring/Facial Recognition Devices/Locks/Automatic
+ Doors/Solar System Installation, Management, Configuration, Repairing, Service time to time checking, Maintainence, Providing services to homes,
+ housing  societies, firms, factories, offices, clubs, gymnasims. 
+This page, section will have a call to action button of "WAnt a Quotation ? " / "Hire a PROfessional ! " with tag lines: "Let Technology do the 
+Work for you". led by Mr Nazim Rauf with vast experience of working all over the country in different cities with both military and private 
+contractors and public masses. should have a big testimonials section with logos, or previous work completion pictures, or videos of happy 
+satisfied customers and use of multiple trust brands like hikvision,zkt etc . 
+As i said, i want maximum laravel features in it so i want to use Profiles for each member of the Enterprises, 4 in total but incase we want
+ to increase them in future,  
+like on home page we have a section for team member and then if clicked on we are lead to a separate page which is the profile of each member 
+which shows the details for whom the specialtiy of that specific team member is. 
+it should not only be about the company it self but also the team members should have great part/importance on the website like their presentation 
+on main page and separate pages for themselves as well one part linking to other.  a good interactive website with different themes for each 
+memebers/profile. for example, Atif Safdar is a tax agent/lawyer so his page should have some graphics picture, effects, colors related to his field.
+
+Nazim Rauf is from Different field so his pages image/theme should be purely dedicated to his field of work and similarly, Waseem Asghar and 
+Ans Khans profiles should has disntch design related to their field of work... Showcasing the talent of web development, webdesigning, and 
+their skill set just by the glance of the website as well.
+All steps need to be followed... i have yet to create a git repository etc. i want to work step by step under your guidance, as if you are a 
+senior software engineering and i am a new intern who needs proper guidance and notes at each turn.
+We need to use all features like: Auth for login for admin and other team members so that they can sign in and change something in their 
+respective profiles if they want liket their photos. no one user can enter/edit  into other users profitles or edit them. only admin or super 
+user will have that authority.  we will use google drive integration so that users can upload or change their images in their profiles and 
+we will keep the login signup hidden so nobody other than members who know the url can try to signup or login. will will use a payment gateway 
+of visa/mastercard so that if someone likes or decides to work with use he can pay half or decided amount in advance. and we will integrate
+ whatsapp as well so a signle click and connect the audience to respective team member whose specialties are required/hired.so multiple whatsnumbers
+ one for each member on his respective page/profitle under the call to action button. 
+we will use middlewares, webhooks, apis, web sockets, etc and for each feature we will put a use . for example i donot know how to use the 
+websockets/webhooks but i want to experience it and learn it so i need to implement it in my website some howm no matter how small the feature
+ is but we need to implement it... i hope that covers it all, but above all i need your suggestions as well, a number of readme files for 
+achitecture, code, comments, implementation guide etc. educational content made by you, that explains everything happening in this very project.
+ if i missed something that should be in here please suggest me , i would love to hear. and add and improvise. 
+and before beginning i would want you to jott down all my points and requirements like have a proper documentation of my wants and needs 
+that we need to work on so nothing /no details gets missed and i donot have to explain again and agian. we will build a good looking interactive
+ website if you want tot add some sections you are welcome to do so like testimonials and experience or clients or previous projects section 
+different for each member. carosels, hero sections, etc header and footers are always the same right. 

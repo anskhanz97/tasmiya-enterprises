@@ -1,0 +1,600 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+/* ========================================
+   Phase 4: Services & Testimonials Styles
+   ======================================== */
+
+/* ---- Star Rating Component ---- */
+.star {
+    color: #ffc107 !important;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.star-empty {
+    color: #e9ecef !important;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.rating-display {
+    display: flex;
+    gap: 2px;
+    align-items: center;
+}
+
+.rating-value {
+    color: #333;
+    font-size: 1.1em;
+    font-weight: 600;
+}
+
+.rating-count {
+    font-size: 0.85em;
+    color: #999;
+}
+
+/* ---- Service Card Component ---- */
+.service-card {
+    border: none;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    height: 100%;
+}
+
+.service-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12) !important;
+}
+
+.service-card .card-header {
+    border-top: 4px solid;
+    padding: 1.25rem;
+}
+
+.service-card .card-body {
+    padding: 1.5rem;
+}
+
+.service-icon {
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.08));
+}
+
+.service-icon-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: white;
+}
+
+.service-price {
+    margin: 0;
+}
+
+.service-price small {
+    display: block;
+    font-size: 0.8rem;
+}
+
+/* ---- Testimonial Card Component ---- */
+.testimonial-card {
+    border: none;
+    border-left: 4px solid #e9ecef;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.testimonial-card:hover {
+    border-left-color: #ffc107;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08) !important;
+}
+
+.testimonial-card.featured-testimonial {
+    border-left-color: #ffc107;
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.05) 0%, rgba(255, 193, 7, 0.02) 100%);
+}
+
+.featured-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 10;
+}
+
+.testimonial-card .card-body {
+    padding: 1.5rem;
+}
+
+.testimonial-card .card-text {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #666;
+    font-style: italic;
+}
+
+.testimonial-card .card-footer {
+    padding: 0.75rem 1.5rem;
+    background-color: #f8f9fa !important;
+    border-top: 1px solid #e9ecef;
+}
+
+/* ---- Service & Testimonial Forms ---- */
+.form-label {
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.form-control.is-invalid:focus,
+.form-select.is-invalid:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.invalid-feedback {
+    display: block;
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* ---- Rating Selector ---- */
+.rating-selector {
+    padding: 1rem 0;
+}
+
+.rating-selector label {
+    cursor: pointer;
+    transition: color 0.2s ease, transform 0.2s ease;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.rating-selector label:hover {
+    color: #ffc107 !important;
+    transform: scale(1.1);
+}
+
+.rating-input {
+    margin: 0;
+}
+
+#ratingLabel {
+    font-weight: 500;
+}
+
+/* ---- Character Counter ---- */
+#descriptionCounter,
+#contentCounter {
+    display: block;
+    font-size: 0.85rem;
+    color: #999;
+    margin-top: 0.25rem;
+}
+
+/* ---- Service Listing Page ---- */
+.services-hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 4rem 0;
+    border-radius: 0;
+}
+
+.services-hero h1 {
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.services-hero p {
+    font-size: 1.1rem;
+    opacity: 0.95;
+}
+
+.division-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.division-header::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 30px;
+    border-radius: 2px;
+}
+
+.division-header h3 {
+    margin: 0;
+    font-weight: 600;
+}
+
+/* ---- Service Detail Page ---- */
+.breadcrumb {
+    background-color: transparent;
+    padding: 0.5rem 0;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: '/';
+}
+
+.service-detail-hero {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    border-radius: 8px;
+}
+
+.service-detail-hero .card-header {
+    border-top: none;
+}
+
+.service-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.service-info-item {
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.service-info-item small {
+    display: block;
+    color: #999;
+    font-size: 0.8rem;
+}
+
+.service-info-item h4 {
+    margin: 0.5rem 0 0 0;
+    color: #333;
+}
+
+/* ---- Specialist List ---- */
+.specialist-card {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.specialist-card:hover {
+    background: #f0f2f5;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+}
+
+.specialist-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+/* ---- Testimonials Listing ---- */
+.testimonials-section {
+    margin-top: 2rem;
+}
+
+.testimonials-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+/* ---- Rating Breakdown ---- */
+.rating-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.rating-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.rating-row-stars {
+    min-width: 60px;
+    color: #ffc107;
+}
+
+.rating-row-bar {
+    flex: 1;
+    height: 6px;
+    background: #e9ecef;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.rating-row-bar .progress-bar {
+    border-radius: 3px;
+}
+
+.rating-row-count {
+    min-width: 30px;
+    text-align: right;
+    font-weight: 500;
+}
+
+/* ---- Sidebar Styling ---- */
+.sidebar-card {
+    margin-bottom: 1.5rem;
+}
+
+.sidebar-stat {
+    padding: 1rem 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.sidebar-stat:last-child {
+    border-bottom: none;
+}
+
+.sidebar-stat small {
+    display: block;
+    color: #999;
+    font-size: 0.8rem;
+    margin-bottom: 0.25rem;
+}
+
+.sidebar-stat h4 {
+    margin: 0;
+    font-weight: 700;
+}
+
+/* ---- CTA Buttons ---- */
+.btn-cta {
+    padding: 0.625rem 1.5rem;
+    font-weight: 600;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.btn-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* ---- Responsive Adjustments ---- */
+@media (max-width: 768px) {
+    .services-hero h1 {
+        font-size: 2rem;
+    }
+
+    .services-hero {
+        padding: 2rem 0;
+    }
+
+    .testimonials-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .service-detail-hero .d-flex {
+        flex-direction: column;
+    }
+
+    .rating-selector {
+        justify-content: space-around;
+    }
+
+    .testimonials-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+}
+
+/* ---- Alert Styling ---- */
+.alert-dismissible .btn-close {
+    padding: 0.25rem;
+}
+
+.alert {
+    border: none;
+    border-radius: 6px;
+}
+
+.alert-info {
+    background-color: #e7f3ff;
+    border-left: 4px solid #0066cc;
+    color: #003d99;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border-left: 4px solid #28a745;
+    color: #155724;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border-left: 4px solid #dc3545;
+    color: #721c24;
+}
+
+/* ---- Hover Effects ---- */
+.transition-all {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-shadow:hover {
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* ---- Form Group Styling ---- */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+/* ---- Pagination Styling ---- */
+.pagination {
+    margin-top: 2rem;
+}
+
+.page-link {
+    color: #667eea;
+    border: 1px solid #e9ecef;
+}
+
+.page-link:hover {
+    color: #764ba2;
+    background-color: #f8f9fa;
+    border-color: #e9ecef;
+}
+
+.page-link.active {
+    background-color: #667eea;
+    border-color: #667eea;
+}
+
+/* ========================================
+   Masonry Grid Layout for Portfolio
+   ======================================== */
+
+.masonry-grid {
+    column-count: 1;
+    column-gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .masonry-grid {
+        column-count: 2;
+    }
+}
+
+@media (min-width: 1024px) {
+    .masonry-grid {
+        column-count: 3;
+    }
+}
+
+.masonry-item {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    margin-bottom: 1.5rem;
+    display: inline-block;
+    width: 100%;
+}
+
+/* Project Card Styling */
+.project-card {
+    border: none;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.project-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15) !important;
+}
+
+.project-card img {
+    transition: transform 0.4s ease;
+}
+
+.project-card:hover img {
+    transform: scale(1.05);
+}
+
+.project-card .division-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 10;
+}
+
+.project-image-container {
+    position: relative;
+    overflow: hidden;
+    background: #f8f9fa;
+    min-height: 200px;
+}
+
+.project-icon-large {
+    font-size: 4rem;
+    line-height: 1;
+}
+
+/* Division Filter Tabs */
+.division-tabs {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+}
+
+.division-tab {
+    padding: 0.75rem 1.5rem;
+    border: 2px solid #e9ecef;
+    border-radius: 50px;
+    background: white;
+    color: #333;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.division-tab:hover {
+    border-color: #667eea;
+    color: #667eea;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+}
+
+.division-tab.active {
+    border-color: var(--primary-color, #667eea);
+    background: var(--primary-color, #667eea);
+    color: white;
+}
+
+/* Featured Projects Section */
+.featured-badge {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    clip-path: polygon(0 0, 100% 0, 85% 100%, 0% 100%);
+    padding-right: 1.5rem;
+}
