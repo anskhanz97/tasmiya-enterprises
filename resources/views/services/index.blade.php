@@ -8,7 +8,6 @@
     .services-hero {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
         background-size: 200% 200%;
-        animation: heroGradient 15s ease infinite;
         position: relative;
         overflow: hidden;
         padding: 120px 20px 140px;
@@ -31,7 +30,6 @@
             radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
             radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
             radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
-        animation: floatPattern 20s ease-in-out infinite;
     }
     
     .services-hero::after {
@@ -44,7 +42,6 @@
         background-image: 
             url('data:image/svg+xml,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="2" fill="white" opacity="0.2"/></svg>');
         background-size: 50px 50px;
-        animation: sparkle 30s linear infinite;
         pointer-events: none;
     }
     
@@ -110,6 +107,14 @@
         text-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
         font-weight: 300;
     }
+
+    .services-hero-art { position: relative; width: 245px; height: 205px; margin-left: auto; }
+    .services-hero-art::before { content: ''; position: absolute; inset: 12px 18px; border: 1px solid rgba(255,255,255,.42); border-radius: 24px; transform: rotate(-9deg); }
+    .services-hero-art__tile { position: absolute; display: grid; place-items: center; width: 108px; height: 108px; border: 1px solid rgba(255,255,255,.56); border-radius: 22px; background: rgba(255,255,255,.18); backdrop-filter: blur(8px); box-shadow: 0 15px 36px rgba(31,28,96,.15); }
+    .services-hero-art__tile .work-icon { width: 76px; height: 76px; }
+    .services-hero-art__tile--tax { left: 0; top: 0; transform: rotate(-8deg); }
+    .services-hero-art__tile--code { right: 0; top: 34px; transform: rotate(7deg); }
+    .services-hero-art__tile--support { left: 48px; bottom: 0; transform: rotate(3deg); }
     
     /* Main Content */
     .services-container {
@@ -126,18 +131,11 @@
         border-radius: 30px;
         border: 1px solid rgba(255, 255, 255, 0.8);
         box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
-        backdrop-filter: blur(10px);
-        transition: all 0.3s ease;
+        transition: box-shadow 0.25s ease;
     }
     
     .division-section:hover {
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
-        transform: translateY(-5px);
-    }
-    
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(30px); }
-        to { opacity: 1; transform: translateY(0); }
     }
     
     .division-header {
@@ -170,7 +168,6 @@
         width: 200%;
         height: 200%;
         background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.5), transparent);
-        animation: shine 3s infinite;
     }
     
     @keyframes shine {
@@ -217,7 +214,6 @@
     .stats-section {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
         background-size: 200% 200%;
-        animation: statsGradient 10s ease infinite;
         padding: 80px 20px;
         margin-top: 60px;
         border-radius: 30px;
@@ -330,28 +326,7 @@
         filter: blur(20px);
     }
     
-    /* Service Grid - Staggered Animation */
-    .services-grid > * {
-        animation: slideUp 0.6s ease-out backwards;
-    }
-    
-    .services-grid > *:nth-child(1) { animation-delay: 0.1s; }
-    .services-grid > *:nth-child(2) { animation-delay: 0.2s; }
-    .services-grid > *:nth-child(3) { animation-delay: 0.3s; }
-    .services-grid > *:nth-child(4) { animation-delay: 0.4s; }
-    .services-grid > *:nth-child(5) { animation-delay: 0.5s; }
-    .services-grid > *:nth-child(6) { animation-delay: 0.6s; }
-    
-    @keyframes slideUp {
-        from {
-            opacity: 0;
-            transform: translateY(40px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
+    /* Service cards render immediately so the catalogue stays responsive. */
     
     @media (max-width: 768px) {
         .services-hero {
@@ -455,7 +430,11 @@
                 </p>
             </div>
             <div class="col-lg-4 text-end d-none d-lg-block">
-                <div style="font-size: 10rem; opacity: 0.2; animation: float 3s ease-in-out infinite; filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));">📋</div>
+                <div class="services-hero-art" aria-hidden="true">
+                    <span class="services-hero-art__tile services-hero-art__tile--tax"><x-work-icon type="tax" /></span>
+                    <span class="services-hero-art__tile services-hero-art__tile--code"><x-work-icon type="code" /></span>
+                    <span class="services-hero-art__tile services-hero-art__tile--support"><x-work-icon type="support" /></span>
+                </div>
             </div>
         </div>
         
@@ -472,11 +451,11 @@
     {{-- Services by Division --}}
     @forelse($servicesByDivision as $divisionId => $services)
         @php
-            $division = $services->first()->division;
+            $division = $services->first()->service->division;
             $themeColors = $division->getThemeColors();
         @endphp
         
-        <div class="division-section" style="--division-primary: {{ $themeColors['primary'] }}; --division-secondary: {{ $themeColors['secondary'] }};">
+        <div class="division-section" id="division-{{ $division->slug }}" style="--division-primary: {{ $themeColors['primary'] }}; --division-secondary: {{ $themeColors['secondary'] }};">
             <div class="division-header">
                 <div class="division-title-wrapper">
                     <div class="division-accent"></div>
@@ -488,8 +467,8 @@
             </div>
 
             <div class="services-grid">
-                @foreach($services as $service)
-                    <x-service-card :service="$service" />
+                @foreach($services as $offering)
+                    <x-service-card :offering="$offering" />
                 @endforeach
             </div>
             
@@ -596,7 +575,7 @@
         @endif
     @empty
         <div class="alert alert-info text-center py-5" style="border-radius: 20px; border: 2px dashed #667eea; background: rgba(102, 126, 234, 0.05);">
-            <div style="font-size: 4rem; margin-bottom: 20px; opacity: 0.5;">📋</div>
+            <div style="display: flex; justify-content: center; color: #667eea; margin-bottom: 20px;"><x-work-icon type="audit" style="width: 64px; height: 64px;" /></div>
             <h4 style="color: #667eea; font-weight: 700;">No Services Available</h4>
             <p class="mb-0 text-muted">Please check back soon for our professional services.</p>
         </div>
@@ -622,8 +601,8 @@
                 </div>
                 <div class="col-md-4">
                     <div class="stat-box">
-                        <span class="stat-number">100%</span>
-                        <p class="stat-label mb-0">Satisfaction Guaranteed</p>
+                        <span class="stat-number">{{ $servicesByDivision->count() }}</span>
+                        <p class="stat-label mb-0">Service Divisions</p>
                     </div>
                 </div>
             </div>
@@ -632,23 +611,3 @@
 </div>
 
 @endsection
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Intersection Observer for scroll animations
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.animation = 'fadeIn 0.8s ease-out forwards';
-            }
-        });
-    }, { threshold: 0.1 });
-    
-    // Observe division sections
-    document.querySelectorAll('.division-section').forEach((section, index) => {
-        section.style.opacity = '0';
-        section.style.animationDelay = `${index * 0.1}s`;
-        observer.observe(section);
-    });
-});
-</script>

@@ -291,6 +291,13 @@
     }
 </style>
 
+@php
+    $companyEmail = \App\Models\SiteSetting::get('integration_company_email') ?: 'contact@tasmiya.com';
+    $companyWhatsApp = \App\Models\SiteSetting::get('integration_company_whatsapp') ?: '+92-312-4246916';
+    $companyAddress = \App\Models\SiteSetting::get('integration_company_address') ?: 'Office No.5, First Floor, Mozang Heights, 43 Mozang Rd, Lahore, Pakistan';
+    $mapUrl = \App\Models\SiteSetting::get('integration_map_embed_url');
+    $mapSearchUrl = 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode($companyAddress);
+@endphp
 <div class="contact-hero">
     <h1>✨ Get in Touch</h1>
     <p>We'd love to hear from you! Let's start a conversation.</p>
@@ -425,7 +432,7 @@
                 </div>
                 <div class="info">
                     <div class="label">Email Us</div>
-                    <div class="value">contact@tasmiya.com</div>
+                    <div class="value"><a href="mailto:{{ $companyEmail }}">{{ $companyEmail }}</a></div>
                 </div>
             </div>
 
@@ -437,7 +444,7 @@
                 </div>
                 <div class="info">
                     <div class="label">WhatsApp</div>
-                    <div class="value">+92-312-4246916</div>
+                    <div class="value"><a href="https://wa.me/{{ preg_replace('/\D/', '', $companyWhatsApp) }}" target="_blank" rel="noopener">{{ $companyWhatsApp }}</a></div>
                 </div>
             </div>
 
@@ -449,18 +456,24 @@
                 </div>
                 <div class="info">
                     <div class="label">Visit Us</div>
-                    <div class="value">Office No.5, First Floor, Mozang Heights, 43 Mozang Rd, Lahore, Pakistan</div>
+                    <div class="value">{{ $companyAddress }}</div>
                 </div>
             </div>
 
             <!-- Google Map -->
             <div class="map-container">
-                <iframe 
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3401.672!2d74.31735!3d31.55728!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39190457bfc00000%3A0x0!2sH848%2BXW%20Lahore%2C%20Pakistan!5e0!3m2!1sen!2s!4v1707667890!5m2!1sen!2s" 
+                @if($mapUrl)
+                <iframe
+                    src="{{ $mapUrl }}"
                     allowfullscreen="" 
                     loading="lazy" 
                     referrerpolicy="no-referrer-when-downgrade">
                 </iframe>
+                @else
+                <div style="height:100%;min-height:280px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:13px;padding:30px;background:radial-gradient(circle at 50% 47%,#d8d9f7 0 12%,transparent 13%),linear-gradient(90deg,transparent 48%,#d4d7ee 49%,#d4d7ee 51%,transparent 52%),linear-gradient(#f7f8ff,#e7eafd);text-align:center;color:#27356c">
+                    <span style="font-size:30px;color:#6155b2">⌖</span><strong>Find us in Lahore</strong><span style="max-width:340px;font-size:13px">{{ $companyAddress }}</span><a href="{{ $mapSearchUrl }}" target="_blank" rel="noopener" style="background:#5b4fac;color:white;padding:11px 15px;border-radius:9px;text-decoration:none;font-weight:700;font-size:13px">Open directions</a>
+                </div>
+                @endif
             </div>
         </div>
     </div>

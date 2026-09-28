@@ -123,6 +123,7 @@ class ProfileUpdateRequest extends FormRequest
                 'max:10',                    // Max 10 items
             ],
             'specializations.*' => [
+                'nullable',
                 'string',                    // Each item must be string
                 'max:50',                    // Max 50 chars per specialization
                 'min:2',                     // Min 2 chars per specialization
@@ -149,7 +150,7 @@ class ProfileUpdateRequest extends FormRequest
                 'nullable',                  // Can be empty
                 'image',                     // Must be image file
                 'mimes:jpeg,jpg,png,gif,webp',  // Allowed formats
-                'max:2048',                  // Max 2MB (in kilobytes)
+                'max:5120',                  // Max 5MB (in kilobytes)
             ],
 
             // Banner image URL
@@ -165,8 +166,28 @@ class ProfileUpdateRequest extends FormRequest
                 'nullable',                  // Can be empty
                 'image',                     // Must be image file
                 'mimes:jpeg,jpg,png,gif,webp',  // Allowed formats
-                'max:2048',                  // Max 2MB (in kilobytes)
+                'max:5120',                  // Max 5MB (in kilobytes)
             ],
+
+            'remove_profile_image' => ['nullable', 'boolean'],
+            'remove_banner_image' => ['nullable', 'boolean'],
+            'section_order' => [
+                'required',
+                'string',
+                function ($attribute, $value, $fail) {
+                    $keys = explode(',', $value);
+                    $expected = array_keys(\App\Models\Profile::SECTION_TITLES);
+                    if (count($keys) !== count($expected) || array_diff($keys, $expected) || count(array_unique($keys)) !== count($expected)) {
+                        $fail('The section order is invalid. Please reload the editor and try again.');
+                    }
+                },
+            ],
+            'section_titles' => ['required', 'array'],
+            'section_titles.*' => ['required', 'string', 'max:60'],
+            'section_descriptions' => ['nullable', 'array'],
+            'section_descriptions.*' => ['nullable', 'string', 'max:160'],
+            'section_visibility' => ['required', 'array'],
+            'section_visibility.*' => ['required', 'boolean'],
 
             // Social links - JSON object with contact info
             'social_links' => [
@@ -250,10 +271,10 @@ class ProfileUpdateRequest extends FormRequest
             'banner_image_url.url' => 'Please provide a valid banner URL.',
             'profile_image.image' => 'Profile picture must be an image file.',
             'profile_image.mimes' => 'Profile picture must be JPEG, PNG, GIF, or WebP format.',
-            'profile_image.max' => 'Profile picture must not exceed 2MB.',
+            'profile_image.max' => 'Profile picture must not exceed 5MB.',
             'banner_image.image' => 'Banner image must be an image file.',
             'banner_image.mimes' => 'Banner image must be JPEG, PNG, GIF, or WebP format.',
-            'banner_image.max' => 'Banner image must not exceed 2MB.',
+            'banner_image.max' => 'Banner image must not exceed 5MB.',
             'consultation_fee.numeric' => 'Fee must be a valid number.',
             'consultation_fee.min' => 'Fee cannot be negative.',
             'social_links.whatsapp.regex' => 'Please enter a valid WhatsApp number.',

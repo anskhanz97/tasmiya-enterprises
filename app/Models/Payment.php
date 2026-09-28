@@ -25,6 +25,11 @@ class Payment extends Model
         'invoice_number',
         'description',
         'notes',
+        'payment_reference',
+        'payment_proof_path',
+        'destination_snapshot',
+        'reviewed_by',
+        'reviewed_at',
         'paid_at',
         'refunded_at',
     ];
@@ -38,6 +43,8 @@ class Payment extends Model
         'refunded_at' => 'datetime',
         'stripe_webhook_received_at' => 'datetime',
         'stripe_response' => 'array',
+        'destination_snapshot' => 'array',
+        'reviewed_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];

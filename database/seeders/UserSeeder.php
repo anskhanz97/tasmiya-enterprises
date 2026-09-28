@@ -34,7 +34,7 @@ class UserSeeder extends Seeder
             'phone' => '+92-300-1234567',
             'whatsapp_number' => '+92-300-1234567',
             'bio' => 'Tax expert with 15+ years of experience in FBR compliance, income tax filing, GST management, and property tax optimization. Committed to helping businesses and individuals navigate complex taxation rules.',
-            'profile_image_url' => null, // Will be set via Google Drive later
+            'profile_image_url' => '/images/profiles/atif/image.webp',
         ]);
 
         // Team member 2: Waseem Asghar (IT & Digital - Team Member)
@@ -48,7 +48,7 @@ class UserSeeder extends Seeder
             'phone' => '+92-300-2345678',
             'whatsapp_number' => '+92-300-2345678',
             'bio' => 'Full-stack web developer and digital marketing specialist. Expert in Laravel, React, Vue.js, and cloud deployment. Passionate about creating innovative digital solutions that drive business growth.',
-            'profile_image_url' => null,
+            'profile_image_url' => '/images/profiles/waseem/image.webp',
         ]);
 
         // Team member 3: Ans Khan (IT & Digital - Team Member)
@@ -62,7 +62,7 @@ class UserSeeder extends Seeder
             'phone' => '+92-300-3456789',
             'whatsapp_number' => '+92-300-3456789',
             'bio' => 'Social media marketing expert and graphic designer. Specializing in brand development, social media campaigns, and AI-powered graphic design. Helping businesses establish and grow their digital presence.',
-            'profile_image_url' => null,
+            'profile_image_url' => '/images/profiles/ans/image.webp',
         ]);
 
         // Team member 4: Nazim Rauf (Technical Support - Team Member)
@@ -76,7 +76,7 @@ class UserSeeder extends Seeder
             'phone' => '+92-300-4567890',
             'whatsapp_number' => '+92-300-4567890',
             'bio' => 'Technical installation and maintenance expert with extensive experience across the country. Specialized in CCTV systems, network security, solar installations, and intelligent building systems. Trusted by military and private contractors.',
-            'profile_image_url' => null,
+            'profile_image_url' => '/images/profiles/nazim/image.webp',
         ]);
 
         echo "\n✅ 4 team members created successfully!\n";

@@ -6,6 +6,12 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class ContactInquiryStoreRequest extends FormRequest
 {
+    protected function prepareForValidation(): void
+    {
+        if ($this->filled('phone')) {
+            $this->merge(['phone' => preg_replace('/[^0-9+]/', '', $this->input('phone'))]);
+        }
+    }
     /**
      * Determine if the user is authorized to make this request.
      */

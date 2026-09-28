@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Our Team - Tasmiya Enterprises')
+@section('title', 'Our Team')
 
 @section('content')
 <style>
@@ -255,6 +255,8 @@
         height: 100%;
         object-fit: cover;
     }
+    .member-profile-image { display: grid; place-items: center; }
+    .member-profile-image .member-initial { color: #fff; font-size: 4rem; font-weight: 800; }
     
     .member-info {
         padding: 30px 40px 40px;
@@ -375,31 +377,48 @@
         background: #f8faff;
     }
     
-    .social-links {
+    .team-contact-links {
         display: flex;
-        gap: 20px;
+        gap: 14px;
         margin-top: 2rem;
         justify-content: center;
     }
     
-    .social-link {
-        width: 50px;
-        height: 50px;
+    .team-contact-link {
+        width: 54px;
+        height: 54px;
         border-radius: 50%;
-        background: rgba(255, 255, 255, 0.2);
+        background: #fff;
+        border: 2px solid #fff;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: white;
-        font-size: 1.2rem;
-        transition: all 0.3s ease;
-        backdrop-filter: blur(10px);
+        color: #51449e;
+        text-decoration: none;
+        box-shadow: 0 5px 15px rgba(31, 26, 87, 0.18);
+        transition: transform 0.2s ease, background-color 0.2s ease;
     }
     
-    .social-link:hover {
-        background: white;
-        color: #667eea;
-        transform: scale(1.1) rotate(5deg);
+    .team-contact-link svg {
+        display: block;
+        width: 24px;
+        height: 24px;
+        stroke: currentColor;
+        stroke-width: 2;
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .team-contact-link:hover {
+        background: #eef0ff;
+        color: #33247e;
+        transform: translateY(-3px);
+    }
+
+    .team-contact-link:focus-visible {
+        outline: 3px solid #fff;
+        outline-offset: 4px;
     }
     
     /* ===== CTA SECTION ===== */
@@ -558,15 +577,21 @@
             cursor: pointer;
         }
     }
+    .team-member:focus-within { transform: rotateY(180deg); }
+    .member-cta:focus-visible, .cta-btn:focus-visible { outline: 3px solid #132a50; outline-offset: 4px; }
+    @media (prefers-reduced-motion: reduce) {
+        .team-hero::before, .member-title, .flip-hint, .team-cta::before { animation: none; }
+        .team-member, .member-banner img, .member-profile-image { transition-duration: .01ms; }
+    }
 </style>
 
 <!-- HERO SECTION -->
 <div class="team-hero">
     <div class="team-hero-content">
         <h1>Meet Our Leadership Team</h1>
-        <p>Four dedicated professionals bringing expertise in taxation, technology, and business solutions to help your enterprise thrive</p>
+        <p>Dedicated professionals bringing expertise in taxation, technology, and business solutions to help your enterprise thrive.</p>
         @php
-            $totalTeam = 4;
+            $totalTeam = $profiles->count();
             $totalDivisions = \App\Models\Division::count();
         @endphp
         <div class="hero-stats">
@@ -588,63 +613,36 @@
 
 <!-- MAIN CONTENT -->
 <div class="team-container">
-    @php
-        $teamMembers = [
-            [
-                'name' => 'ans',
-                'profile_image' => '/images/profiles/ans/image.png',
-                'banner_image' => '/images/profiles/ans/banner.png'
-            ],
-            [
-                'name' => 'atif',
-                'profile_image' => '/images/profiles/atif/image.png',
-                'banner_image' => '/images/profiles/atif/banner.png'
-            ],
-            [
-                'name' => 'nazim',
-                'profile_image' => '/images/profiles/nazim/image.png',
-                'banner_image' => '/images/profiles/nazim/banner.png'
-            ],
-            [
-                'name' => 'waseem',
-                'profile_image' => '/images/profiles/waseem/image.png',
-                'banner_image' => '/images/profiles/waseem/banner.png'
-            ]
-        ];
-        
-        $profiles = \App\Models\Profile::with('user.division')->visible()->get();
-    @endphp
-    
-    <!-- TEAM GRID (2x2) with 3D Flip Cards -->
+    <!-- TEAM GRID with 3D Flip Cards -->
     <div class="team-grid">
-        @foreach($teamMembers as $member)
+        @foreach($profiles as $profile)
             @php
-                // Find profile matching the folder name
-                $profile = $profiles->first(function($p) use ($member) {
-                    return strtolower($p->user->name) === $member['name'] || 
-                           str_contains(strtolower($p->user->name), $member['name']) ||
-                           str_contains(strtolower($p->user->email ?? ''), $member['name']);
-                });
-                
-                // Fallback to any profile if not found
-                if (!$profile && $profiles->isNotEmpty()) {
-                    $profile = $profiles->shift();
+                $firstName = \Illuminate\Support\Str::slug(\Illuminate\Support\Str::before($profile->user->name, ' '));
+                $bannerImage = $profile->getBannerImageUrl();
+                $profileImage = $profile->displayImageUrl('profile');
+                if (($profile->banner_image_url === null || $profile->banner_image_url === "/images/profiles/{$firstName}/banner.webp") && $bannerImage && is_file(public_path("images/profiles/{$firstName}/banner-card.webp"))) {
+                    $bannerImage = asset("images/profiles/{$firstName}/banner-card.webp");
+                }
+                if (($profile->profile_image_url === null || $profile->profile_image_url === "/images/profiles/{$firstName}/image.webp") && $profileImage && is_file(public_path("images/profiles/{$firstName}/image-card.webp"))) {
+                    $profileImage = asset("images/profiles/{$firstName}/image-card.webp");
                 }
             @endphp
-            
-            @if($profile)
                 <div class="team-member-wrapper">
                     <div class="team-member">
                         <!-- FRONT SIDE -->
                         <div class="card-front">
                             <!-- Banner Image -->
                             <div class="member-banner">
-                                <img src="{{ asset($member['banner_image']) }}" alt="{{ $profile->user->name }} Banner">
+                                @if($bannerImage)<img src="{{ $bannerImage }}" alt="" loading="lazy" decoding="async" width="960" height="360">@endif
                             </div>
                             
                             <!-- Profile Image (Overlapping) -->
                             <div class="member-profile-image">
-                                <img src="{{ asset($member['profile_image']) }}" alt="{{ $profile->user->name }}">
+                                @if($profileImage)
+                                    <img src="{{ $profileImage }}" alt="Portrait of {{ $profile->user->name }}" loading="lazy" decoding="async" width="480" height="480">
+                                @else
+                                    <span class="member-initial" aria-hidden="true">{{ strtoupper(substr($profile->user->name, 0, 1)) }}</span>
+                                @endif
                             </div>
                             
                             <!-- Member Info -->
@@ -672,21 +670,29 @@
                                 <p>{{ $profile->bio ?? 'Dedicated to providing exceptional service and expertise in driving business growth and success. With years of experience, committed to delivering results that matter.' }}</p>
                                 <a href="{{ route('profiles.show', $profile) }}" class="member-cta">View Full Profile →</a>
                                 
-                                @if($profile->social_links)
-                                    <div class="social-links">
-                                        @if(isset($profile->social_links['linkedin']))
-                                            <a href="{{ $profile->social_links['linkedin'] }}" class="social-link" target="_blank" rel="noopener">
-                                                <i class="fab fa-linkedin-in"></i>
+                                @php
+                                    $links = $profile->social_links ?? [];
+                                    $phone = preg_replace('/[^\d+]/', '', $links['phone'] ?? $links['whatsapp'] ?? '');
+                                    $linkedIn = $links['linkedin'] ?? null;
+                                    if ($linkedIn && ! \Illuminate\Support\Str::startsWith($linkedIn, ['http://', 'https://'])) {
+                                        $linkedIn = 'https://' . $linkedIn;
+                                    }
+                                @endphp
+                                @if($phone || !empty($links['email']) || $linkedIn)
+                                    <div class="team-contact-links" aria-label="Contact {{ $profile->user->name }}">
+                                        @if($phone)
+                                            <a href="tel:{{ $phone }}" class="team-contact-link" aria-label="Call {{ $profile->user->name }}" title="Call {{ $profile->user->name }}">
+                                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h3l2 5-2 2a16 16 0 0 0 6 6l2-2 5 2v3a2 2 0 0 1-2 2C10.2 21 3 13.8 3 5a2 2 0 0 1 2-2Z"/></svg>
                                             </a>
                                         @endif
-                                        @if(isset($profile->social_links['twitter']))
-                                            <a href="{{ $profile->social_links['twitter'] }}" class="social-link" target="_blank" rel="noopener">
-                                                <i class="fab fa-twitter"></i>
+                                        @if(!empty($links['email']))
+                                            <a href="mailto:{{ $links['email'] }}" class="team-contact-link" aria-label="Email {{ $profile->user->name }}" title="Email {{ $profile->user->name }}">
+                                                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></svg>
                                             </a>
                                         @endif
-                                        @if(isset($profile->social_links['email']))
-                                            <a href="mailto:{{ $profile->social_links['email'] }}" class="social-link">
-                                                <i class="fas fa-envelope"></i>
+                                        @if($linkedIn)
+                                            <a href="{{ $linkedIn }}" class="team-contact-link" target="_blank" rel="noopener noreferrer" aria-label="{{ $profile->user->name }} on LinkedIn" title="LinkedIn">
+                                                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 10v7M8 7.5v.1M12 17v-7h3a3 3 0 0 1 3 3v4M12 13a3 3 0 0 1 3-3"/></svg>
                                             </a>
                                         @endif
                                     </div>
@@ -695,7 +701,6 @@
                         </div>
                     </div>
                 </div>
-            @endif
         @endforeach
     </div>
     
@@ -717,7 +722,7 @@
         cards.forEach(card => {
             card.addEventListener('click', function(e) {
                 // Prevent following the link when clicking on the card itself
-                if (e.target.closest('.member-cta')) {
+                if (e.target.closest('.member-cta, .team-contact-link')) {
                     return; // Allow CTA click to work
                 }
                 

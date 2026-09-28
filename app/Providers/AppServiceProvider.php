@@ -3,11 +3,13 @@
 namespace App\Providers;
 
 use App\Models\Profile;
+use App\Models\Payment;
 use App\Models\Project;
 use App\Models\User;
 use App\Models\Service;
 use App\Models\Testimonial;
 use App\Policies\ProfilePolicy;
+use App\Policies\PaymentPolicy;
 use App\Policies\ProjectPolicy;
 use App\Policies\UserPolicy;
 use App\Policies\ServicePolicy;
@@ -78,6 +80,7 @@ class AppServiceProvider extends ServiceProvider
         // Enables: $this->authorize('view', $profile)
         // And: @can('edit', $profile) in Blade views
         \Illuminate\Support\Facades\Gate::policy(Profile::class, ProfilePolicy::class);
+        \Illuminate\Support\Facades\Gate::policy(Payment::class, PaymentPolicy::class);
 
         // Service model uses ServicePolicy for authorization checks
         // Controls who can create, edit, delete services
@@ -95,5 +98,4 @@ class AppServiceProvider extends ServiceProvider
         \Illuminate\Support\Facades\Gate::policy(Project::class, ProjectPolicy::class);
     }
 }
-
 

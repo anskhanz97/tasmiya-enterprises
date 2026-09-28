@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ContactInquiryStoreRequest;
 use App\Models\ContactInquiry;
+use App\Models\SiteSetting;
 use App\Services\WhatsAppService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class ContactInquiryController extends Controller
 {
@@ -39,11 +42,35 @@ class ContactInquiryController extends Controller
             'status' => 'new',
         ]);
 
-        // Send WhatsApp notification to admins if WhatsApp is configured
-        if (config('services.whatsapp.api_token')) {
-            $whatsapp = new WhatsAppService();
-            $whatsapp->notifyAdminsAboutInquiry($inquiry);
+        $email = SiteSetting::get('integration_company_email');
+        $smtpHost = SiteSetting::get('integration_smtp_host');
+        if ($email && $smtpHost && SiteSetting::get('integration_smtp_from_email')) {
+            try {
+                config([
+                    'mail.mailers.smtp.host' => $smtpHost,
+                    'mail.mailers.smtp.port' => (int) (SiteSetting::get('integration_smtp_port') ?: 587),
+                    'mail.mailers.smtp.username' => SiteSetting::get('integration_smtp_username'),
+                    'mail.mailers.smtp.password' => SiteSetting::get('integration_smtp_password'),
+                    'mail.mailers.smtp.timeout' => 8,
+                    'mail.mailers.smtp.scheme' => SiteSetting::get('integration_smtp_encryption') === 'ssl' ? 'smtps' : 'smtp',
+                    'mail.from.address' => SiteSetting::get('integration_smtp_from_email'),
+                    'mail.from.name' => 'Tasmiya Enterprises',
+                ]);
+                Mail::purge('smtp');
+                Mail::mailer('smtp')->raw("New website inquiry #{$inquiry->id}\n\nName: {$inquiry->name}\nEmail: {$inquiry->email}\nPhone: {$inquiry->phone}\nSubject: {$inquiry->subject}\n\n{$inquiry->message}", function ($mail) use ($email, $inquiry) {
+                    $mail->to($email)->replyTo($inquiry->email, $inquiry->name)->subject('Website inquiry: '.$inquiry->subject);
+                });
+                $inquiry->email_delivery_status = 'sent';
+            } catch (\Throwable $e) {
+                Log::error('Inquiry email failed', ['inquiry_id' => $inquiry->id, 'error' => $e->getMessage()]);
+                $inquiry->email_delivery_status = 'failed';
+            }
         }
+
+        if (SiteSetting::get('integration_company_whatsapp') && SiteSetting::get('integration_whatsapp_template_name')) {
+            $inquiry->whatsapp_delivery_status = (new WhatsAppService())->notifyCompanyAboutInquiry($inquiry) ? 'sent' : 'failed';
+        }
+        $inquiry->save();
 
         return redirect()
             ->back()
@@ -137,12 +164,8 @@ class ContactInquiryController extends Controller
             'message' => ['required', 'string', 'max:4096'],
         ]);
 
-        // Send WhatsApp message
-        if ($inquiry->getContactPhone()) {
-            $whatsapp->sendMessage(
-                $inquiry->getContactPhone(),
-                $validated['message']
-            );
+        if (! $inquiry->getContactPhone() || ! $whatsapp->sendMessage($inquiry->getContactPhone(), $validated['message'])) {
+            return back()->with('error', 'WhatsApp could not send this reply. Check the Cloud API configuration and the customer conversation window.');
         }
 
         // Update inquiry status

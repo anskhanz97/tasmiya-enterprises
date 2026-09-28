@@ -156,6 +156,7 @@ class ProfileController extends Controller
         if (! $profile->relationLoaded('user')) {
             $profile->load(['user', 'division']);
         }
+        $profile->load(['serviceOfferings' => fn ($query) => $query->whereHas('service', fn ($service) => $service->active())->with(['service.division', 'profile.user'])]);
 
         // Get theme colors from profile's division
         // Used in view to apply division-specific styling
@@ -255,41 +256,63 @@ class ProfileController extends Controller
         // ProfileUpdateRequest already validated and authorized
         // $request->validated() returns only safe, validated data
         $validated = $request->validated();
+        $order = explode(',', $validated['section_order']);
+        $validated['presentation_sections'] = collect($order)->map(fn ($key, $index) => [
+            'key' => $key,
+            'title' => trim($validated['section_titles'][$key] ?? Profile::SECTION_TITLES[$key]),
+            'description' => trim($validated['section_descriptions'][$key] ?? ''),
+            'visible' => (bool) ($validated['section_visibility'][$key] ?? true),
+            'order' => $index,
+        ])->all();
+        unset($validated['section_order'], $validated['section_titles'], $validated['section_descriptions'], $validated['section_visibility']);
 
-        // Handle profile image upload
-        if ($request->hasFile('profile_image')) {
-            // Delete old profile image if exists
-            if ($profile->profile_image_url) {
-                $oldPath = str_replace('/storage/', '', parse_url($profile->profile_image_url, PHP_URL_PATH));
-                Storage::disk('public')->delete($oldPath);
+        $validated['specializations'] = array_values(array_filter(
+            array_map('trim', $validated['specializations'] ?? []),
+            fn ($value) => $value !== ''
+        ));
+        $validated['social_links'] = array_merge($profile->social_links ?? [], $validated['social_links'] ?? []);
+
+        foreach (['profile', 'banner'] as $kind) {
+            $urlKey = "{$kind}_image_url";
+            $hideKey = "hide_{$kind}_image";
+            $removeKey = "remove_{$kind}_image";
+            $replacementUrl = $validated[$urlKey] ?? null;
+
+            if (! $replacementUrl) {
+                unset($validated[$urlKey]);
             }
-            
-            // Store new image
-            $path = $request->file('profile_image')->store('profile-images', 'public');
-            $validated['profile_image_url'] = '/storage/' . $path;
+
+            if ($request->boolean($removeKey)) {
+                $this->deleteStoredImage($profile->{$urlKey});
+                $validated[$urlKey] = null;
+                $validated[$hideKey] = true;
+            } elseif ($replacementUrl) {
+                $this->deleteStoredImage($profile->{$urlKey});
+                $validated[$hideKey] = false;
+            }
+
+            if ($request->hasFile("{$kind}_image")) {
+                $this->deleteStoredImage($profile->{$urlKey});
+                $path = $request->file("{$kind}_image")->store("{$kind}-images", 'public');
+                $validated[$urlKey] = '/storage/' . $path;
+                $validated[$hideKey] = false;
+            }
         }
 
-        // Handle banner image upload
-        if ($request->hasFile('banner_image')) {
-            // Delete old banner image if exists
-            if ($profile->banner_image_url) {
-                $oldPath = str_replace('/storage/', '', parse_url($profile->banner_image_url, PHP_URL_PATH));
-                Storage::disk('public')->delete($oldPath);
-            }
-            
-            // Store new image
-            $path = $request->file('banner_image')->store('banner-images', 'public');
-            $validated['banner_image_url'] = '/storage/' . $path;
-        }
-
-        // Update the profile with validated data
-        // Only fillable attributes can be updated
+        unset($validated['profile_image'], $validated['banner_image'], $validated['remove_profile_image'], $validated['remove_banner_image']);
         $profile->update($validated);
 
         // Redirect to profile view with success message
         return redirect()
             ->route('profiles.show', $profile)
             ->with('success', 'Profile updated successfully! Your changes are now live.');
+    }
+
+    private function deleteStoredImage(?string $url): void
+    {
+        if ($url && str_starts_with($url, '/storage/')) {
+            Storage::disk('public')->delete(substr($url, strlen('/storage/')));
+        }
     }
 
     /**

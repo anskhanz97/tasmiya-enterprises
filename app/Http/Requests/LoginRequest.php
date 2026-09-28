@@ -3,15 +3,13 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rules\Password;
 
 /**
  * LoginRequest - Validates and authorizes login form submission
  * 
  * This FormRequest class handles:
  * 1. Validation: Ensures email/password are in correct format
- * 2. Authentication: Actually checks if email+password combination is valid
+ * 2. Authentication: Leaves credential checking to the controller
  * 3. Authorization: Could check if user has permission to log in
  * 4. Error messages: Custom error messages for users
  * 
@@ -116,23 +114,10 @@ class LoginRequest extends FormRequest
              * Rules:
              * - 'required': Email field cannot be empty
              * - 'email': Must be valid email format (checks @ symbol, etc)
-             * - 'exists:users,email': Email must already exist in users table
-             *   (prevents errors if user tries to log in with non-existent email)
-             * 
-             * Why 'exists':
-             * - If email doesn't exist, user will fail login anyway
-             * - Early error message is clearer
-             * - Doesn't leak whether email is registered (privacy)
-             * 
-             * Actually... 'exists' does leak this info.
-             * Common pattern: Use generic error message
-             * "The email or password is incorrect"
-             * Not: "Email not found" or "Password wrong"
-             * 
-             * But for internal team member registration, this doesn't matter
-             * (Not a public sign-up form where privacy concerns exist)
+             * Credential matching happens in Auth::attempt(), so validation
+             * does not need an extra database lookup for the email address.
              */
-            'email' => ['required', 'email', 'exists:users,email'],
+            'email' => ['required', 'email'],
 
             // ========== PASSWORD VALIDATION ==========
             
@@ -220,7 +205,7 @@ class LoginRequest extends FormRequest
      * 
      * This method provides custom, user-friendly messages:
      * - "Please enter your email address."
-     * - "We couldn't find an account with that email address."
+     * - "Please enter your password."
      * 
      * Return: array of field.rule => message pairs
      *
@@ -231,7 +216,6 @@ class LoginRequest extends FormRequest
         return [
             'email.required' => 'Please enter your email address.',
             'email.email' => 'Please enter a valid email address.',
-            'email.exists' => 'We couldn\'t find an account with that email address.',
             'password.required' => 'Please enter your password.',
         ];
     }

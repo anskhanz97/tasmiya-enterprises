@@ -1,76 +1,79 @@
-{{-- Service Card Component --}}
-@props(['service', 'showAction' => true])
+@props(['service' => null, 'offering' => null, 'showAction' => true, 'compact' => false])
 
 @php
+    $service = $service ?? $offering->service;
     $themeColors = $service->getThemeColors();
-    $specialistsCount = $service->getSpecialistsCount();
+    $specialistsCount = $offering ? null : $service->getSpecialistsCount();
+    $presentation = config("service_cards.services.{$service->slug}", []);
+    $icon = $offering?->iconKey() ?? $presentation['icon'] ?? config("service_cards.divisions.{$service->division->slug}.icon", 'audit');
+    $focus = $offering?->tags() ?? $presentation['focus'] ?? [];
+    $cardTitle = $offering?->title() ?? $service->name;
+    $cardDescription = $offering?->description() ?? $service->description;
+    $cardPrice = $offering?->price() ?? $service->base_price;
+    $cardCurrency = $offering?->currency() ?? $service->currency;
+    $serviceUrl = route('services.show', $service) . ($offering ? '?profile=' . $offering->profile_id : '');
 @endphp
 
-<div class="card service-card h-100" style="border: none; border-radius: 24px; overflow: hidden; box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); background: white; position: relative;">
-    <div class="card-header border-0" style="background: {{ $themeColors['gradient'] }}; padding: 35px; position: relative; overflow: hidden;">
-        <div class="card-shine" style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent); animation: cardShine 3s infinite;"></div>
-        <div class="d-flex align-items-center gap-3" style="position: relative; z-index: 2;">
-            @if($service->icon_url)
-                <div style="width: 70px; height: 70px; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); border-radius: 18px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);">
-                    <img src="{{ $service->icon_url }}" alt="{{ $service->name }}" style="width: 40px; height: 40px; object-fit: contain; filter: brightness(0) invert(1);">
-                </div>
+<article class="service-card {{ $compact ? 'service-card--compact' : '' }}" style="--card-accent: {{ $themeColors['primary'] }};">
+    <div class="service-card__visual">
+        <div class="service-card__symbol">
+            @if($service->icon_url && ! $offering?->icon_key)
+                <img src="{{ $service->icon_url }}" alt="" loading="lazy" decoding="async" width="68" height="68">
             @else
-                <div style="width: 70px; height: 70px; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); border-radius: 18px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 900; font-size: 2rem; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);">
-                    {{ substr($service->name, 0, 1) }}
-                </div>
+                <x-work-icon :type="$icon" />
             @endif
-            <div style="flex: 1;">
-                <h6 class="mb-2" style="color: white; font-weight: 800; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);">
-                    {{ $service->division->name }}
-                </h6>
-                <div style="display: inline-block; background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(5px); padding: 6px 14px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.4);">
-                    <small class="d-block" style="color: white; font-weight: 700; font-size: 0.75rem;">
-                        {{ $specialistsCount }} {{ Str::plural('Expert', $specialistsCount) }}
-                    </small>
-                </div>
-            </div>
         </div>
+        <span class="service-card__category">{{ $service->division->name }}</span>
     </div>
-    
-    <div class="card-body" style="padding: 40px; position: relative; display: flex; flex-direction: column; min-height: 240px;">
-        <h5 class="card-title" style="color: #0f172a; font-weight: 900; font-size: 1.6rem; margin-bottom: 20px; line-height: 1.3;">{{ $service->name }}</h5>
-        
-        <p class="card-text" style="color: #64748b; font-size: 1.05rem; line-height: 1.9; margin-bottom: 0; flex-grow: 1;">
-            {{ $service->description }}
-        </p>
+    <div class="service-card__body">
+        <h3><a href="{{ $serviceUrl }}">{{ $cardTitle }}</a></h3>
+        <p class="service-card__description">{{ $cardDescription }}</p>
+        @if($focus)
+            <div class="service-card__focus" aria-label="Areas covered">
+                @foreach($focus as $item)<span>{{ $item }}</span>@endforeach
+            </div>
+        @endif
     </div>
-</div>
+    <div class="service-card__footer">
+        <div class="service-card__meta">
+            <span>{{ $offering ? $offering->profile->user->name : ($specialistsCount > 0 ? $specialistsCount . ' ' . \Illuminate\Support\Str::plural('specialist', $specialistsCount) : 'Expert-led') }}</span>
+            <strong>@if((float) $cardPrice > 0)<small>Starting at</small> {{ $cardCurrency ?: 'PKR' }} {{ number_format((float) $cardPrice) }}@else Quote on request @endif</strong>
+        </div>
+        @if($showAction)<a href="{{ $serviceUrl }}" class="service-card__action">View service <span aria-hidden="true">↗</span></a>@endif
+    </div>
+</article>
 
+@once
 <style>
-@keyframes cardShine {
-    0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-    100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
-}
-
-.service-card {
-    position: relative;
-}
-
-.service-card::before {
-    content: '';
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    right: -2px;
-    bottom: -2px;
-    background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
-    border-radius: 24px;
-    opacity: 0;
-    transition: opacity 0.4s ease;
-    z-index: -1;
-}
-
-.service-card:hover {
-    transform: translateY(-12px) scale(1.02) !important;
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2) !important;
-}
-
-.service-card:hover::before {
-    opacity: 1;
-}
+    .service-card { display: flex; flex-direction: column; min-width: 0; height: 100%; background: #fff; border: 1px solid #dce6f0; border-radius: 18px; overflow: hidden; box-shadow: 0 12px 30px rgba(13,41,71,.07); transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease; }
+    .service-card:hover { transform: translateY(-5px); border-color: color-mix(in srgb, var(--card-accent), white 55%); box-shadow: 0 20px 38px rgba(13,41,71,.13); }
+    .service-card__visual { position: relative; isolation: isolate; min-height: 145px; display: flex; align-items: end; justify-content: space-between; gap: 12px; padding: 22px 24px; color: var(--card-accent); background: color-mix(in srgb, var(--card-accent), white 92%); overflow: hidden; }
+    .service-card__visual::before { content: ''; position: absolute; z-index: -1; width: 230px; height: 230px; right: -50px; top: -130px; border: 28px solid color-mix(in srgb, var(--card-accent), white 82%); border-radius: 50%; }
+    .service-card__visual::after { content: ''; position: absolute; z-index: -1; width: 130px; height: 130px; right: 58px; bottom: -98px; border: 1px solid color-mix(in srgb, var(--card-accent), white 57%); border-radius: 50%; }
+    .service-card__symbol { display: grid; place-items: center; width: 92px; height: 92px; flex: 0 0 92px; border-radius: 22px; background: #fff; border: 1px solid color-mix(in srgb, var(--card-accent), white 75%); box-shadow: 0 9px 20px rgba(21,56,89,.09); }
+    .service-card__symbol .work-icon, .service-card__symbol img { display: block; width: 68px; height: 68px; object-fit: contain; }
+    .service-card__category { max-width: 130px; color: color-mix(in srgb, var(--card-accent), #142b45 35%); font-size: .72rem; line-height: 1.4; font-weight: 700; text-align: right; }
+    .service-card__body { flex: 1; padding: 26px 26px 22px; }
+    .service-card__body h3 { margin: 0 0 11px; color: #102945; font-size: clamp(1.3rem, 2vw, 1.58rem); line-height: 1.28; letter-spacing: -.035em; font-weight: 800; }
+    .service-card__body h3 a { color: inherit; text-decoration: none; }
+    .service-card__body h3 a:hover { color: var(--card-accent); }
+    .service-card__description { color: #52677d; font-size: .93rem; line-height: 1.7; min-height: 4.8em; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; margin: 0 0 18px; }
+    .service-card__focus { display: flex; flex-wrap: wrap; gap: 7px; }
+    .service-card__focus span { padding: 6px 9px; border-radius: 6px; background: #f2f6fa; color: #405b75; font-size: .7rem; font-weight: 600; line-height: 1.35; }
+    .service-card__footer { border-top: 1px solid #e5ecf3; margin: 0 26px; padding: 17px 0 22px; }
+    .service-card__meta { display: flex; justify-content: space-between; align-items: end; gap: 10px; color: #718398; font-size: .73rem; }
+    .service-card__meta strong { color: #102945; font-size: .85rem; font-weight: 800; text-align: right; }
+    .service-card__meta small { display: block; color: #718398; font-size: .67rem; font-weight: 500; }
+    .service-card__action { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 18px; padding: 11px 14px; border-radius: 8px; color: #fff; background: #143856; text-decoration: none; font-size: .82rem; font-weight: 700; transition: background .2s ease; }
+    .service-card__action:hover { color: #fff; background: var(--card-accent); text-decoration: none; }
+    .service-card__action span { font-size: 1.1rem; line-height: 1; }
+    .service-card a:focus-visible { outline: 3px solid var(--card-accent); outline-offset: 3px; }
+    .service-card--compact .service-card__visual { min-height: 126px; }
+    .service-card--compact .service-card__symbol { width: 78px; height: 78px; flex-basis: 78px; border-radius: 18px; }
+    .service-card--compact .service-card__symbol .work-icon, .service-card--compact .service-card__symbol img { width: 58px; height: 58px; }
+    .service-card--compact .service-card__body { padding: 22px 22px 18px; }
+    .service-card--compact .service-card__footer { margin: 0 22px; }
+    .service-card--compact .service-card__body h3 { font-size: 1.32rem; }
+    @media (prefers-reduced-motion: reduce) { .service-card, .service-card__action { transition: none; } .service-card:hover { transform: none; } }
 </style>
+@endonce

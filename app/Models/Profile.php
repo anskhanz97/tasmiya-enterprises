@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
+use Illuminate\Support\Str;
 
 /**
  * Profile Model
@@ -61,6 +62,9 @@ class Profile extends Model
         'languages',
         'consultation_fee',
         'is_visible',
+        'presentation_sections',
+        'hide_profile_image',
+        'hide_banner_image',
     ];
 
     /**
@@ -87,7 +91,58 @@ class Profile extends Model
         'consultation_fee' => 'float',
         'is_visible' => 'boolean',
         'experience_years' => 'integer',
+        'presentation_sections' => 'array',
+        'hide_profile_image' => 'boolean',
+        'hide_banner_image' => 'boolean',
     ];
+
+    public const SECTION_TITLES = [
+        'about' => 'About me',
+        'skills' => 'Expertise & skills',
+        'projects' => 'Featured projects',
+        'services' => 'Services I offer',
+        'testimonials' => 'What clients say',
+    ];
+
+    public function presentationSections(): array
+    {
+        $saved = collect($this->presentation_sections ?? [])->keyBy('key');
+
+        return collect(self::SECTION_TITLES)->map(function ($title, $key) use ($saved) {
+            $item = $saved->get($key, []);
+
+            return [
+                'key' => $key,
+                'title' => $item['title'] ?? $title,
+                'description' => $item['description'] ?? '',
+                'visible' => (bool) ($item['visible'] ?? true),
+                'order' => (int) ($item['order'] ?? array_search($key, array_keys(self::SECTION_TITLES), true)),
+            ];
+        })->sortBy('order')->values()->all();
+    }
+
+    public function displayImageUrl(string $kind): ?string
+    {
+        if (! in_array($kind, ['profile', 'banner'], true) || $this->{"hide_{$kind}_image"}) {
+            return null;
+        }
+
+        $savedUrl = $this->{"{$kind}_image_url"};
+        if ($savedUrl) {
+            return $savedUrl;
+        }
+
+        $firstName = Str::slug(Str::before($this->user->name, ' '));
+        $base = "images/profiles/{$firstName}/" . ($kind === 'banner' ? 'banner' : 'image');
+        foreach (['webp', 'png'] as $extension) {
+            $path = "{$base}.{$extension}";
+            if (is_file(public_path($path))) {
+                return asset($path);
+            }
+        }
+
+        return null;
+    }
 
     /**
      * Relationship: User
@@ -174,6 +229,11 @@ class Profile extends Model
     public function services()
     {
         return $this->belongsToMany(Service::class, 'service_profile');
+    }
+
+    public function serviceOfferings()
+    {
+        return $this->hasMany(ServiceOffering::class);
     }
 
     /**
@@ -346,14 +406,14 @@ class Profile extends Model
      */
     public function hasImage(): bool
     {
-        return ! empty($this->profile_image_url) && $this->profile_image_url !== 'placeholder';
+        return $this->displayImageUrl('profile') !== null;
     }
 
     /**
      * Get profile image URL with fallback
      * 
      * Returns the profile image from organized directory or a placeholder avatar
-     * Image stored at: public/images/profiles/{firstname}/image.png
+     * Default image stored at: public/images/profiles/{firstname}/image.webp
      * 
      * Usage:
      * <img src="{{ $profile->getImageUrl() }}" />
@@ -362,32 +422,21 @@ class Profile extends Model
      */
     public function getImageUrl(): string
     {
-        // Try to get image from organized directory: public/images/profiles/{name}/image.png
-        $firstName = strtolower(explode(' ', $this->user->name)[0]);
-        $imagePath = "/images/profiles/{$firstName}/image.png";
-        $fullPath = public_path($imagePath);
-
-        if (file_exists($fullPath)) {
-            return asset($imagePath);
+        if ($image = $this->displayImageUrl('profile')) {
+            return $image;
         }
 
-        // Fallback to stored URL if available
-        if ($this->hasImage()) {
-            return $this->profile_image_url;
-        }
+        $initial = htmlspecialchars(strtoupper(substr($this->user->name, 0, 1)), ENT_QUOTES, 'UTF-8');
+        $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400"><rect width="400" height="400" fill="#d9e9e3"/><text x="50%" y="53%" dominant-baseline="middle" text-anchor="middle" fill="#174d50" font-family="Arial,sans-serif" font-size="190" font-weight="700">' . $initial . '</text></svg>';
 
-        // Generate placeholder avatar using user initials
-        $initials = substr($this->user->name, 0, 1);
-        $color = substr(md5($this->user->id), 0, 6); // Consistent color per user
-
-        return "https://via.placeholder.com/150/{$color}/FFFFFF?text={$initials}";
+        return 'data:image/svg+xml,' . rawurlencode($svg);
     }
 
     /**
      * Get banner/cover image URL for profile page
      * 
      * Returns the banner image from organized directory
-     * Image stored at: public/images/profiles/{firstname}/banner.png
+     * Default banner stored at: public/images/profiles/{firstname}/banner.webp
      * 
      * Usage:
      * <img src="{{ $profile->getBannerImageUrl() }}" class="cover-image" />
@@ -396,21 +445,7 @@ class Profile extends Model
      */
     public function getBannerImageUrl(): ?string
     {
-        // Try to get banner from organized directory: public/images/profiles/{name}/banner.png
-        $firstName = strtolower(explode(' ', $this->user->name)[0]);
-        $bannerPath = "/images/profiles/{$firstName}/banner.png";
-        $fullPath = public_path($bannerPath);
-
-        if (file_exists($fullPath)) {
-            return asset($bannerPath);
-        }
-
-        // Fallback to stored banner URL if available
-        if ($this->banner_image_url) {
-            return $this->banner_image_url;
-        }
-
-        return null;
+        return $this->displayImageUrl('banner');
     }
 
     /**

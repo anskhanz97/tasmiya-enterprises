@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Services\PaymentOptions;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class PaymentStoreRequest extends FormRequest
 {
@@ -22,8 +24,8 @@ class PaymentStoreRequest extends FormRequest
         return [
             'service_id' => ['nullable', 'exists:services,id'],
             'amount' => ['required', 'numeric', 'min:0.01', 'max:999999.99'],
-            'currency' => ['nullable', 'string', 'in:PKR,USD,EUR,GBP'],
-            'payment_method' => ['required', 'string', 'in:card,bank_transfer,cash,check'],
+            'currency' => ['nullable', 'string', 'in:PKR'],
+            'payment_method' => ['required', 'string', Rule::in(array_keys(PaymentOptions::available()))],
             'description' => ['nullable', 'string', 'max:500'],
         ];
     }

@@ -46,6 +46,7 @@ class Service extends Model
         'currency',
         'division_id',
         'is_active',
+        'created_by_profile_id',
     ];
 
     /**
@@ -106,6 +107,11 @@ class Service extends Model
     public function profiles()
     {
         return $this->belongsToMany(Profile::class, 'service_profile');
+    }
+
+    public function offerings()
+    {
+        return $this->hasMany(ServiceOffering::class);
     }
 
     /**
@@ -206,6 +212,10 @@ class Service extends Model
      */
     public function getTestimonialCount()
     {
+        if ($this->getAttribute('approved_testimonials_count') !== null) {
+            return (int) $this->getAttribute('approved_testimonials_count');
+        }
+
         return $this->testimonials()
             ->where('is_approved', true)
             ->count();
@@ -221,6 +231,10 @@ class Service extends Model
      */
     public function getSpecialistsCount()
     {
+        if ($this->getAttribute('specialists_count') !== null) {
+            return (int) $this->getAttribute('specialists_count');
+        }
+
         return $this->profiles()->count();
     }
 

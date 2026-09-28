@@ -144,6 +144,71 @@
     box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
 }
 
+/* Shared select treatment. The native control remains the form field; on
+   pointer devices app.js presents a themed option panel in its place. */
+select:not([multiple]):not([size]) {
+    border-radius: 10px !important;
+    cursor: pointer;
+    accent-color: #6054b5;
+}
+
+select:not([multiple]):not([size]):hover:not(:disabled) {
+    border-color: #8579ca !important;
+}
+
+select:not([multiple]):not([size]):focus-visible {
+    outline: 3px solid #e4dffa;
+    outline-offset: 2px;
+}
+
+.app-select-options {
+    position: fixed;
+    z-index: 10000;
+    max-height: min(300px, 50vh);
+    overflow-y: auto;
+    padding: 5px;
+    border: 1px solid #d9d8ec;
+    border-radius: 13px;
+    background: #fff;
+    box-shadow: 0 16px 38px rgba(28, 34, 77, .18);
+    color: #213355;
+    font-family: inherit;
+}
+
+.app-select-option {
+    display: block;
+    width: 100%;
+    margin: 0;
+    padding: 10px 12px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: 14px;
+    line-height: 1.35;
+    text-align: left;
+    cursor: pointer;
+}
+
+.app-select-option:hover,
+.app-select-option[data-active="true"],
+.app-select-option:focus-visible {
+    outline: none;
+    background: #ece9fa;
+    color: #483d9c;
+}
+
+.app-select-option[aria-selected="true"] {
+    color: #473b9a;
+    font-weight: 700;
+}
+
+.app-select-option:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+}
+
 .form-control.is-invalid:focus,
 .form-select.is-invalid:focus {
     border-color: #dc3545;

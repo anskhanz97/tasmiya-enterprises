@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\ContactInquiry;
+use App\Models\SiteSetting;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -11,7 +12,7 @@ class WhatsAppService
     /**
      * WhatsApp Business API base URL
      */
-    private const API_BASE_URL = 'https://graph.instagram.com/v18.0';
+    private const API_BASE_URL = 'https://graph.facebook.com/v23.0';
 
     /**
      * Business phone number ID (from .env)
@@ -28,8 +29,8 @@ class WhatsAppService
      */
     public function __construct()
     {
-        $this->phoneNumberId = config('services.whatsapp.business_phone_id');
-        $this->accessToken = config('services.whatsapp.api_token');
+        $this->phoneNumberId = SiteSetting::get('integration_whatsapp_phone_id') ?: (config('services.whatsapp.business_phone_id') ?: '');
+        $this->accessToken = SiteSetting::get('integration_whatsapp_access_token') ?: (config('services.whatsapp.api_token') ?: '');
     }
 
     /**
@@ -83,7 +84,7 @@ class WhatsAppService
                 ];
             }
 
-            $response = Http::withToken($this->accessToken)
+            $response = Http::timeout(8)->withToken($this->accessToken)
                 ->post(
                     self::API_BASE_URL . "/{$this->phoneNumberId}/messages",
                     $payload
@@ -183,14 +184,15 @@ class WhatsAppService
      */
     public function verifyWebhookSignature(string $payload, string $signature): bool
     {
-        if (!config('services.whatsapp.api_token')) {
+        $appSecret = SiteSetting::get('integration_whatsapp_app_secret') ?: config('services.whatsapp.app_secret');
+        if (! $appSecret || ! str_starts_with($signature, 'sha256=')) {
             return false;
         }
 
         $hash = hash_hmac(
             'sha256',
             $payload,
-            config('services.whatsapp.api_token')
+            $appSecret
         );
 
         return hash_equals("sha256={$hash}", $signature);
@@ -219,6 +221,18 @@ class WhatsAppService
     private function isConfigured(): bool
     {
         return !empty($this->phoneNumberId) && !empty($this->accessToken);
+    }
+
+    public function notifyCompanyAboutInquiry(ContactInquiry $inquiry): bool
+    {
+        $number = SiteSetting::get('integration_company_whatsapp');
+        $template = SiteSetting::get('integration_whatsapp_template_name');
+        if (! $number || ! $template || ! $this->isConfigured()) return false;
+
+        $summary = "{$inquiry->name}: {$inquiry->subject} (inquiry #{$inquiry->id})";
+        return $this->sendMessage($number, $summary, $template, [
+            ['type' => 'text', 'text' => mb_substr($summary, 0, 500)],
+        ]);
     }
 
     /**

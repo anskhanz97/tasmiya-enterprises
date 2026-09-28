@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProfileServiceOfferingController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\TestimonialController;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -16,7 +18,18 @@ use Illuminate\Support\Facades\Route;
  * Shows welcome/home page with company overview and divisions
  */
 Route::get('/', function () {
-    return view('home');
+    $divisions = \App\Models\Division::all();
+    $services = \App\Models\ServiceOffering::query()
+        ->whereHas('service', fn ($query) => $query->active())
+        ->whereHas('profile', fn ($query) => $query->visible())
+        ->with(['service.division', 'profile.user'])->get()->shuffle();
+    $featuredServices = collect([
+        $services->first(fn ($offering) => $offering->service->division?->slug === 'fbr-taxation'),
+        $services->first(fn ($offering) => $offering->service->division?->slug === 'tech-support'),
+    ])->merge($services->filter(fn ($offering) => $offering->service->division?->slug === 'it-digital')->take(2))->filter();
+    $featuredTeam = \App\Models\Profile::with('user.division')->visible()->limit(6)->get();
+
+    return view('home', compact('divisions', 'featuredServices', 'featuredTeam'));
 })->name('home');
 
 /**
@@ -28,6 +41,10 @@ Route::get('/', function () {
 Route::get('/about', function () {
     return view('pages.about');
 })->name('about');
+
+Route::get('/faq', function () {
+    return view('pages.faq');
+})->name('faq');
 
 Route::get('/privacy', function () {
     return view('pages.privacy');
@@ -173,6 +190,15 @@ Route::get('/settings', [\App\Http\Controllers\SettingsController::class, 'index
 Route::put('/settings/social', [\App\Http\Controllers\SettingsController::class, 'updateSocialLinks'])
     ->middleware('auth')
     ->name('settings.social.update');
+Route::put('/settings/integrations', [\App\Http\Controllers\SettingsController::class, 'updateIntegrations'])
+    ->middleware('auth')
+    ->name('settings.integrations.update');
+Route::get('/settings/whatsapp/templates', [\App\Http\Controllers\SettingsController::class, 'whatsappTemplates'])
+    ->middleware('auth')
+    ->name('settings.whatsapp.templates');
+Route::post('/settings/google/verify', [\App\Http\Controllers\SettingsController::class, 'verifyGooglePicker'])
+    ->middleware('auth')
+    ->name('settings.google.verify');
 
 /**
  * ========== PROFILE ROUTES ==========
@@ -247,6 +273,13 @@ Route::put('/profiles/{profile}', [ProfileController::class, 'update'])
     ->middleware('auth')
     ->name('profiles.update');
 
+Route::middleware('auth')->group(function () {
+    Route::get('/profiles/{profile}/services', [ProfileServiceOfferingController::class, 'index'])->name('profiles.services.index');
+    Route::post('/profiles/{profile}/services', [ProfileServiceOfferingController::class, 'store'])->name('profiles.services.store');
+    Route::put('/profiles/{profile}/services/{offering}', [ProfileServiceOfferingController::class, 'update'])->name('profiles.services.update');
+    Route::delete('/profiles/{profile}/services/{offering}', [ProfileServiceOfferingController::class, 'destroy'])->name('profiles.services.destroy');
+});
+
 /**
  * Delete profile
  * DELETE /profiles/{profile}
@@ -315,6 +348,12 @@ Route::get('/profiles/{profile}', [ProfileController::class, 'show'])
 Route::get('/services', [ServiceController::class, 'index'])
     ->name('services.index');
 
+// Register the literal path before /services/{service} so "create" is not
+// interpreted as a service identifier.
+Route::get('/services/create', [ServiceController::class, 'create'])
+    ->middleware('auth')
+    ->name('services.create');
+
 /**
  * Show single service with details and testimonials
  * GET /services/{service}
@@ -338,10 +377,6 @@ Route::get('/services/{service}', [ServiceController::class, 'show'])
  * 
  * Authorization: Must be admin (checked in controller via policy)
  */
-Route::get('/services/create', [ServiceController::class, 'create'])
-    ->middleware('auth')
-    ->name('services.create');
-
 /**
  * Store new service (Admin only)
  * POST /services
@@ -563,6 +598,12 @@ Route::post('/payments', [\App\Http\Controllers\PaymentController::class, 'store
 Route::get('/payments/{payment}', [\App\Http\Controllers\PaymentController::class, 'show'])
     ->middleware('auth')
     ->name('payments.show');
+Route::post('/payments/{payment}/proof', [\App\Http\Controllers\PaymentController::class, 'submitProof'])
+    ->middleware('auth')->name('payments.proof.store');
+Route::get('/payments/{payment}/proof', [\App\Http\Controllers\PaymentController::class, 'proof'])
+    ->middleware('auth')->name('payments.proof.show');
+Route::post('/payments/{payment}/review', [\App\Http\Controllers\PaymentController::class, 'review'])
+    ->middleware('auth')->name('payments.review');
 
 // Confirm payment
 Route::post('/payments/{payment}/confirm', [\App\Http\Controllers\PaymentController::class, 'confirm'])
@@ -590,6 +631,8 @@ Route::post('/webhooks/stripe', [\App\Http\Controllers\PaymentController::class,
     ->name('webhooks.stripe');
 
 // WhatsApp webhook (Phase 5)
+Route::get('/webhooks/whatsapp', [\App\Http\Controllers\WhatsAppController::class, 'verifyWebhook'])
+    ->name('webhooks.whatsapp.verify');
 Route::post('/webhooks/whatsapp', [\App\Http\Controllers\WhatsAppController::class, 'handleWebhook'])
     ->name('webhooks.whatsapp');
 
@@ -604,6 +647,7 @@ Route::get('/contact', [\App\Http\Controllers\ContactInquiryController::class, '
 
 // Submit inquiry
 Route::post('/contact', [\App\Http\Controllers\ContactInquiryController::class, 'store'])
+    ->middleware('throttle:5,1')
     ->name('contact.store');
 
 /**

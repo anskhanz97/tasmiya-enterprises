@@ -72,9 +72,9 @@ class ProfileSeeder extends Seeder
             // Experience
             'experience_years' => 12,
             
-            // Profile Image (Phase 5 integration)
-            'profile_image_url' => null,
-            'banner_image_url' => null,
+            // Optimized local defaults; admins can replace either image in the portal.
+            'profile_image_url' => '/images/profiles/atif/image.webp',
+            'banner_image_url' => '/images/profiles/atif/banner.webp',
             
             // Contact Information (WhatsApp, LinkedIn, etc.)
             'social_links' => [
@@ -122,8 +122,8 @@ class ProfileSeeder extends Seeder
                 'Brand Elevation',
             ],
             'experience_years' => 4,
-            'profile_image_url' => null,
-            'banner_image_url' => null,
+            'profile_image_url' => '/images/profiles/waseem/image.webp',
+            'banner_image_url' => '/images/profiles/waseem/banner.webp',
             'social_links' => [
                 'whatsapp' => '+92-303-4829937',
                 'linkedin' => 'linkedin.com/in/waseemasghar',
@@ -161,8 +161,8 @@ class ProfileSeeder extends Seeder
                 'Database-Driven Design',
             ],
             'experience_years' => 3,
-            'profile_image_url' => null,
-            'banner_image_url' => null,
+            'profile_image_url' => '/images/profiles/ans/image.webp',
+            'banner_image_url' => '/images/profiles/ans/banner.webp',
             'social_links' => [
                 'whatsapp' => '+92-305-1852884',
                 'linkedin' => 'linkedin.com/in/anskhan',
@@ -199,8 +199,8 @@ class ProfileSeeder extends Seeder
                 'Technical Solutions',
             ],
             'experience_years' => 5,
-            'profile_image_url' => null,
-            'banner_image_url' => null,
+            'profile_image_url' => '/images/profiles/nazim/image.webp',
+            'banner_image_url' => '/images/profiles/nazim/banner.webp',
             'social_links' => [
                 'whatsapp' => '+92-320-5889344',
                 'linkedin' => 'linkedin.com/in/nazimrauf',

@@ -20,6 +20,8 @@ class ContactInquiry extends Model
         'source',
         'source_type',
         'status',
+        'email_delivery_status',
+        'whatsapp_delivery_status',
         'assigned_to',
         'notes',
         'responded_at',

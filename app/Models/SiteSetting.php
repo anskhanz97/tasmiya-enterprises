@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Crypt;
 
 class SiteSetting extends Model
 {
@@ -21,7 +22,10 @@ class SiteSetting extends Model
     {
         return Cache::remember("setting_{$key}", 3600, function () use ($key, $default) {
             $setting = static::where('key', $key)->first();
-            return $setting ? $setting->value : $default;
+            if (! $setting) return $default;
+            return $setting->type === 'secret' && $setting->value
+                ? Crypt::decryptString($setting->value)
+                : $setting->value;
         });
     }
 
@@ -33,7 +37,7 @@ class SiteSetting extends Model
         static::updateOrCreate(
             ['key' => $key],
             [
-                'value' => $value,
+                'value' => $type === 'secret' && $value ? Crypt::encryptString($value) : $value,
                 'type' => $type,
                 'description' => $description,
             ]
@@ -47,11 +51,17 @@ class SiteSetting extends Model
      */
     public static function getSocialLinks(): array
     {
-        return [
-            'facebook' => static::get('social_facebook'),
-            'twitter' => static::get('social_twitter'),
-            'linkedin' => static::get('social_linkedin'),
-            'instagram' => static::get('social_instagram'),
-        ];
+        $saved = static::get('social_links');
+        if ($saved !== null) {
+            $links = json_decode($saved, true);
+            return is_array($links) ? array_values(array_filter($links, fn ($link) => is_array($link) && isset($link['label'], $link['url']))) : [];
+        }
+
+        // Legacy settings remain visible until an admin saves the new ordered list.
+        $links = [];
+        foreach (['facebook' => 'Facebook', 'twitter' => 'X', 'linkedin' => 'LinkedIn', 'instagram' => 'Instagram'] as $key => $label) {
+            if ($url = static::get('social_'.$key)) $links[] = ['label' => $label, 'url' => $url];
+        }
+        return $links;
     }
 }

@@ -13,7 +13,7 @@ class PaymentPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,7 +21,7 @@ class PaymentPolicy
      */
     public function view(User $user, Payment $payment): bool
     {
-        return false;
+        return $user->isAdmin() || $payment->user_id === $user->id;
     }
 
     /**
@@ -29,7 +29,7 @@ class PaymentPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -37,7 +37,7 @@ class PaymentPolicy
      */
     public function update(User $user, Payment $payment): bool
     {
-        return false;
+        return $user->isAdmin();
     }
 
     /**

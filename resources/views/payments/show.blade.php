@@ -1,193 +1,23 @@
 @extends('layouts.app')
-
+@section('title','Payment '.$payment->id)
 @section('content')
-<div class="container mx-auto px-4 py-8">
-    <div class="max-w-2xl mx-auto">
-        
-        @if (session('success'))
-            <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-                <p class="text-green-800">✓ {{ session('success') }}</p>
-            </div>
-        @endif
-
-        @if (session('error'))
-            <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-                <p class="text-red-800">✗ {{ session('error') }}</p>
-            </div>
-        @endif
-
-        <!-- Payment Details Card -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-            <h1 class="text-3xl font-bold mb-6">Payment Details</h1>
-
-            <div class="grid grid-cols-2 gap-6 mb-6">
-                <!-- Payment ID -->
-                <div>
-                    <p class="text-sm text-gray-600">Payment ID</p>
-                    <p class="text-lg font-semibold text-gray-900">#{{ $payment->id }}</p>
-                </div>
-
-                <!-- Status -->
-                <div>
-                    <p class="text-sm text-gray-600">Status</p>
-                    <span class="inline-block mt-1 px-3 py-1 rounded-full text-sm font-semibold
-                        @if($payment->status === 'completed') bg-green-100 text-green-800
-                        @elseif($payment->status === 'pending') bg-yellow-100 text-yellow-800
-                        @elseif($payment->status === 'processing') bg-blue-100 text-blue-800
-                        @elseif($payment->status === 'failed') bg-red-100 text-red-800
-                        @elseif($payment->status === 'refunded') bg-gray-100 text-gray-800
-                        @endif
-                    ">
-                        {{ ucfirst($payment->status) }}
-                    </span>
-                </div>
-
-                <!-- Amount -->
-                <div>
-                    <p class="text-sm text-gray-600">Amount</p>
-                    <p class="text-2xl font-bold text-gray-900">{{ number_format($payment->amount, 2) }} {{ $payment->currency }}</p>
-                </div>
-
-                <!-- Payment Method -->
-                <div>
-                    <p class="text-sm text-gray-600">Payment Method</p>
-                    <p class="text-lg font-semibold text-gray-900">{{ ucwords(str_replace('_', ' ', $payment->payment_method)) }}</p>
-                </div>
-            </div>
-
-            <hr class="my-6">
-
-            <!-- Additional Details -->
-            <div class="space-y-4">
-                @if($payment->service)
-                    <div>
-                        <p class="text-sm text-gray-600">Service</p>
-                        <p class="text-gray-900">{{ $payment->service->name }}</p>
-                    </div>
-                @endif
-
-                @if($payment->description)
-                    <div>
-                        <p class="text-sm text-gray-600">Description</p>
-                        <p class="text-gray-900">{{ $payment->description }}</p>
-                    </div>
-                @endif
-
-                <div>
-                    <p class="text-sm text-gray-600">Payer</p>
-                    <p class="text-gray-900">{{ $payment->user->name }} ({{ $payment->user->email }})</p>
-                </div>
-
-                <div>
-                    <p class="text-sm text-gray-600">Payment Date</p>
-                    <p class="text-gray-900">{{ $payment->created_at->format('M d, Y \a\t H:i A') }}</p>
-                </div>
-
-                @if($payment->paid_at)
-                    <div>
-                        <p class="text-sm text-gray-600">Paid At</p>
-                        <p class="text-gray-900">{{ $payment->paid_at->format('M d, Y \a\t H:i A') }}</p>
-                    </div>
-                @endif
-
-                @if($payment->stripe_payment_intent_id)
-                    <div>
-                        <p class="text-sm text-gray-600">Stripe Intent ID</p>
-                        <p class="text-gray-900 font-mono text-xs">{{ $payment->stripe_payment_intent_id }}</p>
-                    </div>
-                @endif
-            </div>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="space-y-3">
-            @if($payment->isPending() && $payment->payment_method === 'card')
-                <form action="{{ route('payments.confirm', $payment) }}" method="POST">
-                    @csrf
-                    <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg transition">
-                        ✓ Confirm Payment
-                    </button>
-                </form>
-            @endif
-
-            @if($payment->canBeRefunded())
-                <button onclick="showRefundModal()" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold py-2 rounded-lg transition">
-                    ↩ Request Refund
-                </button>
-            @endif
-
-            <a href="{{ route('payments.index') }}" class="block text-center bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 rounded-lg transition">
-                ← Back to Payments
-            </a>
-        </div>
-
-        <!-- Invoice/Receipt Section -->
-        @if($payment->isCompleted())
-            <div class="bg-gray-50 rounded-lg p-6 mt-8">
-                <h2 class="text-xl font-bold mb-4">📄 Receipt</h2>
-                <div class="bg-white p-4 rounded border border-gray-200">
-                    <p class="text-sm text-gray-600">Invoice #{{ $payment->invoice_number ?? $payment->id }}</p>
-                    <p class="text-sm text-gray-600">Date: {{ $payment->created_at->format('M d, Y') }}</p>
-                    <p class="text-2xl font-bold my-4">{{ number_format($payment->amount, 2) }} {{ $payment->currency }}</p>
-                    <p class="text-sm text-gray-600">Status: Paid</p>
-                </div>
-                <button onclick="window.print()" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
-                    🖨 Print Receipt
-                </button>
-            </div>
-        @endif
-    </div>
-</div>
-
-<!-- Refund Modal -->
-<div id="refundModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-        <h2 class="text-2xl font-bold mb-4">Request Refund</h2>
-        
-        <form action="{{ route('payments.refund', $payment) }}" method="POST">
-            @csrf
-            
-            <div class="mb-4">
-                <label for="reason" class="block text-sm font-medium text-gray-700 mb-2">Reason</label>
-                <select name="reason" id="reason" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
-                    <option value="requested_by_customer">Requested by Customer</option>
-                    <option value="duplicate">Duplicate Charge</option>
-                    <option value="fraudulent">Fraudulent</option>
-                    <option value="general">Other</option>
-                </select>
-            </div>
-
-            <div class="mb-6">
-                <label for="notes" class="block text-sm font-medium text-gray-700 mb-2">Additional Notes</label>
-                <textarea name="notes" id="notes" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Explain why you need a refund..."></textarea>
-            </div>
-
-            <div class="flex gap-3">
-                <button type="button" onclick="closeRefundModal()" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
-                    Cancel
-                </button>
-                <button type="submit" class="flex-1 px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg">
-                    Submit Refund Request
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<script>
-    function showRefundModal() {
-        document.getElementById('refundModal').classList.remove('hidden');
-    }
-
-    function closeRefundModal() {
-        document.getElementById('refundModal').classList.add('hidden');
-    }
-
-    // Close modal when clicking outside
-    document.getElementById('refundModal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeRefundModal();
-        }
-    });
-</script>
+@php $destination=$payment->destination_snapshot ?: ($methods[$payment->payment_method] ?? null); @endphp
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
+.pd{background:#f4f5fa;min-height:100vh;padding:36px clamp(16px,4vw,60px) 90px;color:#1c2851;font-family:'DM Sans',sans-serif}.pd *{box-sizing:border-box}.pd-inner{max-width:1050px;margin:auto}.pd a{color:#574aae}.pd-back{font-size:13px;font-weight:800;text-decoration:none}.pd-head{display:flex;justify-content:space-between;gap:20px;align-items:end;margin:25px 0}.pd h1,.pd h2{font-family:Outfit;letter-spacing:-.04em}.pd h1{font-size:clamp(35px,4vw,55px);margin:0}.pd-status{padding:10px 14px;background:#fff2ce;color:#7e5b19;border-radius:9px;font-weight:800;font-size:12px}.pd-status.completed{background:#ddf3e9;color:#176747}.pd-status.failed{background:#ffe2df;color:#8c3f39}.pd-status.processing{background:#e7e7fa;color:#534a9b}.pd-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}.pd-card{background:white;border:1px solid #e0e4f1;border-radius:17px;padding:28px;margin-bottom:17px}.pd-card h2{font-size:26px;margin:0 0 17px}.pd-card p{color:#64708b;line-height:1.6;font-size:14px}.pd-amount{font:700 clamp(39px,5vw,66px) Outfit;letter-spacing:-.05em;margin-bottom:18px}.pd-data{display:grid;grid-template-columns:1fr 1fr;gap:19px}.pd-data small{display:block;color:#7a85a0;font-weight:700;margin-bottom:5px}.pd-data strong{font-size:14px;overflow-wrap:anywhere}.pd-destination{background:#eceafa}.pd-destination strong{display:block;font-size:17px;overflow-wrap:anywhere;margin:6px 0 14px}.pd-field{margin-bottom:16px}.pd-field label{display:block;font-weight:800;font-size:13px;margin-bottom:8px}.pd-field input,.pd-field textarea,.pd-field select{display:block;width:100%;border:1px solid #cdd3e5;border-radius:9px;padding:11px;font:500 14px 'DM Sans',sans-serif}.pd-button{display:inline-block;border:0;background:#5a4eac;color:white!important;text-decoration:none;padding:12px 18px;border-radius:9px;font:800 13px 'DM Sans',sans-serif;cursor:pointer}.pd-button:hover{background:#413795}.pd-button-danger{background:#8e4d60}.pd-note{font-size:12px!important}.pd-alert{padding:13px 16px;background:#e3f2ea;color:#176747;border-radius:10px;margin-bottom:17px}.pd-alert-error{background:#ffe5e2;color:#8c3f39}
+@media(max-width:720px){.pd-grid,.pd-data{grid-template-columns:1fr}.pd-head{display:block}.pd-status{display:inline-block;margin-top:13px}}
+</style>
+<main class="pd"><div class="pd-inner"><a class="pd-back" href="{{ route('payments.index') }}">Back to payments</a><div class="pd-head"><h1>Payment #{{ $payment->id }}</h1><span class="pd-status {{ $payment->status }}">{{ ucfirst($payment->status) }}</span></div>
+@if(session('success'))<div class="pd-alert" role="status">{{ session('success') }}</div>@endif
+@if(session('error'))<div class="pd-alert pd-alert-error" role="alert">{{ session('error') }}</div>@endif
+@if($errors->any())<div class="pd-alert pd-alert-error" role="alert">{{ $errors->first() }}</div>@endif
+<div class="pd-grid"><div>
+<section class="pd-card"><div class="pd-amount">PKR {{ number_format($payment->amount,2) }}</div><div class="pd-data"><div><small>Method</small><strong>{{ $destination['label'] ?? ucwords(str_replace('_',' ',$payment->payment_method)) }}</strong></div><div><small>Created</small><strong>{{ $payment->created_at->format('j M Y, g:i A') }}</strong></div><div><small>Service</small><strong>{{ $payment->service?->name ?? 'Custom payment' }}</strong></div><div><small>Transaction reference</small><strong>{{ $payment->payment_reference ?: 'Not submitted' }}</strong></div></div>@if($payment->description)<p>{{ $payment->description }}</p>@endif</section>
+@if($payment->payment_method !== 'card')
+<section class="pd-card pd-destination"><h2>Transfer instructions</h2>@if($destination)<p>Send the exact amount to this {{ strtolower($destination['label']) }} destination in your bank or wallet app.</p>@if($destination['bank'])<span>Bank: {{ $destination['bank'] }}</span>@endif<strong>{{ $destination['destination'] }}</strong>@if($destination['owner'])<p>Account title: {{ $destination['owner'] }}</p>@endif @else<p>The receiving details have changed. Please contact Tasmiya before transferring funds.</p>@endif<p class="pd-note">A transfer is not completed on this website. Submit your app's transaction reference after sending funds.</p></section>
+@if($payment->status === 'pending' && $payment->user_id === auth()->id())<section class="pd-card"><h2>Submit transfer reference</h2><p>After sending the money, enter the reference shown by your bank or wallet. A receipt image or PDF helps the team find the transaction.</p><form method="POST" action="{{ route('payments.proof.store',$payment) }}" enctype="multipart/form-data">@csrf<div class="pd-field"><label for="payment_reference">Transaction reference</label><input id="payment_reference" name="payment_reference" maxlength="120" required value="{{ old('payment_reference') }}"></div><div class="pd-field"><label for="payment_proof">Receipt (optional, private)</label><input id="payment_proof" name="payment_proof" type="file" accept=".jpg,.jpeg,.png,.pdf"><small>JPG, PNG or PDF up to 5 MB.</small></div><button class="pd-button" type="submit">Send for verification</button></form></section>@endif
+@endif
+</div><aside><section class="pd-card"><h2>Payment status</h2>@if($payment->status==='pending')<p>Waiting for your transfer reference. No payment has been verified yet.</p>@elseif($payment->status==='processing')<p>Your reference is with the team. They will verify receipt in the destination account.</p>@elseif($payment->status==='completed')<p>Verified and marked paid{{ $payment->paid_at ? ' on '.$payment->paid_at->format('j M Y') : '' }}.</p>@elseif($payment->status==='failed')<p>Not verified. Contact the team if you believe this is an error.</p>@else<p>{{ ucfirst($payment->status) }}.</p>@endif @if($payment->payment_proof_path)<p><a href="{{ route('payments.proof.show',$payment) }}">Download submitted receipt</a></p>@endif</section>
+@if(auth()->user()?->isAdmin() && $payment->payment_method !== 'card' && in_array($payment->status,['pending','processing']))<section class="pd-card"><h2>Admin verification</h2><p>Check the actual receiving account before marking paid. The reference alone does not confirm funds.</p><form method="POST" action="{{ route('payments.review',$payment) }}">@csrf<div class="pd-field"><label for="notes">Review notes</label><textarea id="notes" name="notes" rows="3">{{ $payment->notes }}</textarea></div><button class="pd-button" type="submit" name="decision" value="completed" @disabled(!$payment->payment_reference)>Mark paid after verification</button><button class="pd-button pd-button-danger" type="submit" name="decision" value="failed" style="margin-top:9px">Reject reference</button></form></section>@endif
+</aside></div></div></main>
 @endsection

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Service;
+use App\Models\ServiceOffering;
 use App\Models\Division;
 use App\Http\Requests\StoreServiceRequest;
 use App\Http\Requests\UpdateServiceRequest;
@@ -73,26 +74,25 @@ class ServiceController extends Controller
      */
     public function index(Request $request)
     {
-        // Eager load division and testimonials to prevent N+1 queries
-        // testimonials relation is constrained to only approved testimonials
-        $services = Service::query()
-            ->active() // Only show active services
+        // The listing needs counts, not full testimonial/profile collections.
+        $services = ServiceOffering::query()
+            ->whereHas('service', fn ($query) => $query->active())
+            ->whereHas('profile', fn ($query) => $query->visible())
             ->with([
-                'division',
-                'testimonials' => function ($query) {
-                    $query->where('is_approved', true);
-                }
+                'service' => fn ($query) => $query->with('division')->withCount([
+                    'testimonials as approved_testimonials_count' => fn ($reviews) => $reviews->where('is_approved', true),
+                ]),
+                'profile.user',
             ])
-            ->orderBy('division_id')
-            ->orderBy('name')
+            ->orderBy('service_id')
             ->get();
 
         // Group services by division for better organization in view
-        $servicesByDivision = $services->groupBy('division_id');
+        $servicesByDivision = $services->groupBy(fn ($offering) => $offering->service->division_id);
 
         // Calculate totals
         $totalServices = $services->count();
-        $totalReviews = $services->sum(fn($s) => $s->getTestimonialCount());
+        $totalReviews = $services->pluck('service')->unique('id')->sum(fn ($service) => $service->getTestimonialCount());
 
         return view('services.index', [
             'servicesByDivision' => $servicesByDivision,
@@ -138,7 +138,7 @@ class ServiceController extends Controller
         // Eager load profiles with their division info
         $service->load([
             'profiles' => function ($query) {
-                $query->visible()->with('division');
+                $query->visible()->with(['division', 'user']);
             },
             'division',
         ]);
@@ -153,7 +153,12 @@ class ServiceController extends Controller
         // Calculate statistics for display
         $averageRating = $service->getAverageRating();
         $reviewCount = $service->getTestimonialCount();
-        $specialistsCount = $service->getSpecialistsCount();
+        $visibleOfferings = $service->offerings()
+            ->whereHas('profile', fn ($query) => $query->visible())
+            ->with('profile.user')->get();
+        $specialistsCount = $visibleOfferings->count();
+        $selectedOffering = $visibleOfferings->firstWhere('profile_id', (int) request()->query('profile'));
+        $displayOffering = $selectedOffering ?? $visibleOfferings->sortBy(fn ($offering) => (float) $offering->price())->first();
 
         return view('services.show', [
             'service' => $service,
@@ -161,6 +166,8 @@ class ServiceController extends Controller
             'averageRating' => $averageRating,
             'reviewCount' => $reviewCount,
             'specialistsCount' => $specialistsCount,
+            'visibleOfferings' => $visibleOfferings,
+            'displayOffering' => $displayOffering,
         ]);
     }
 

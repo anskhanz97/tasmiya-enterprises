@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Tasmiya Enterprises - Business Solutions')
+@section('title', 'Business Solutions')
 
 @section('content')
 <style>
@@ -30,7 +30,7 @@
             radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.25) 0%, transparent 50%),
             radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.25) 0%, transparent 50%),
             radial-gradient(circle at 50% 20%, rgba(16, 185, 129, 0.15) 0%, transparent 50%);
-        animation: gradientShift 15s ease infinite;
+        /* Keep the layered light while avoiding a full-viewport repaint loop. */
     }
     
     @keyframes gradientShift {
@@ -53,7 +53,6 @@
             url('data:image/svg+xml,<svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg"><rect x="40" y="40" width="40" height="40" fill="rgba(168,85,247,0.1)" transform="rotate(45 60 60)"/></svg>');
         background-size: 100px 100px, 150px 150px, 120px 120px;
         background-position: 0% 0%, 50% 50%, 100% 100%;
-        animation: floatShapes 30s linear infinite;
         pointer-events: none;
     }
     
@@ -249,9 +248,6 @@
     /* Section */
     .section {
         margin-bottom: 140px;
-        opacity: 0;
-        transform: translateY(50px);
-        animation: fadeInSection 0.8s ease-out forwards;
     }
     
     @keyframes fadeInSection {
@@ -310,7 +306,6 @@
             radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
             radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
             radial-gradient(circle at 50% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 50%);
-        animation: teamGradientShift 20s ease infinite;
         pointer-events: none;
     }
     
@@ -330,7 +325,6 @@
             radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
             radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
         background-size: 50px 50px;
-        animation: teamDotPattern 30s linear infinite;
         pointer-events: none;
     }
     
@@ -373,229 +367,32 @@
     }
 
     
-    /* Why Choose Grid - 3D Cards */
-    .why-choose-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-        gap: 40px;
-        margin-bottom: 60px;
-    }
-    
-    .why-card {
-        background: white;
-        padding: 50px 40px;
-        border-radius: 24px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-        transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-        text-align: center;
-        border: 2px solid transparent;
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .why-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-    
-    .why-card:hover {
-        transform: translateY(-12px);
-        box-shadow: 0 20px 50px rgba(59, 130, 246, 0.2);
-    }
-    
-    .why-card:hover::before {
-        opacity: 1;
-    }
-    
-    .why-card-icon {
-        font-size: 4rem;
-        margin-bottom: 2rem;
-        display: inline-block;
-        transition: transform 0.4s ease;
-        position: relative;
-        z-index: 2;
-    }
-    
-    .why-card:hover .why-card-icon {
-        transform: scale(1.15);
-    }
-    
-    .why-card h3 {
-        font-size: 1.6rem;
-        font-weight: 800;
-        color: #0f172a;
-        margin-bottom: 1.2rem;
-        position: relative;
-        z-index: 2;
-        transition: color 0.3s ease;
-    }
-    
-    .why-card:hover h3 {
-        color: #3b82f6;
-    }
-    
-    .why-card p {
-        color: #64748b;
-        line-height: 1.8;
-        margin: 0;
-        font-size: 1.05rem;
-        position: relative;
-        z-index: 2;
-        transition: color 0.3s ease;
-    }
-    
-    .why-card:hover p {
-        color: #475569;
-    }
+    /* Service entry grids */
+    .why-choose-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin-bottom: 60px; }
+    .featured-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; }
+    @media (max-width: 1120px) { .why-choose-grid { gap: 18px; } .featured-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 830px) { .why-choose-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 600px) { .featured-grid { grid-template-columns: 1fr; } }
 
-    
-    .learn-more {
-        display: inline-block;
-        margin-top: 2rem;
-        padding: 12px 28px;
-        background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-        color: #3b82f6;
-        text-decoration: none;
-        border-radius: 8px;
-        font-weight: 700;
-        font-size: 0.95rem;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        z-index: 2;
-        overflow: hidden;
-    }
-    
-    .learn-more::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.3), transparent);
-        transition: left 0.5s ease;
-    }
-    
-    .learn-more:hover::before {
-        left: 100%;
-    }
-    
-    .learn-more:hover {
-        background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-        color: white;
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
-    }
-    
-    /* Featured Items Grid - 3D Perspective Cards */
-    .featured-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 35px;
-    }
-    
-    .featured-item {
-        background: white;
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
-        display: flex;
-        flex-direction: column;
-        position: relative;
-    }
-    
-    .featured-item::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        pointer-events: none;
-    }
-    
-    .featured-item:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 20px 50px rgba(59, 130, 246, 0.25);
-    }
-    
-    .featured-item:hover::after {
-        opacity: 1;
-    }
-    
-    .featured-item-header {
-        height: 180px;
-        background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 3rem;
-        color: white;
-        position: relative;
-        overflow: hidden;
-        transition: transform 0.3s ease;
-    }
-    
-    .featured-item-header::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
-        animation: rotate 10s linear infinite;
-    }
-    
-    @keyframes rotate {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-    
-    .featured-item:hover .featured-item-header {
-        transform: scale(1.05);
-    }
-    
-    .featured-item-body {
-        padding: 30px;
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-        position: relative;
-        z-index: 2;
-    }
-    
-    .featured-item h3 {
-        font-size: 1.3rem;
-        font-weight: 800;
-        color: #0f172a;
-        margin-bottom: 1rem;
-        transition: color 0.3s ease;
-    }
-    
-    .featured-item:hover h3 {
-        color: #3b82f6;
-    }
-    
-    .featured-item p {
-        color: #64748b;
-        font-size: 1rem;
-        line-height: 1.7;
-        flex-grow: 1;
-        margin: 0;
-    }
-    
+    /* Three practice cards read like concise service briefs, not emoji tiles. */
+    .division-card { --practice-color: #1e3a8a; position: relative; display: flex; flex-direction: column; min-height: 420px; padding: 30px; border: 1px solid #dbe4ef; border-radius: 18px; background: #fff; box-shadow: 0 15px 35px rgba(15,42,72,.07); overflow: hidden; transition: border-color .25s ease, box-shadow .25s ease, transform .25s ease; }
+    .division-card::before { content: ''; position: absolute; width: 180px; height: 180px; right: -90px; top: -90px; border: 1px solid color-mix(in srgb, var(--practice-color), white 70%); border-radius: 50%; pointer-events: none; }
+    .division-card:hover { transform: translateY(-5px); border-color: color-mix(in srgb, var(--practice-color), white 55%); box-shadow: 0 23px 40px rgba(15,42,72,.12); }
+    .division-card__top { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; min-height: 104px; }
+    .division-card__icon { display: grid; place-items: center; width: 86px; height: 86px; flex: 0 0 86px; border-radius: 19px; color: var(--practice-color); background: color-mix(in srgb, var(--practice-color), white 91%); border: 1px solid color-mix(in srgb, var(--practice-color), white 78%); }
+    .division-card__icon .work-icon { width: 62px; height: 62px; }
+    .division-card__type { max-width: 130px; color: #6b7e92; font-size: .72rem; line-height: 1.45; font-weight: 600; text-align: right; }
+    .division-card h3 { margin: 12px 0 9px; color: #122b49; font-size: clamp(1.45rem, 2.2vw, 1.8rem); line-height: 1.25; letter-spacing: -.035em; font-weight: 800; }
+    .division-card p { margin: 0 0 18px; color: #587087; font-size: .95rem; line-height: 1.65; }
+    .division-card__focus { list-style: none; padding: 18px 0 16px; margin: 0 0 16px; border-top: 1px solid #e5ecf3; display: grid; gap: 10px; }
+    .division-card__focus li { display: flex; align-items: baseline; gap: 10px; color: #3d5872; font-size: .82rem; font-weight: 600; }
+    .division-card__focus li::before { content: ''; width: 7px; height: 7px; flex: 0 0 7px; border-radius: 2px; background: var(--practice-color); }
+    .division-card__link { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: auto; padding-top: 15px; border-top: 1px solid #e5ecf3; color: var(--practice-color); text-decoration: none; font-size: .87rem; font-weight: 800; }
+    .division-card__link:hover { color: #102b48; text-decoration: none; }
+    .division-card__link span { font-size: 1.15rem; line-height: 1; }
+    .division-card a:focus-visible { outline: 3px solid var(--practice-color); outline-offset: 4px; }
+    @media (prefers-reduced-motion: reduce) { .division-card { transition: none; } .division-card:hover { transform: none; } }
+
     /* Team Member Cards - Special Styling */
     .team-member-card {
         background: white;
@@ -907,7 +704,6 @@
             radial-gradient(circle, rgba(168, 85, 247, 0.2) 1.5px, transparent 1.5px);
         background-size: 100px 100px, 150px 150px, 80px 80px;
         background-position: 0 0, 50px 50px, 25px 25px;
-        animation: floatingParticles 20s linear infinite;
         opacity: 0.4;
         pointer-events: none;
         z-index: 1;
@@ -1227,44 +1023,11 @@
         }
     }
     
-    /* Mouse Cursor Effect */
-    .cursor-dot {
-        position: fixed;
-        width: 8px;
-        height: 8px;
-        background: #3b82f6;
-        border-radius: 50%;
-        pointer-events: none;
-        z-index: 9999;
-        transition: transform 0.2s ease;
-        mix-blend-mode: difference;
-    }
-    
-    .cursor-outline {
-        position: fixed;
-        width: 40px;
-        height: 40px;
-        border: 2px solid #3b82f6;
-        border-radius: 50%;
-        pointer-events: none;
-        z-index: 9999;
-        transition: all 0.15s ease-out;
-        mix-blend-mode: difference;
-    }
-    
     /* Floating Animation for Icons */
     @keyframes float {
         0%, 100% { transform: translateY(0px); }
         50% { transform: translateY(-15px); }
     }
-    
-    .why-card-icon {
-        animation: float 3s ease-in-out infinite;
-    }
-    
-    .why-card:nth-child(1) .why-card-icon { animation-delay: 0s; }
-    .why-card:nth-child(2) .why-card-icon { animation-delay: 0.3s; }
-    .why-card:nth-child(3) .why-card-icon { animation-delay: 0.6s; }
     
     /* ===== CLIENTS SECTION - ANIMATED SLIDER ===== */
     .clients-section {
@@ -1306,6 +1069,7 @@
     .clients-slider:hover {
         animation-play-state: paused;
     }
+    .clients-slider.is-offscreen { animation-play-state: paused; }
     
     @keyframes slideClients {
         0% {
@@ -1397,15 +1161,16 @@
             height: 100px;
         }
     }
+    @media (prefers-reduced-motion: reduce) {
+        .hero-content, .hero h1, .hero .subtitle, .hero-buttons, .stat-item, .scroll-indicator,
+        .why-card-icon, .carousel-btn, .carousel-item.active .team-member-card,
+        .clients-slider { animation: none !important; }
+    }
 
 </style>
 
 <!-- HERO SECTION -->
 <div class="hero">
-    <!-- Custom Cursor -->
-    <div class="cursor-dot"></div>
-    <div class="cursor-outline"></div>
-    
     <div class="hero-content">
         <h1>Transform Your Business</h1>
         <p class="subtitle">Expert solutions across taxation, technology, and technical support. We empower businesses of all sizes to achieve their full potential with innovative strategies and dedicated service.</p>
@@ -1443,74 +1208,46 @@
 <!-- CONTENT HUB -->
 <div class="content-hub">
     <!-- WHY CHOOSE TASMIYA -->
-    <div class="section">
+    <div class="section" id="divisions">
         <div class="section-header">
             <h2>Why Choose Tasmiya Enterprises?</h2>
             <p>Three specialized divisions working together to deliver comprehensive solutions</p>
         </div>
         
         <div class="why-choose-grid">
-            @php
-                $divisions = \App\Models\Division::all();
-            @endphp
-            
             @foreach($divisions as $division)
                 @php
                     $themeColors = $division->getThemeColors();
+                    $practice = config("service_cards.divisions.{$division->slug}", []);
                 @endphp
-                <div class="why-card" style="border-top: 4px solid {{ $themeColors['primary'] }};">
-                    <div class="why-card-icon">{{ $division->icon_path }}</div>
-                    <h3 style="color: {{ $themeColors['primary'] }};">{{ $division->name }}</h3>
+                <article class="division-card" style="--practice-color: {{ $themeColors['primary'] }};">
+                    <div class="division-card__top">
+                        <div class="division-card__icon"><x-work-icon :type="$practice['icon'] ?? 'audit'" /></div>
+                        <span class="division-card__type">{{ $division->tagline ?: 'Business expertise' }}</span>
+                    </div>
+                    <h3>{{ $division->name }}</h3>
                     <p>{{ $division->description }}</p>
-                    <a href="{{ route('team.index') }}" class="learn-more">Meet the Team →</a>
-                </div>
+                    @if(!empty($practice['focus']))
+                        <ul class="division-card__focus">
+                            @foreach($practice['focus'] as $item)<li>{{ $item }}</li>@endforeach
+                        </ul>
+                    @endif
+                    <a href="{{ route('services.index') }}#division-{{ $division->slug }}" class="division-card__link">Explore this division <span aria-hidden="true">↗</span></a>
+                </article>
             @endforeach
         </div>
     </div>
     
     <!-- FEATURED SERVICES -->
-    <div class="section">
+    <div class="section" id="featured-services">
         <div class="section-header">
             <h2>Our Services</h2>
             <p>Discover the range of professional services we offer</p>
         </div>
         
         <div class="featured-grid">
-            @php
-                // Get 1 service from FBR Taxation
-                $fbrService = \App\Models\Service::with('division')
-                    ->whereHas('division', fn($q) => $q->where('slug', 'fbr-taxation'))
-                    ->inRandomOrder()
-                    ->first();
-                
-                // Get 1 service from Technical Support
-                $techService = \App\Models\Service::with('division')
-                    ->whereHas('division', fn($q) => $q->where('slug', 'tech-support'))
-                    ->inRandomOrder()
-                    ->first();
-                
-                // Get 2 services from IT & Digital
-                $itServices = \App\Models\Service::with('division')
-                    ->whereHas('division', fn($q) => $q->where('slug', 'it-digital'))
-                    ->inRandomOrder()
-                    ->limit(2)
-                    ->get();
-                
-                // Combine all services
-                $featuredServices = collect([$fbrService, $techService])
-                    ->merge($itServices)
-                    ->filter(); // Remove nulls if any division has no services
-            @endphp
-            
-            @forelse($featuredServices as $service)
-                <div class="featured-item">
-                    <div class="featured-item-header">💼</div>
-                    <div class="featured-item-body">
-                        <h3>{{ $service->name }}</h3>
-                        <p>{{ Str::limit($service->description, 80) }}</p>
-                        <a href="{{ route('services.show', $service) }}" class="view-all">View Details →</a>
-                    </div>
-                </div>
+            @forelse($featuredServices as $offering)
+                <x-service-card :offering="$offering" :compact="true" />
             @empty
                 <p class="text-muted text-center col-12">Services coming soon</p>
             @endforelse
@@ -1539,24 +1276,23 @@
             <div class="carousel-container" id="teamCarousel">
                 <div class="carousel-viewport">
                     <div class="carousel-inner" id="carouselInner">
-                        @php
-                            $featuredTeam = \App\Models\Profile::with('user.division')
-                                ->visible()
-                                ->limit(6)
-                                ->get();
-                        @endphp
-                        
                         @forelse($featuredTeam as $index => $profile)
                             @php
                                 $divisionColors = $profile->user->division->getThemeColors();
                                 $imageUrl = $profile->getImageUrl();
-                                $hasRealImage = $profile->hasImage() || file_exists(public_path("/images/profiles/" . strtolower(explode(' ', $profile->user->name)[0]) . "/image.png"));
+                                $hasRealImage = $profile->hasImage();
+                                $firstName = \Illuminate\Support\Str::slug(\Illuminate\Support\Str::before($profile->user->name, ' '));
+                                if ($hasRealImage && ($profile->profile_image_url === null || $profile->profile_image_url === "/images/profiles/{$firstName}/image.webp")) {
+                                    if (is_file(public_path("images/profiles/{$firstName}/image-card.webp"))) {
+                                        $imageUrl = asset("images/profiles/{$firstName}/image-card.webp");
+                                    }
+                                }
                             @endphp
                             <div class="carousel-item" data-index="{{ $index }}" style="--item-index: {{ $index }};">
                                 <a href="{{ route('profiles.show', $profile) }}" class="team-member-card carousel-card">
                                     <div class="team-image-wrapper" style="background: {{ $divisionColors['gradient'] }};">
                                         @if($hasRealImage)
-                                            <img src="{{ $imageUrl }}" alt="{{ $profile->user->name }}">
+                                            <img src="{{ $imageUrl }}" alt="{{ $profile->user->name }}" loading="lazy" decoding="async" width="480" height="480">
                                         @else
                                             <div class="team-placeholder">
                                                 {{ strtoupper(substr($profile->user->name, 0, 1)) }}
@@ -1617,11 +1353,11 @@
                     @foreach($clients as $client)
                         @if($client['url'])
                             <a href="{{ $client['url'] }}" target="_blank" class="client-logo" title="{{ $client['name'] }}">
-                                <img src="{{ $client['logo'] }}" alt="{{ $client['name'] }}" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22100%22%3E%3Crect fill=%22%23f1f5f9%22 width=%22200%22 height=%22100%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2216%22 fill=%22%2394a3b8%22%3E{{ $client['name'] }}%3C/text%3E%3C/svg%3E';">
+                                <img src="{{ $client['logo'] }}" alt="{{ $client['name'] }}" decoding="async" width="200" height="100">
                             </a>
                         @else
                             <div class="client-logo" title="{{ $client['name'] }}">
-                                <img src="{{ $client['logo'] }}" alt="{{ $client['name'] }}" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22100%22%3E%3Crect fill=%22%23f1f5f9%22 width=%22200%22 height=%22100%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2216%22 fill=%22%2394a3b8%22%3E{{ $client['name'] }}%3C/text%3E%3C/svg%3E';">
+                                <img src="{{ $client['logo'] }}" alt="{{ $client['name'] }}" decoding="async" width="200" height="100">
                             </div>
                         @endif
                     @endforeach
@@ -1644,48 +1380,6 @@
 // Animated Counter for Hero Stats
 document.addEventListener('DOMContentLoaded', function() {
     const stats = document.querySelectorAll('.stat-number');
-    
-    // Custom Cursor Effect
-    const cursorDot = document.querySelector('.cursor-dot');
-    const cursorOutline = document.querySelector('.cursor-outline');
-    
-    if (cursorDot && cursorOutline) {
-        let mouseX = 0, mouseY = 0;
-        let outlineX = 0, outlineY = 0;
-        
-        document.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-            
-            cursorDot.style.left = mouseX + 'px';
-            cursorDot.style.top = mouseY + 'px';
-        });
-        
-        // Smooth follow effect for outline
-        function animateOutline() {
-            outlineX += (mouseX - outlineX) * 0.15;
-            outlineY += (mouseY - outlineY) * 0.15;
-            
-            cursorOutline.style.left = outlineX + 'px';
-            cursorOutline.style.top = outlineY + 'px';
-            
-            requestAnimationFrame(animateOutline);
-        }
-        animateOutline();
-        
-        // Scale up on hover
-        const interactiveElements = document.querySelectorAll('a, button, .btn-hero, .why-card, .featured-item');
-        interactiveElements.forEach(el => {
-            el.addEventListener('mouseenter', () => {
-                cursorDot.style.transform = 'scale(2)';
-                cursorOutline.style.transform = 'scale(1.5)';
-            });
-            el.addEventListener('mouseleave', () => {
-                cursorDot.style.transform = 'scale(1)';
-                cursorOutline.style.transform = 'scale(1)';
-            });
-        });
-    }
     
     const animateCounter = (element) => {
         const target = parseInt(element.getAttribute('data-target'));
@@ -1713,38 +1407,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (entry.target.classList.contains('stat-number') && entry.target.textContent === '0') {
                     animateCounter(entry.target);
                 }
-                if (entry.target.classList.contains('section')) {
-                    entry.target.style.animation = 'fadeInSection 0.8s ease-out forwards';
-                }
+                observer.unobserve(entry.target);
             }
         });
     }, { threshold: 0.1 });
     
     // Observe stat numbers
     stats.forEach(stat => observer.observe(stat));
-    
-    // Observe sections for scroll animations
-    document.querySelectorAll('.section').forEach((section, index) => {
-        section.style.animationDelay = `${index * 0.1}s`;
-        observer.observe(section);
-    });
-    
-    // Parallax effect for hero (optimized with requestAnimationFrame)
-    let ticking = false;
-    window.addEventListener('scroll', () => {
-        if (!ticking) {
-            window.requestAnimationFrame(() => {
-                const scrolled = window.pageYOffset;
-                const hero = document.querySelector('.hero-content');
-                if (hero && scrolled < window.innerHeight) {
-                    hero.style.transform = `translateY(${scrolled * 0.5}px)`;
-                    hero.style.opacity = 1 - (scrolled / 600);
-                }
-                ticking = false;
-            });
-            ticking = true;
-        }
-    });
     
     // Smooth scroll for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -1762,8 +1431,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 3D Cylindrical Carousel for Team Section - GLOBAL FUNCTIONS
     window.currentTeamIndex = 0;
-    window.teamCarouselAutoPlay = true;
+    window.teamCarouselAutoPlay = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     window.teamAutoPlayInterval = null;
+    window.teamCarouselInView = false;
 
     window.updateTeamCarouselPosition = function() {
         const carousel = document.getElementById('carouselInner');
@@ -1816,6 +1486,8 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     window.startTeamAutoPlay = function() {
+        clearInterval(window.teamAutoPlayInterval);
+        if (!window.teamCarouselAutoPlay || !window.teamCarouselInView || document.hidden) return;
         window.teamAutoPlayInterval = setInterval(() => {
             window.rotateCarousel(1);
         }, 5000);
@@ -1834,9 +1506,27 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
+        const carouselVisibility = new IntersectionObserver(([entry]) => {
+            window.teamCarouselInView = entry.isIntersecting;
+            if (entry.isIntersecting) window.startTeamAutoPlay();
+            else clearInterval(window.teamAutoPlayInterval);
+        });
+        carouselVisibility.observe(carouselContainer);
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) clearInterval(window.teamAutoPlayInterval);
+            else window.startTeamAutoPlay();
+        });
+
         // Initialize carousel
         window.updateTeamCarouselPosition();
-        window.startTeamAutoPlay();
+    }
+
+    const clientsSlider = document.querySelector('.clients-slider');
+    if (clientsSlider && 'IntersectionObserver' in window) {
+        const sliderVisibility = new IntersectionObserver(([entry]) => {
+            clientsSlider.classList.toggle('is-offscreen', !entry.isIntersecting);
+        });
+        sliderVisibility.observe(clientsSlider);
     }
 });
 </script>

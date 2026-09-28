@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'About Us - Tasmiya Enterprises')
+@section('title', 'About Us')
 
 @section('content')
 <style>
@@ -86,6 +86,12 @@
         opacity: 0.8;
         animation: float 3s ease-in-out infinite;
     }
+    .story-image { min-height: 310px; display: flex; flex-direction: column; align-items: stretch; justify-content: center; gap: 12px; background: linear-gradient(145deg, #112b4b, #235e91); box-shadow: 0 20px 45px rgba(11,42,75,.15); }
+    .story-discipline { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 17px 21px; border: 1px solid rgba(255,255,255,.24); background: rgba(255,255,255,.1); border-radius: 11px; color: #fff; font-size: 1rem; font-weight: 700; text-align: left; }
+    .story-discipline span { color: #c5dff4; font-size: .82rem; font-weight: 500; }
+    .about-mission { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; background: linear-gradient(135deg, #f8fafc, #eef4f9); padding: 52px; border-radius: 16px; margin-bottom: 85px; }
+    .about-mission h3 { font-size: 1.4rem; font-weight: 800; color: #0f172a; margin-bottom: 1rem; }
+    .about-mission p { color: #64748b; line-height: 1.8; }
     
     @keyframes float {
         0%, 100% { transform: translateY(0px); }
@@ -173,11 +179,14 @@
         .story-section {
             grid-template-columns: 1fr;
         }
+        .story-section { gap: 30px; margin-bottom: 65px; }
+        .about-mission { grid-template-columns: 1fr; gap: 28px; padding: 30px; }
         
         .values-grid {
             grid-template-columns: 1fr;
         }
     }
+    @media (prefers-reduced-motion: reduce) { .story-image-icon { animation: none; } .value-card, .cta-button { transition: none; } }
 </style>
 
 <!-- Hero Section -->
@@ -205,31 +214,31 @@
                 delivering results that exceed expectations.
             </p>
         </div>
-        <div class="story-image">
-            <div class="story-image-icon">🚀</div>
+        <div class="story-image" aria-label="Our three areas of work">
+            <div class="story-discipline">Taxation <span>Clarity and compliance</span></div>
+            <div class="story-discipline">Technology <span>Practical digital work</span></div>
+            <div class="story-discipline">Technical support <span>Reliable assistance</span></div>
         </div>
     </div>
     
     <!-- Mission & Vision -->
-    <div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); padding: 60px; border-radius: 16px; margin-bottom: 100px;">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+    <div class="about-mission">
             <div>
-                <h3 style="font-size: 1.4rem; font-weight: 800; color: #0f172a; margin-bottom: 1rem;">Our Mission</h3>
-                <p style="color: #64748b; line-height: 1.8;">
+                <h3>Our Mission</h3>
+                <p>
                     To empower businesses of all sizes with cutting-edge solutions and professional expertise that drive 
                     growth, ensure compliance, and unlock competitive advantage across taxation, digital transformation, 
                     and technical infrastructure.
                 </p>
             </div>
             <div>
-                <h3 style="font-size: 1.4rem; font-weight: 800; color: #0f172a; margin-bottom: 1rem;">Our Vision</h3>
-                <p style="color: #64748b; line-height: 1.8;">
+                <h3>Our Vision</h3>
+                <p>
                     To be the leading multi-sector solutions provider, recognized for deep specialization, consistent 
                     reliability, and transformative impact. We envision a future where every business has access to 
                     world-class expertise tailored to their unique needs.
                 </p>
             </div>
-        </div>
     </div>
     
     <!-- Core Values -->

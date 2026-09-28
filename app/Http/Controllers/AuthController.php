@@ -185,10 +185,8 @@ class AuthController extends Controller
         // - Password is not empty
         // - Email+password combination is correct (using Auth::attempt)
         
-        // Get the validated email and password
-        // Note: $request->validated() returns only the fields defined in LoginRequest rules
-        // This prevents any extra fields from being processed
-        $credentials = $request->validated();
+        // The remember checkbox controls the login cookie; it is not a users-table column.
+        $credentials = $request->safe()->only(['email', 'password']);
 
         // Attempt to authenticate user
         // This checks:

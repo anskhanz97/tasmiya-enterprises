@@ -409,56 +409,8 @@
         margin: 0 auto;
     }
     
-    .service-card {
-        background: white;
-        border-radius: 25px;
-        padding: 35px;
-        text-align: center;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-        transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .service-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 5px;
-        background: var(--primary-gradient);
-        transform: scaleX(0);
-        transition: transform 0.5s ease;
-    }
-    
-    .service-card:hover::before {
-        transform: scaleX(1);
-    }
-    
-    .service-card:hover {
-        transform: translateY(-15px) scale(1.02);
-        box-shadow: 0 25px 60px rgba(102, 126, 234, 0.25);
-    }
-    
-    .service-icon {
-        font-size: 3.5rem;
-        margin-bottom: 1.2rem;
-        filter: drop-shadow(0 4px 10px rgba(102, 126, 234, 0.3));
-    }
-    
-    .service-name {
-        font-size: 1.15rem;
-        font-weight: 800;
-        color: #1a1a2e;
-        margin-bottom: 0.8rem;
-    }
-    
-    .service-description {
-        color: #64748b;
-        line-height: 1.7;
-        font-size: 0.95rem;
-    }
+    .profile-service-empty { grid-column: 1 / -1; padding: 24px; border: 1px dashed #bbc9dd; border-radius: 14px; color: #60728a; background: #fff; text-align: center; }
+    .profile-service-manage { display: inline-block; margin: 14px auto 0; padding: 10px 15px; border-radius: 9px; background: #e9e7fa; color: #5146a5; font-size: 13px; font-weight: 800; text-decoration: none; }
     
     /* ===== TESTIMONIALS CAROUSEL ===== */
     .testimonials-section {
@@ -627,17 +579,21 @@
             font-size: 1.7rem;
         }
     }
+    .profile-sections { display: flex; flex-direction: column; }
+    .profile-section-intro { max-width: 700px; margin: 12px auto 30px; text-align: center; color: #6a7e8b; line-height: 1.65; }
+    .projects-section .profile-section-intro { color: rgba(255,255,255,.78); }
 </style>
 
 @php
     $firstName = strtolower(explode(' ', $profile->user->name)[0] ?? 'user');
-    $bannerPath = "/images/profiles/{$firstName}/banner.png";
-    $imagePath = "/images/profiles/{$firstName}/image.png";
+    $bannerUrl = $profile->displayImageUrl('banner');
+    $imageUrl = $profile->displayImageUrl('profile');
+    $sections = collect($profile->presentationSections())->keyBy('key');
 @endphp
 
 <!-- PARALLAX HERO -->
 <div class="profile-hero" id="hero">
-    <div class="hero-banner" style="background-image: url('{{ asset($bannerPath) }}');"></div>
+    <div class="hero-banner" @if($bannerUrl) style="background-image: url('{{ $bannerUrl }}');" @endif></div>
     <div class="hero-overlay"></div>
     <div class="hero-content">
         <h1 class="hero-title">{{ $profile->user->name }}</h1>
@@ -660,52 +616,58 @@
 </div>
 
 <!-- FLOATING PROFILE IMAGE -->
+@if($imageUrl)
 <div class="profile-image-container">
     <div class="profile-ring"></div>
     <div class="profile-image-wrapper">
-        <img src="{{ asset($imagePath) }}" alt="{{ $profile->user->name }}">
+        <img src="{{ $imageUrl }}" alt="{{ $profile->user->name }}">
     </div>
 </div>
+@endif
 
 <!-- INFO SECTION -->
-<div class="info-section">
+<div class="profile-sections">
+@if($sections['about']['visible'])
+<div class="info-section" style="order: {{ $sections['about']['order'] }};">
     <div class="info-container">
         <!-- Bio -->
         <div class="bio-card">
-            <h2>About Me</h2>
+            <h2>{{ $sections['about']['title'] }}</h2>
             <p class="bio-text">
                 {{ $profile->bio ?? 'Dedicated professional with extensive experience in delivering exceptional results and driving business success. Committed to excellence and continuous improvement in every project.' }}
             </p>
         </div>
         
-        <!-- Skills -->
+    </div>
+</div>
+@endif
+
+@if($sections['skills']['visible'])
+<div class="info-section" style="order: {{ $sections['skills']['order'] }};">
+    <div class="info-container">
         <div class="skills-section">
-            <h2 class="section-title">Expertise & Skills</h2>
+            <h2 class="section-title">{{ $sections['skills']['title'] }}</h2>
             <div class="skills-grid">
-                @php
-                    $skills = explode(',', $profile->expertise_areas ?? 'Leadership,Strategy,Communication,Problem Solving,Team Management,Innovation');
-                    $levels = [95, 90, 88, 92, 85, 87];
-                @endphp
-                @foreach($skills as $index => $skill)
+                @forelse($profile->specializations ?? [] as $skill)
                     <div class="skill-item">
-                        <div class="skill-name">
-                            <span>{{ trim($skill) }}</span>
-                            <span class="skill-percentage">{{ $levels[$index] ?? 90 }}%</span>
-                        </div>
-                        <div class="skill-bar-bg">
-                            <div class="skill-bar-fill" style="--skill-width: {{ $levels[$index] ?? 90 }}%;"></div>
-                        </div>
+                        <div class="skill-name"><span>{{ $skill }}</span></div>
+                        <div class="skill-bar-bg"><div class="skill-bar-fill" style="--skill-width: 100%;"></div></div>
                     </div>
-                @endforeach
+                @empty
+                    <p class="bio-text">No specializations have been listed yet.</p>
+                @endforelse
             </div>
         </div>
     </div>
 </div>
+@endif
 
 <!-- PROJECTS SLIDER -->
-<div class="projects-section">
+@if($sections['projects']['visible'])
+<div class="projects-section" style="order: {{ $sections['projects']['order'] }};">
     <div class="projects-container">
-        <h2 class="section-title" style="color: white;">Featured Projects</h2>
+        <h2 class="section-title" style="color: white;">{{ $sections['projects']['title'] }}</h2>
+        @if($sections['projects']['description'])<p class="profile-section-intro">{{ $sections['projects']['description'] }}</p>@endif
         <div class="projects-slider" id="projectsSlider">
             @php
                 $projectIcons = [
@@ -743,30 +705,29 @@
         </div>
     </div>
 </div>
+@endif
 
 <!-- SERVICES -->
-<div class="services-section">
-    <h2 class="section-title">Services I Offer</h2>
+@if($sections['services']['visible'])
+<div class="services-section" style="order: {{ $sections['services']['order'] }};">
+    <h2 class="section-title">{{ $sections['services']['title'] }}</h2>
+    @if($sections['services']['description'])<p class="profile-section-intro">{{ $sections['services']['description'] }}</p>@endif
     <div class="services-grid">
-        @php
-            $serviceIcons = ['💼', '📊', '🎯', '🚀'];
-            $serviceNames = ['Consultation', 'Strategy & Planning', 'Implementation', 'Support & Training'];
-        @endphp
-        @foreach($serviceNames as $index => $serviceName)
-            <div class="service-card">
-                <div class="service-icon">{{ $serviceIcons[$index] }}</div>
-                <h3 class="service-name">{{ $serviceName }}</h3>
-                <p class="service-description">
-                    Expert {{ strtolower($serviceName) }} tailored to your specific needs and business goals.
-                </p>
-            </div>
-        @endforeach
+        @forelse($profile->serviceOfferings as $offering)
+            <x-service-card :offering="$offering" />
+        @empty
+            <p class="profile-service-empty">No services listed yet.</p>
+        @endforelse
     </div>
+    @if($canEdit)<div style="text-align:center"><a class="profile-service-manage" href="{{ route('profiles.services.index', $profile) }}">Manage service cards</a></div>@endif
 </div>
+@endif
 
 <!-- TESTIMONIALS -->
-<div class="testimonials-section">
-    <h2 class="section-title">What Clients Say</h2>
+@if($sections['testimonials']['visible'])
+<div class="testimonials-section" style="order: {{ $sections['testimonials']['order'] }};">
+    <h2 class="section-title">{{ $sections['testimonials']['title'] }}</h2>
+    @if($sections['testimonials']['description'])<p class="profile-section-intro">{{ $sections['testimonials']['description'] }}</p>@endif
     <div class="testimonials-carousel">
         @php
             $testimonials = [
@@ -787,6 +748,8 @@
             <span class="dot {{ $index === 0 ? 'active' : '' }}" onclick="showTestimonial({{ $index }})"></span>
         @endforeach
     </div>
+</div>
+@endif
 </div>
 
 <!-- CTA -->
@@ -836,6 +799,7 @@
     const dots = document.querySelectorAll('.dot');
     
     function showTestimonial(index) {
+        if (!testimonials.length) return;
         testimonials[currentTestimonial].classList.remove('active');
         dots[currentTestimonial].classList.remove('active');
         
@@ -846,7 +810,7 @@
     }
     
     // Auto-advance testimonials
-    setInterval(() => {
+    if (testimonials.length) setInterval(() => {
         const next = (currentTestimonial + 1) % testimonials.length;
         showTestimonial(next);
     }, 5000);

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\WhatsAppService;
+use App\Models\SiteSetting;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
@@ -21,15 +22,14 @@ class WhatsAppController extends Controller
     public function handleWebhook(Request $request, WhatsAppService $whatsapp): JsonResponse
     {
         try {
-            // WhatsApp webhook verification
-            if ($request->method() === 'GET') {
-                return $this->verifyWebhook($request);
+            if (! $whatsapp->verifyWebhookSignature($request->getContent(), $request->header('X-Hub-Signature-256', ''))) {
+                return response()->json(['error' => 'Invalid signature'], 403);
             }
 
             // Get the incoming webhook data
             $payload = $request->all();
 
-            Log::info('WhatsApp webhook received', $payload);
+            Log::info('WhatsApp webhook received', ['entries' => count($payload['entry'] ?? [])]);
 
             // Extract messages from webhook
             $messages = $payload['entry'][0]['changes'][0]['value']['messages'] ?? [];
@@ -60,22 +60,18 @@ class WhatsAppController extends Controller
      * Verify webhook token when WhatsApp sends GET request
      * This is required for webhook setup in WhatsApp Business API dashboard
      */
-    private function verifyWebhook(Request $request): JsonResponse
+    public function verifyWebhook(Request $request)
     {
-        $token = config('services.whatsapp.webhook_verify_token', 'tasmiya_webhook_token_2026');
-        $challenge = $request->input('hub_challenge');
-        $verify_token = $request->input('hub_verify_token');
+        $token = SiteSetting::get('integration_whatsapp_verify_token') ?: config('services.whatsapp.webhook_verify_token');
+        $challenge = $request->query('hub_challenge', $request->query('hub.challenge'));
+        $verify_token = $request->query('hub_verify_token', $request->query('hub.verify_token'));
 
-        if ($verify_token === $token) {
+        if ($token && $request->query('hub_mode', $request->query('hub.mode')) === 'subscribe' && is_string($verify_token) && hash_equals($token, $verify_token)) {
             Log::info('WhatsApp webhook verified');
-            return response()->json($challenge, 200)
-                ->header('Content-Type', 'text/plain');
+            return response((string) $challenge, 200)->header('Content-Type', 'text/plain');
         }
 
-        Log::warning('WhatsApp webhook verification failed', [
-            'expected' => $token,
-            'received' => $verify_token,
-        ]);
+        Log::warning('WhatsApp webhook verification failed');
 
         return response()->json(['error' => 'Invalid token'], 403);
     }

@@ -12,12 +12,7 @@
     {{-- Google Fonts --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
-
-    {{-- AOS Library (Animate on Scroll) --}}
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    {{-- Swiper CSS --}}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     {{-- Modern Styles --}}
     <style>
@@ -114,6 +109,49 @@
             list-style: none;
         }
 
+        .nav-mobile-trigger,
+        .nav-mobile-menu { display: none; }
+
+        .nav-mobile-trigger {
+            border: 1px solid #d7d4ef;
+            border-radius: 10px;
+            background: #fff;
+            color: #5145a3;
+            width: 40px;
+            height: 40px;
+            font-size: 22px;
+            cursor: pointer;
+        }
+
+        .nav-mobile-menu {
+            position: absolute;
+            top: 70px;
+            left: 20px;
+            right: 20px;
+            padding: 8px;
+            border: 1px solid #dddaf0;
+            border-radius: 15px;
+            background: #fff;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .nav-mobile-menu a {
+            display: block;
+            padding: 10px 13px;
+            border-radius: 9px;
+            color: #28375b;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .nav-mobile-menu a:hover,
+        .nav-mobile-menu a:focus-visible {
+            background: #efedfb;
+            color: #5045a1;
+            outline: none;
+        }
+
         .navbar-nav a {
             color: #333;
             text-decoration: none;
@@ -184,9 +222,11 @@
             top: 100%;
             right: 0;
             background: white;
-            border-radius: 12px;
+            border: 1px solid #dcdcf1;
+            border-radius: 16px;
             box-shadow: var(--shadow-lg);
-            min-width: 200px;
+            min-width: 220px;
+            padding: 6px;
             margin-top: 10px;
             visibility: hidden;
             opacity: 0;
@@ -215,19 +255,16 @@
             text-decoration: none;
             font-size: 14px;
             transition: all 0.2s ease;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .user-dropdown a:last-child,
-        .user-dropdown form button:last-child {
-            border-bottom: none;
+            border-radius: 10px;
         }
 
         .user-dropdown a:hover,
-        .user-dropdown form button:hover {
-            background: var(--light);
-            color: var(--primary);
-            padding-left: 20px;
+        .user-dropdown form button:hover,
+        .user-dropdown a:focus-visible,
+        .user-dropdown form button:focus-visible {
+            background: #efedfb;
+            color: #5045a1;
+            outline: none;
         }
 
         .btn-login {
@@ -395,6 +432,7 @@
         .footer-socials {
             display: flex;
             gap: 10px;
+            flex-wrap: wrap;
             order: 1;
         }
 
@@ -409,6 +447,7 @@
             align-items: center;
             justify-content: center;
             text-decoration: none;
+            color: rgba(255, 255, 255, 0.9);
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
@@ -597,6 +636,10 @@
             .navbar-container {
                 padding: 0 20px;
             }
+            .nav-mobile-trigger { display: block; margin-left: auto; }
+            .nav-mobile-menu.show { display: block; }
+            .navbar-nav { margin-left: 10px; }
+            .navbar-nav > a { display: none; }
             .footer-container {
                 padding: 40px 20px 20px;
             }
@@ -611,6 +654,12 @@
                 flex-direction: column;
             }
         }
+
+        @media (max-width: 420px) {
+            .navbar-brand { font-size: 21px; }
+            .user-menu-trigger > span { display: none; }
+            .user-dropdown { min-width: 200px; }
+        }
     </style>
 </head>
 <body>
@@ -620,6 +669,15 @@
             <a href="{{ route('home') }}" class="navbar-brand">
                 <span>🏢</span> Tasmiya
             </a>
+
+            <button type="button" class="nav-mobile-trigger" aria-label="Open site navigation" aria-controls="mobileNav" aria-expanded="false">☰</button>
+            <div class="nav-mobile-menu" id="mobileNav">
+                <a href="{{ route('home') }}">Home</a>
+                <a href="{{ route('services.index') }}">Services</a>
+                <a href="{{ route('team.index') }}">Team</a>
+                <a href="{{ route('about') }}">About</a>
+                <a href="{{ route('contact.create') }}">Contact</a>
+            </div>
 
             <div class="navbar-nav">
                 <a href="{{ route('home') }}">Home</a>
@@ -631,18 +689,17 @@
                 {{-- User Menu --}}
                 @auth
                     <div class="user-menu">
-                        <button class="user-menu-trigger" onclick="toggleUserMenu()">
+                        <button type="button" class="user-menu-trigger" aria-controls="userDropdown" aria-expanded="false" aria-label="Open account menu">
                             <div class="user-avatar">{{ auth()->user()->initials }}</div>
                             <span>{{ auth()->user()->name }}</span>
                         </button>
 
                         <div class="user-dropdown" id="userDropdown">
-                            <a href="#profile">View Profile</a>
+                            <a href="{{ route('dashboard') }}">Dashboard</a>
                             <a href="{{ route('payments.index') }}">💳 Payments</a>
                             <a href="{{ route('contact.create') }}">📧 Contact</a>
-                            @if(auth()->user()->isAdmin())
-                                <a href="{{ route('services.create') }}">💼 Add Service</a>
-                                <a href="#admin">👑 Admin Panel</a>
+                            @if(auth()->user()->profile)
+                                <a href="{{ route('profiles.services.index', auth()->user()->profile) }}">💼 Add / Manage Services</a>
                             @endif
                             <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
                                 @csrf
@@ -696,8 +753,7 @@
                     <div class="footer-section">
                         <h4>Support</h4>
                         <ul>
-                            <li><a href="{{ route('contact.create') }}">Contact Us</a></li>
-                            <li><a href="#">FAQ</a></li>
+                            <li><a href="{{ route('faq') }}">FAQ</a></li>
                         </ul>
                     </div>
                     <div class="footer-section">
@@ -720,93 +776,13 @@
                         $socialLinks = \App\Models\SiteSetting::getSocialLinks();
                     @endphp
                     
-                    @if($socialLinks['facebook'])
-                        <a href="{{ $socialLinks['facebook'] }}" class="social-link" title="Facebook" target="_blank" rel="noopener">
-                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"></path></svg>
-                        </a>
-                    @endif
-                    
-                    @if($socialLinks['twitter'])
-                        <a href="{{ $socialLinks['twitter'] }}" class="social-link" title="Twitter" target="_blank" rel="noopener">
-                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>
-                        </a>
-                    @endif
-                    
-                    @if($socialLinks['linkedin'])
-                        <a href="{{ $socialLinks['linkedin'] }}" class="social-link" title="LinkedIn" target="_blank" rel="noopener">
-                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564z"></path></svg>
-                        </a>
-                    @endif
-                    
-                    @if($socialLinks['instagram'])
-                        <a href="{{ $socialLinks['instagram'] }}" class="social-link" title="Instagram" target="_blank" rel="noopener">
-                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.85s-.012 3.584-.07 4.85c-.148 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07s-3.584-.012-4.85-.07c-3.252-.148-4.771-1.691-4.919-4.919-.058-1.265-.07-1.645-.07-4.85s.012-3.584.07-4.85c.148-3.225 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.85-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948s.014 3.667.072 4.947c.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072s3.667-.014 4.947-.072c4.358-.2 6.78-2.618 6.98-6.98.059-1.281.073-1.689.073-4.948s-.014-3.667-.072-4.947c-.2-4.358-2.618-6.78-6.98-6.98C15.667.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.88 1.44 1.44 0 0 0 0-2.88z"></path></svg>
-                        </a>
-                    @endif
+                    @foreach($socialLinks as $socialLink)
+                        <a href="{{ $socialLink['url'] }}" class="social-link" title="{{ $socialLink['label'] }}" aria-label="{{ $socialLink['label'] }}" target="_blank" rel="noopener noreferrer" style="width:auto;min-width:42px;padding:0 10px;font-size:12px;font-weight:700;text-decoration:none">{{ $socialLink['label'] }} ↗</a>
+                    @endforeach
                 </div>
             </div>
         </div>
     </footer>
 
-    {{-- External JS Libraries --}}
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-
-    <script>
-        // ========== INITIALIZE AOS ==========
-        AOS.init({
-            duration: 1000,
-            once: false,
-            offset: 100,
-        });
-
-        // ========== NAVBAR SCROLL EFFECT ==========
-        const navbar = document.getElementById('navbar');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 50) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
-        });
-
-        // ========== USER MENU TOGGLE ==========
-        function toggleUserMenu() {
-            const dropdown = document.getElementById('userDropdown');
-            dropdown.classList.toggle('show');
-        }
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(event) {
-            const userMenu = document.querySelector('.user-menu');
-            const dropdown = document.getElementById('userDropdown');
-            if (!userMenu?.contains(event.target)) {
-                dropdown?.classList.remove('show');
-            }
-        });
-
-        // ========== SCROLL TO TOP BUTTON ==========
-        const scrollToTopBtn = document.getElementById('scrollToTop');
-        
-        // Show/hide button based on scroll position
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 300) {
-                scrollToTopBtn.classList.add('visible');
-            } else {
-                scrollToTopBtn.classList.remove('visible');
-            }
-        });
-        
-        // Smooth scroll to top when clicked
-        scrollToTopBtn.addEventListener('click', () => {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        });
-    </script>
 </body>
 </html>
