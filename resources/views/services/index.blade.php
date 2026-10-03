@@ -4,134 +4,93 @@
 
 @section('content')
 <style>
-    /* Hero Section */
+    /* The service index is the hero artwork: three clear routes into the catalogue. */
     .services-hero {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-        background-size: 200% 200%;
+        background: radial-gradient(circle at 83% 18%, rgba(176, 139, 255, .32), transparent 31%), linear-gradient(125deg, #1d194c 0%, #393078 48%, #7150aa 100%);
         position: relative;
         overflow: hidden;
-        padding: 120px 20px 140px;
+        padding: clamp(135px, 13vw, 180px) 24px 110px;
         color: white;
     }
-    
-    @keyframes heroGradient {
-        0%, 100% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-    }
-    
     .services-hero::before {
         content: '';
         position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: 
-            radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
-            radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
-            radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
+        inset: 0;
+        background: linear-gradient(90deg, rgba(255,255,255,.055) 1px, transparent 1px), linear-gradient(rgba(255,255,255,.055) 1px, transparent 1px);
+        background-size: 72px 72px;
+        mask-image: linear-gradient(90deg, transparent, #000 28%, #000 90%);
+        pointer-events: none;
     }
-    
     .services-hero::after {
         content: '';
         position: absolute;
-        width: 100%;
-        height: 100%;
-        top: 0;
-        left: 0;
-        background-image: 
-            url('data:image/svg+xml,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="2" fill="white" opacity="0.2"/></svg>');
-        background-size: 50px 50px;
+        width: min(42vw, 570px);
+        aspect-ratio: 1;
+        right: -12%;
+        bottom: -70%;
+        border: 1px solid rgba(255,255,255,.2);
+        border-radius: 50%;
+        box-shadow: 0 0 0 76px rgba(255,255,255,.025), 0 0 0 155px rgba(255,255,255,.025);
         pointer-events: none;
     }
-    
-    @keyframes sparkle {
-        0% { transform: translateY(0); opacity: 1; }
-        100% { transform: translateY(-50px); opacity: 0.5; }
-    }
-    
-    @keyframes floatPattern {
-        0% { transform: translateY(0) translateX(0); }
-        50% { transform: translateY(-20px) translateX(10px); }
-        100% { transform: translateY(0) translateX(0); }
-    }
-    
-    @keyframes float {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-20px); }
-    }
-    
     .services-hero-content {
         position: relative;
         z-index: 2;
-        max-width: 1200px;
+        max-width: 1280px;
         margin: 0 auto;
-        animation: fadeInUp 0.8s ease-out;
+        display: grid;
+        grid-template-columns: minmax(0, 1.2fr) minmax(310px, .8fr);
+        align-items: center;
+        gap: clamp(44px, 7vw, 110px);
     }
-    
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
     .services-hero h1 {
-        font-size: clamp(2.8rem, 6vw, 4.5rem);
+        font-size: clamp(3.2rem, 6.6vw, 5.9rem);
         font-weight: 900;
-        margin-bottom: 1.5rem;
-        letter-spacing: -2px;
-        background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 50%, #ddd6fe 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        text-shadow: none;
-        animation: textShine 3s ease-in-out infinite;
-        position: relative;
+        max-width: 10ch;
+        margin: 0 0 30px;
+        line-height: 1.04;
+        letter-spacing: -.055em;
+        color: #fff;
     }
-    
-    @keyframes textShine {
-        0%, 100% { filter: brightness(1); }
-        50% { filter: brightness(1.2); }
-    }
-    
-    .services-hero p {
-        font-size: 1.25rem;
-        opacity: 0.95;
-        line-height: 1.8;
-        max-width: 750px;
-        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
-        font-weight: 300;
-    }
-
-    .services-hero-art { position: relative; width: 245px; height: 205px; margin-left: auto; }
-    .services-hero-art::before { content: ''; position: absolute; inset: 12px 18px; border: 1px solid rgba(255,255,255,.42); border-radius: 24px; transform: rotate(-9deg); }
-    .services-hero-art__tile { position: absolute; display: grid; place-items: center; width: 108px; height: 108px; border: 1px solid rgba(255,255,255,.56); border-radius: 22px; background: rgba(255,255,255,.18); backdrop-filter: blur(8px); box-shadow: 0 15px 36px rgba(31,28,96,.15); }
-    .services-hero-art__tile .work-icon { width: 76px; height: 76px; }
-    .services-hero-art__tile--tax { left: 0; top: 0; transform: rotate(-8deg); }
-    .services-hero-art__tile--code { right: 0; top: 34px; transform: rotate(7deg); }
-    .services-hero-art__tile--support { left: 48px; bottom: 0; transform: rotate(3deg); }
+    .services-hero p { max-width: 56ch; color: #e3def7; font-size: clamp(1.08rem, 1.6vw, 1.3rem); line-height: 1.7; margin: 0 0 34px; }
+    .services-hero-cta { display: inline-flex; align-items: center; gap: 14px; padding: 15px 23px; border-radius: 10px; background: #fff; color: #392a81; font-weight: 800; text-decoration: none; box-shadow: 0 16px 36px rgba(14,10,52,.2); transition: transform .2s ease, box-shadow .2s ease; }
+    .services-hero-cta:hover { color: #392a81; transform: translateY(-3px); box-shadow: 0 20px 38px rgba(14,10,52,.3); }
+    .services-hero-cta span { font-size: 1.2rem; }
+    .services-hero-guide { padding: 26px; border: 1px solid rgba(255,255,255,.28); border-radius: 24px; background: rgba(255,255,255,.11); box-shadow: 0 25px 65px rgba(16,10,55,.2); backdrop-filter: blur(14px); }
+    .services-hero-guide h2 { margin: 0 0 18px; color: #fff; font-size: 1.25rem; font-weight: 800; }
+    .services-hero-guide__link { display: grid; grid-template-columns: 48px minmax(0,1fr) auto; gap: 13px; align-items: center; padding: 15px 12px; border-top: 1px solid rgba(255,255,255,.23); color: #fff; text-decoration: none; transition: background .2s ease, padding-left .2s ease; }
+    .services-hero-guide__link:hover { background: rgba(255,255,255,.13); color: #fff; padding-left: 18px; }
+    .services-hero-guide__icon { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 12px; background: rgba(255,255,255,.93); color: #3e3281; }
+    .services-hero-guide__icon .work-icon { width: 31px; height: 31px; }
+    .services-hero-guide__name { font-weight: 800; line-height: 1.3; }
+    .services-hero-guide__count { color: #ddd5f8; font-size: .78rem; white-space: nowrap; }
+    .services-hero-copy { animation: servicesEnter .7s ease-out both; }
+    .services-hero-guide { animation: servicesEnter .7s .12s ease-out both; }
+    @keyframes servicesEnter { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
     
     /* Main Content */
     .services-container {
         max-width: 1400px;
         margin: 0 auto;
-        padding: 100px 20px;
+        padding: 70px 20px;
     }
+    .services-container--catalogue { padding-bottom: 0; }
+    .services-container + .services-container { padding-top: 0; }
+    .services-jump { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 0 0 54px; padding: 15px 18px; border: 1px solid #dcd8ed; border-radius: 14px; background: #fff; box-shadow: 0 8px 26px rgba(43,35,99,.06); }
+    .services-jump__label { margin-right: 10px; color: #433776; font-weight: 800; }
+    .services-jump a { padding: 9px 13px; border-radius: 8px; color: #514688; font-size: .86rem; font-weight: 700; text-decoration: none; background: #f4f1fb; }
+    .services-jump a:hover, .services-jump a:focus-visible { background: #e8ddfa; color: #322569; }
     
     /* Division Section */
     .division-section {
-        margin-bottom: 100px;
+        margin-bottom: 72px;
         padding: 40px;
         background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%);
         border-radius: 30px;
         border: 1px solid rgba(255, 255, 255, 0.8);
         box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
         transition: box-shadow 0.25s ease;
+        scroll-margin-top: 96px;
     }
     
     .division-section:hover {
@@ -139,9 +98,12 @@
     }
     
     .division-header {
-        margin-bottom: 50px;
+        margin-bottom: 36px;
         position: relative;
     }
+    .division-breadcrumb { display: flex; align-items: center; gap: 9px; margin-bottom: 20px; color: #746a99; font-size: .82rem; font-weight: 700; }
+    .division-breadcrumb a { color: #5e4eb0; text-decoration: none; }
+    .division-breadcrumb a:hover { text-decoration: underline; }
     
     .division-title-wrapper {
         display: flex;
@@ -207,135 +169,60 @@
     .services-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-        gap: 35px;
+        gap: 26px;
     }
+    .service-page-item { min-width: 0; }
+    .service-page-item[hidden], .service-pager[hidden] { display: none; }
+    .service-pager { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 14px; margin-top: 32px; }
+    .service-pager button { border: 1px solid #c9bce9; background: #fff; color: #493799; border-radius: 9px; padding: 11px 17px; font-weight: 800; transition: background .2s ease, border-color .2s ease; }
+    .service-pager button:not(:disabled):hover { background: #eee8fa; border-color: #8b6bdb; }
+    .service-pager button:disabled { opacity: .42; cursor: not-allowed; }
+    .service-pager__status { min-width: 92px; text-align: center; color: #5b5570; font-size: .88rem; font-weight: 700; }
     
-    /* Stats Section */
+    /* A compact closing summary instead of three oversized statistic cards. */
     .stats-section {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-        background-size: 200% 200%;
-        padding: 80px 20px;
-        margin-top: 60px;
-        border-radius: 30px;
+        background: linear-gradient(125deg, #241b59, #5f469c);
+        padding: clamp(38px, 5vw, 70px);
+        border-radius: 24px;
         position: relative;
         overflow: hidden;
-        box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
     }
-    
-    @keyframes statsGradient {
-        0%, 100% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-    }
-    
     .stats-section::before {
         content: '';
         position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="30" r="1.5" fill="%23667eea" opacity="0.1"/></svg>');
-        opacity: 0.5;
-    }
-    
-    .stats-content {
-        position: relative;
-        z-index: 2;
-        max-width: 1200px;
-        margin: 0 auto;
-    }
-    
-    .stat-box {
-        text-align: center;
-        padding: 40px 30px;
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        border-radius: 24px;
-        border: 2px solid rgba(255, 255, 255, 0.5);
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .stat-box::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-        opacity: 0;
-        transition: opacity 0.4s ease;
-    }
-    
-    .stat-box:hover {
-        transform: translateY(-15px) scale(1.03);
-        box-shadow: 0 25px 60px rgba(102, 126, 234, 0.25);
-        border-color: rgba(255, 255, 255, 0.8);
-    }
-    
-    .stat-box:hover::before {
-        opacity: 1;
-    }
-    
-    .stat-number {
-        font-size: 4rem;
-        font-weight: 900;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        margin-bottom: 10px;
-        display: block;
-        line-height: 1;
-        position: relative;
-        z-index: 2;
-    }
-    
-    .stat-label {
-        font-size: 1.05rem;
-        color: #64748b;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        position: relative;
-        z-index: 2;
-    }
-    
-    .divider {
-        height: 3px;
-        background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3), transparent);
-        margin: 80px 0;
-        position: relative;
-        border-radius: 2px;
-    }
-    
-    .divider::before {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 60px;
-        height: 60px;
-        background: linear-gradient(135deg, #667eea, #764ba2);
+        width: 410px;
+        height: 410px;
+        right: -120px;
+        top: -240px;
+        border: 1px solid rgba(255,255,255,.2);
         border-radius: 50%;
-        opacity: 0.1;
-        filter: blur(20px);
+        box-shadow: 0 0 0 65px rgba(255,255,255,.04), 0 0 0 130px rgba(255,255,255,.03);
+    }
+    .stats-content { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(340px, .95fr); align-items: end; gap: 48px; }
+    .stats-content h2 { max-width: 13ch; color: #fff; font-size: clamp(2rem, 3.4vw, 3.5rem); line-height: 1.1; letter-spacing: -.04em; font-weight: 900; }
+    .stats-content p { max-width: 48ch; color: #e5dffa; line-height: 1.7; margin: 18px 0 22px; }
+    .stats-content a { color: #fff; font-weight: 800; text-underline-offset: 5px; }
+    .stats-metrics { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid rgba(255,255,255,.35); padding-top: 25px; }
+    .stats-metrics div { padding-inline: 16px; border-right: 1px solid rgba(255,255,255,.24); }
+    .stats-metrics div:first-child { padding-left: 0; }
+    .stats-metrics div:last-child { border-right: 0; }
+    .stats-metrics strong { display: block; color: #fff; font-size: clamp(1.7rem, 3vw, 3rem); line-height: 1.15; font-weight: 900; }
+    .stats-metrics span { display: block; margin-top: 8px; color: #e3dcf8; font-size: .78rem; line-height: 1.4; }
     }
     
     /* Service cards render immediately so the catalogue stays responsive. */
     
     @media (max-width: 768px) {
         .services-hero {
-            padding: 60px 20px 80px;
+            padding: 105px 20px 58px;
         }
-        
+        .services-hero-content { grid-template-columns: 1fr; gap: 28px; }
         .services-hero h1 {
-            font-size: 2.5rem;
+            font-size: clamp(2.8rem, 10vw, 4.4rem);
+            margin-bottom: 22px;
         }
+        .services-hero p { margin-bottom: 25px; }
+        .services-hero-guide { padding: 18px; }
         
         .services-container {
             padding: 60px 20px;
@@ -354,9 +241,7 @@
             grid-template-columns: 1fr;
         }
         
-        .stat-number {
-            font-size: 3rem;
-        }
+        .stats-content { grid-template-columns: 1fr; gap: 28px; }
         
         .cta-card {
             padding: 35px 25px !important;
@@ -417,37 +302,59 @@
     .scroll-indicator svg {
         filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.3));
     }
+    @media (max-width: 480px) {
+        .services-jump { align-items: stretch; }
+        .services-jump__label { flex-basis: 100%; }
+        .services-jump a { flex: 1 1 auto; text-align: center; }
+        .services-hero-guide__count { display: none; }
+        .division-section { padding: 22px 16px; }
+        .stats-section { padding: 34px 24px; }
+        .stats-metrics { gap: 12px; }
+        .stats-metrics div { padding-inline: 6px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .services-hero-copy, .services-hero-guide { animation: none; }
+        .services-hero-cta, .services-hero-guide__link, .service-pager button { transition: none; }
+    }
 </style>
 
 <div class="services-hero">
     <div class="services-hero-content">
-        <div class="row align-items-center">
-            <div class="col-lg-8">
-                <h1>Our Professional Services</h1>
-                <p class="mb-0">
-                    Comprehensive solutions across taxation, IT, and technical support. 
-                    All delivered by our team of certified experts dedicated to your success.
-                </p>
-            </div>
-            <div class="col-lg-4 text-end d-none d-lg-block">
-                <div class="services-hero-art" aria-hidden="true">
-                    <span class="services-hero-art__tile services-hero-art__tile--tax"><x-work-icon type="tax" /></span>
-                    <span class="services-hero-art__tile services-hero-art__tile--code"><x-work-icon type="code" /></span>
-                    <span class="services-hero-art__tile services-hero-art__tile--support"><x-work-icon type="support" /></span>
-                </div>
-            </div>
+        <div class="services-hero-copy">
+            <h1>Expertise for the work ahead.</h1>
+            <p>Taxation, digital delivery, and hands-on technical support—find the right specialist and a clear way forward for your business.</p>
+            <a href="#services-catalogue" class="services-hero-cta">Explore our services <span aria-hidden="true">↗</span></a>
         </div>
-        
-        <!-- Scroll Indicator -->
-        <div class="scroll-indicator">
-            <svg width="30" height="30" viewBox="0 0 24 24" fill="white">
-                <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
-            </svg>
-        </div>
+        @if($servicesByDivision->isNotEmpty())
+            <nav class="services-hero-guide" aria-label="Choose a service division">
+                <h2>Find your focus</h2>
+                @foreach($servicesByDivision as $group)
+                    @php
+                        $heroDivision = $group->first()->service->division;
+                    @endphp
+                    <a class="services-hero-guide__link" href="#division-{{ $heroDivision->slug }}">
+                        <span class="services-hero-guide__icon"><x-work-icon :type="config('service_cards.divisions.' . $heroDivision->slug . '.icon', 'audit')" /></span>
+                        <span class="services-hero-guide__name">{{ $heroDivision->name }}</span>
+                        <span class="services-hero-guide__count">{{ $group->count() }} {{ \Illuminate\Support\Str::plural('service', $group->count()) }} ↗</span>
+                    </a>
+                @endforeach
+            </nav>
+        @endif
     </div>
 </div>
 
-<div class="services-container">
+<div class="services-container services-container--catalogue" id="services-catalogue">
+    @if($servicesByDivision->isNotEmpty())
+        <nav class="services-jump" aria-label="Browse service divisions">
+            <span class="services-jump__label">Browse divisions</span>
+            @foreach($servicesByDivision as $group)
+                @php
+                    $navDivision = $group->first()->service->division;
+                @endphp
+                <a href="#division-{{ $navDivision->slug }}">{{ $navDivision->name }}</a>
+            @endforeach
+        </nav>
+    @endif
     {{-- Services by Division --}}
     @forelse($servicesByDivision as $divisionId => $services)
         @php
@@ -455,8 +362,9 @@
             $themeColors = $division->getThemeColors();
         @endphp
         
-        <div class="division-section" id="division-{{ $division->slug }}" style="--division-primary: {{ $themeColors['primary'] }}; --division-secondary: {{ $themeColors['secondary'] }};">
+        <section class="division-section" id="division-{{ $division->slug }}" data-service-section style="--division-primary: {{ $themeColors['primary'] }}; --division-secondary: {{ $themeColors['secondary'] }};">
             <div class="division-header">
+                <div class="division-breadcrumb"><a href="#services-catalogue">All divisions</a><span aria-hidden="true">/</span><span>{{ $division->name }}</span></div>
                 <div class="division-title-wrapper">
                     <div class="division-accent"></div>
                     <h2 class="division-title" style="color: {{ $themeColors['primary'] }};">
@@ -468,9 +376,14 @@
 
             <div class="services-grid">
                 @foreach($services as $offering)
-                    <x-service-card :offering="$offering" />
+                    <div class="service-page-item"><x-service-card :offering="$offering" /></div>
                 @endforeach
             </div>
+            <nav class="service-pager" aria-label="{{ $division->name }} service pages" hidden>
+                <button type="button" data-page-prev>← Previous</button>
+                <span class="service-pager__status" data-page-status aria-live="polite"></span>
+                <button type="button" data-page-next>Next →</button>
+            </nav>
             
             {{-- WhatsApp CTA Section --}}
             <div class="whatsapp-cta-section" style="margin-top: 60px; position: relative;">
@@ -568,11 +481,8 @@
                     </div>
                 @endif
             </div>
-        </div>
+        </section>
 
-        @if(!$loop->last)
-            <div class="divider"></div>
-        @endif
     @empty
         <div class="alert alert-info text-center py-5" style="border-radius: 20px; border: 2px dashed #667eea; background: rgba(102, 126, 234, 0.05);">
             <div style="display: flex; justify-content: center; color: #667eea; margin-bottom: 20px;"><x-work-icon type="audit" style="width: 64px; height: 64px;" /></div>
@@ -586,28 +496,52 @@
 <div class="services-container">
     <div class="stats-section">
         <div class="stats-content">
-            <div class="row g-4">
-                <div class="col-md-4">
-                    <div class="stat-box">
-                        <span class="stat-number">{{ $totalServices }}</span>
-                        <p class="stat-label mb-0">Professional Services</p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="stat-box">
-                        <span class="stat-number">{{ $totalReviews }}</span>
-                        <p class="stat-label mb-0">Client Reviews</p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="stat-box">
-                        <span class="stat-number">{{ $servicesByDivision->count() }}</span>
-                        <p class="stat-label mb-0">Service Divisions</p>
-                    </div>
-                </div>
+            <div>
+                <h2>One team. Several ways forward.</h2>
+                <p>From a tax filing to a new platform or urgent technical help, start with the specialist who knows the work.</p>
+                <a href="{{ route('team.index') }}">Meet the team ↗</a>
+            </div>
+            <div class="stats-metrics" aria-label="Services at a glance">
+                <div><strong>{{ $totalServices }}</strong><span>Services</span></div>
+                <div><strong>{{ $totalReviews }}</strong><span>Client reviews</span></div>
+                <div><strong>{{ $servicesByDivision->count() }}</strong><span>Divisions</span></div>
             </div>
         </div>
     </div>
 </div>
 
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const pageSize = 6;
+    for (const section of document.querySelectorAll('[data-service-section]')) {
+        const items = [...section.querySelectorAll('.service-page-item')];
+        const pager = section.querySelector('.service-pager');
+        if (items.length <= pageSize || !pager) continue;
+
+        const pageCount = Math.ceil(items.length / pageSize);
+        const previous = pager.querySelector('[data-page-prev]');
+        const next = pager.querySelector('[data-page-next]');
+        const status = pager.querySelector('[data-page-status]');
+        let page = 0;
+
+        function showPage() {
+            items.forEach((item, index) => { item.hidden = Math.floor(index / pageSize) !== page; });
+            previous.disabled = page === 0;
+            next.disabled = page === pageCount - 1;
+            status.textContent = `Page ${page + 1} of ${pageCount}`;
+        }
+
+        function changePage(direction) {
+            page += direction;
+            showPage();
+            section.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+        }
+
+        previous.addEventListener('click', () => changePage(-1));
+        next.addEventListener('click', () => changePage(1));
+        pager.hidden = false;
+        showPage();
+    }
+});
+</script>
 @endsection

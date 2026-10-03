@@ -141,10 +141,13 @@
     .cta-section {
         background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
         padding: 80px 20px;
-        border-radius: 20px;
         text-align: center;
         color: white;
-        margin-top: 100px;
+    }
+
+    .cta-section-content {
+        max-width: 1000px;
+        margin-inline: auto;
     }
     
     .cta-section h2 {
@@ -284,8 +287,11 @@
         </div>
     </div>
     
-    <!-- CTA Section -->
-    <div class="cta-section">
+</div>
+
+<!-- CTA Section -->
+<div class="cta-section">
+    <div class="cta-section-content">
         <h2>Discover What We Can Do For You</h2>
         <p>Explore our services and meet our team of expert professionals</p>
         <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 2rem;">

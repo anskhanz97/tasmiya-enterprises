@@ -289,10 +289,12 @@
     .team-section {
         background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e293b 100%);
         padding: 100px 20px;
-        margin-left: -20px;
-        margin-right: -20px;
         position: relative;
         overflow: hidden;
+    }
+
+    .section.team-section, .section.clients-section, .section.home-cta-section {
+        margin-bottom: 0;
     }
     
     .team-section::before {
@@ -492,6 +494,8 @@
         justify-content: center;
         gap: 30px;
         padding: 60px 20px;
+        max-width: 1280px;
+        margin-inline: auto;
         perspective: 1500px;
         z-index: 2;
     }
@@ -843,7 +847,6 @@
         background-size: 200% 200%;
         color: white;
         padding: 100px 40px;
-        border-radius: 30px;
         text-align: center;
         position: relative;
         overflow: hidden;
@@ -880,6 +883,8 @@
         font-size: clamp(2rem, 4vw, 3rem);
         font-weight: 900;
         margin-bottom: 1.5rem;
+        max-width: 1100px;
+        margin-inline: auto;
         letter-spacing: -1px;
         text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     }
@@ -888,6 +893,8 @@
         font-size: 1.2rem;
         opacity: 0.95;
         margin-bottom: 2.5rem;
+        max-width: 800px;
+        margin-inline: auto;
         line-height: 1.7;
     }
     
@@ -1032,7 +1039,6 @@
     /* ===== CLIENTS SECTION - ANIMATED SLIDER ===== */
     .clients-section {
         background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-        border-radius: 30px;
         padding: 80px 20px;
         position: relative;
         overflow: hidden;
@@ -1257,7 +1263,8 @@
             <a href="{{ route('services.index') }}" style="display: inline-block; padding: 12px 30px; background: #f1f5f9; color: #3b82f6; text-decoration: none; border-radius: 8px; font-weight: 600;">View All Services →</a>
         </div>
     </div>
-    
+</div>
+
     <!-- MEET THE TEAM -->
     <div class="section team-section">
         <div class="section-header">
@@ -1367,15 +1374,13 @@
     </div>
     
     <!-- CTA SECTION -->
-    <div class="section">
+    <div class="section home-cta-section">
         <div class="cta-large">
             <h2>Ready to Transform Your Business?</h2>
             <p>Let's discuss how our expertise can help you achieve your goals</p>
             <a href="{{ route('contact.create') }}" class="cta-button"><span>Start Your Journey</span></a>
         </div>
     </div>
-</div>
-
 <script>
 // Animated Counter for Hero Stats
 document.addEventListener('DOMContentLoaded', function() {

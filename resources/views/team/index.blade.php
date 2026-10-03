@@ -6,11 +6,11 @@
 <style>
     /* ===== HERO SECTION ===== */
     .team-hero {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: radial-gradient(circle at 78% 22%, rgba(175,146,255,.28), transparent 34%), linear-gradient(120deg, #211c52 0%, #4b3a93 56%, #7956ad 100%);
         position: relative;
         overflow: hidden;
-        padding: 100px 20px 140px;
-        min-height: 500px;
+        padding: 135px 24px 100px;
+        min-height: 660px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -23,26 +23,24 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: 
-            radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-            radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-            url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="30" r="1.5" fill="white" opacity="0.2"/></svg>');
-        animation: floatPattern 20s linear infinite;
+        background: linear-gradient(90deg, rgba(255,255,255,.055) 1px, transparent 1px), linear-gradient(rgba(255,255,255,.055) 1px, transparent 1px);
+        background-size: 76px 76px;
+        mask-image: linear-gradient(90deg, transparent, #000 45%);
+        pointer-events: none;
     }
-    
-    @keyframes floatPattern {
-        0% { transform: translateY(0) translateX(0); }
-        50% { transform: translateY(-20px) translateX(10px); }
-        100% { transform: translateY(0) translateX(0); }
-    }
+    .team-hero::after { content: ''; position: absolute; right: -170px; bottom: -370px; width: 690px; height: 690px; border: 1px solid rgba(255,255,255,.22); border-radius: 50%; box-shadow: 0 0 0 75px rgba(255,255,255,.035), 0 0 0 155px rgba(255,255,255,.025); pointer-events: none; }
     
     .team-hero-content {
         position: relative;
         z-index: 2;
-        text-align: center;
+        display: grid;
+        grid-template-columns: minmax(0,1fr) minmax(350px,.86fr);
+        align-items: center;
+        gap: clamp(35px, 5vw, 80px);
+        text-align: left;
         color: white;
-        max-width: 900px;
-        animation: fadeInDown 0.8s ease-out;
+        width: 100%;
+        max-width: 1280px;
     }
     
     @keyframes fadeInDown {
@@ -57,36 +55,47 @@
     }
     
     .team-hero h1 {
-        font-size: clamp(2.5rem, 5vw, 4.5rem);
+        font-size: clamp(3rem, 5.8vw, 5.3rem);
         font-weight: 900;
         margin-bottom: 1.5rem;
-        line-height: 1;
-        letter-spacing: -2px;
-        text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        max-width: 11ch;
+        line-height: 1.05;
+        letter-spacing: -.055em;
     }
     
     .team-hero p {
-        font-size: 1.3rem;
-        opacity: 0.95;
-        margin-bottom: 3rem;
+        font-size: 1.18rem;
+        color: #e7e1fa;
+        margin-bottom: 2.5rem;
         line-height: 1.7;
-        max-width: 700px;
-        margin-left: auto;
-        margin-right: auto;
+        max-width: 53ch;
     }
+    .team-hero-portraits { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); align-items: end; gap: 10px; min-height: 390px; }
+    .team-hero-portrait { position: relative; display: block; height: 320px; border: 1px solid rgba(255,255,255,.42); border-radius: 16px; overflow: hidden; box-shadow: 0 24px 44px rgba(16,10,52,.26); text-decoration: none; transition: transform .25s ease; }
+    .team-hero-portrait:nth-child(2) { height: 390px; }
+    .team-hero-portrait:nth-child(3) { height: 345px; }
+    .team-hero-portrait:hover { transform: translateY(-7px); }
+    .team-hero-portrait img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+    .team-hero-portrait::after { content: ''; position: absolute; inset: 45% 0 0; background: linear-gradient(transparent, rgba(22,15,57,.78)); pointer-events: none; }
+    .team-hero-portrait span { position: absolute; z-index: 1; bottom: 13px; left: 12px; right: 10px; color: #fff; font-size: .83rem; font-weight: 800; line-height: 1.25; }
     
     .hero-stats {
         display: flex;
-        justify-content: center;
-        gap: 70px;
+        justify-content: flex-start;
+        gap: 0;
         flex-wrap: wrap;
-        margin-top: 3rem;
+        margin-top: 2.2rem;
+        padding-top: 22px;
+        border-top: 1px solid rgba(255,255,255,.33);
     }
     
     .stat-box {
-        text-align: center;
-        animation: fadeInUp 0.8s ease-out backwards;
+        text-align: left;
+        padding: 0 22px;
+        border-right: 1px solid rgba(255,255,255,.25);
     }
+    .stat-box:first-child { padding-left: 0; }
+    .stat-box:last-child { border-right: 0; }
     
     .stat-box:nth-child(1) { animation-delay: 0.2s; }
     .stat-box:nth-child(2) { animation-delay: 0.4s; }
@@ -104,7 +113,7 @@
     }
     
     .stat-number {
-        font-size: 3.5rem;
+        font-size: 2.4rem;
         font-weight: 900;
         display: block;
         line-height: 1;
@@ -113,10 +122,9 @@
     }
     
     .stat-label {
-        font-size: 0.95rem;
+        font-size: 0.72rem;
         opacity: 0.9;
-        text-transform: uppercase;
-        letter-spacing: 2px;
+        letter-spacing: .01em;
         font-weight: 600;
     }
     
@@ -124,9 +132,16 @@
     .team-container {
         max-width: 1500px;
         margin: 0 auto;
-        padding: 120px 20px;
+        padding: 100px 20px 120px;
         perspective: 2000px;
+        position: relative;
+        z-index: 1;
     }
+    .team-stage { position: relative; overflow: hidden; background: radial-gradient(circle at 7% 16%, rgba(168,142,236,.27), transparent 26%), radial-gradient(circle at 90% 78%, rgba(107,116,225,.22), transparent 31%), linear-gradient(180deg, #eeeafb 0%, #f8f7fd 48%, #e9e4f7 100%); }
+    .team-stage::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(135deg, transparent 49.8%, rgba(100,74,168,.06) 50%, transparent 50.2%); background-size: 160px 160px; pointer-events: none; }
+    .team-stage-intro { max-width: 1200px; margin: 0 auto 52px; }
+    .team-stage-intro h2 { color: #29205d; font-size: clamp(2rem, 3vw, 3.1rem); font-weight: 900; letter-spacing: -.04em; }
+    .team-stage-intro p { color: #625a78; max-width: 60ch; font-size: 1.08rem; line-height: 1.7; margin: 12px 0 0; }
     
     /* ===== TEAM GRID - STAGGERED DIAMOND LAYOUT ===== */
     .team-grid {
@@ -425,13 +440,10 @@
     .team-cta {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         padding: 100px 40px;
-        border-radius: 30px;
         text-align: center;
         color: white;
-        margin-top: 100px;
         position: relative;
         overflow: hidden;
-        box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
     }
     
     .team-cta::before {
@@ -453,6 +465,8 @@
     .team-cta-content {
         position: relative;
         z-index: 1;
+        max-width: 1100px;
+        margin-inline: auto;
     }
     
     .team-cta h2 {
@@ -511,6 +525,10 @@
     }
     
     @media (max-width: 992px) {
+        .team-hero { min-height: 0; padding: 120px 22px 85px; }
+        .team-hero-content { grid-template-columns: 1fr; gap: 42px; }
+        .team-hero h1 { max-width: 15ch; }
+        .team-hero-portraits { max-width: 690px; width: 100%; margin-inline: auto; }
         .team-grid {
             grid-template-columns: 1fr;
             gap: 50px;
@@ -521,20 +539,8 @@
             height: 550px;
         }
         
-        .hero-stats {
-            gap: 40px;
-        }
-        
-        .stat-number {
-            font-size: 2.8rem;
-        }
-        
-        .team-hero {
-            padding: 80px 20px 120px;
-        }
-        
         .team-container {
-            padding: 100px 20px;
+            padding: 75px 20px 90px;
         }
     }
     
@@ -558,8 +564,15 @@
         }
         
         .team-hero h1 {
-            font-size: 2.5rem;
+            font-size: clamp(2.7rem, 10vw, 3.5rem);
         }
+        .team-hero-portraits { min-height: 245px; gap: 6px; }
+        .team-hero-portrait, .team-hero-portrait:nth-child(3) { height: 205px; border-radius: 10px; }
+        .team-hero-portrait:nth-child(2) { height: 245px; }
+        .team-hero-portrait span { font-size: .65rem; left: 7px; bottom: 8px; }
+        .stat-box { padding: 0 12px; }
+        .stat-number { font-size: 1.9rem; }
+        .stat-label { font-size: .64rem; }
         
         .team-cta h2 {
             font-size: 2rem;
@@ -581,38 +594,44 @@
     .member-cta:focus-visible, .cta-btn:focus-visible { outline: 3px solid #132a50; outline-offset: 4px; }
     @media (prefers-reduced-motion: reduce) {
         .team-hero::before, .member-title, .flip-hint, .team-cta::before { animation: none; }
-        .team-member, .member-banner img, .member-profile-image { transition-duration: .01ms; }
+        .team-member, .member-banner img, .member-profile-image, .team-hero-portrait { transition-duration: .01ms; }
     }
 </style>
 
 <!-- HERO SECTION -->
 <div class="team-hero">
     <div class="team-hero-content">
-        <h1>Meet Our Leadership Team</h1>
-        <p>Dedicated professionals bringing expertise in taxation, technology, and business solutions to help your enterprise thrive.</p>
-        @php
-            $totalTeam = $profiles->count();
-            $totalDivisions = \App\Models\Division::count();
-        @endphp
-        <div class="hero-stats">
-            <div class="stat-box">
-                <span class="stat-number">{{ $totalTeam }}</span>
-                <span class="stat-label">Core Team</span>
+        <div class="team-hero-copy">
+            <h1>Meet Our Leadership Team</h1>
+            <p>Real people behind the advice, digital work, and technical support your business depends on.</p>
+            @php
+                $totalTeam = $profiles->count();
+                $totalDivisions = \App\Models\Division::count();
+            @endphp
+            <div class="hero-stats">
+                <div class="stat-box"><span class="stat-number">{{ $totalTeam }}</span><span class="stat-label">Team members</span></div>
+                <div class="stat-box"><span class="stat-number">{{ $totalDivisions }}</span><span class="stat-label">Divisions</span></div>
+                <div class="stat-box"><span class="stat-number">20+</span><span class="stat-label">Years' experience</span></div>
             </div>
-            <div class="stat-box">
-                <span class="stat-number">{{ $totalDivisions }}</span>
-                <span class="stat-label">Divisions</span>
-            </div>
-            <div class="stat-box">
-                <span class="stat-number">20+</span>
-                <span class="stat-label">Years Experience</span>
-            </div>
+        </div>
+        <div class="team-hero-portraits" aria-label="Meet our specialists">
+            @php
+                $heroProfiles = $profiles->unique(fn ($profile) => $profile->user->division_id)->take(3);
+            @endphp
+            @foreach($heroProfiles as $profile)
+                <a class="team-hero-portrait" href="{{ route('profiles.show', $profile) }}" aria-label="View {{ $profile->user->name }}'s profile">
+                    <img src="{{ $profile->displayImageUrl('profile') }}" alt="" width="260" height="390" @if(!$loop->first) loading="lazy" @endif decoding="async">
+                    <span>{{ $profile->user->name }}</span>
+                </a>
+            @endforeach
         </div>
     </div>
 </div>
 
 <!-- MAIN CONTENT -->
+<div class="team-stage" id="team-members">
 <div class="team-container">
+    <div class="team-stage-intro"><h2>Meet the people you'll work with</h2><p>Explore each specialist's experience, then connect with the person best suited to your project.</p></div>
     <!-- TEAM GRID with 3D Flip Cards -->
     <div class="team-grid">
         @foreach($profiles as $profile)
@@ -703,14 +722,15 @@
                 </div>
         @endforeach
     </div>
-    
-    <!-- CTA SECTION -->
-    <div class="team-cta">
-        <div class="team-cta-content">
-            <h2>Ready to Work With Our Team?</h2>
-            <p>Reach out to us and discover how our experts can help transform your business and achieve your goals together.</p>
-            <a href="{{ route('contact.create') }}" class="cta-btn">Get in Touch</a>
-        </div>
+</div>
+</div>
+
+<!-- CTA SECTION -->
+<div class="team-cta">
+    <div class="team-cta-content">
+        <h2>Ready to Work With Our Team?</h2>
+        <p>Reach out to us and discover how our experts can help transform your business and achieve your goals together.</p>
+        <a href="{{ route('contact.create') }}" class="cta-btn">Get in Touch</a>
     </div>
 </div>
 
