@@ -65,11 +65,14 @@ class TestimonialController extends Controller
 
         // Get all services and profiles for the selection dropdowns
         $services = Service::active()->with('division')->get();
-        $profiles = Profile::visible()->with('user')->get();
+        $profiles = Profile::visible()->with('user')
+            ->when($service, fn ($query) => $query->whereHas('services', fn ($query) => $query->where('services.id', $service->id)))
+            ->get();
 
         return view('testimonials.create', [
             'service' => $service,
             'profile' => $profile,
+            'selectedProfileId' => $profile?->id,
             'services' => $services,
             'profiles' => $profiles,
         ]);
@@ -123,6 +126,9 @@ class TestimonialController extends Controller
         $profileId = $request->input('profile_id');
 
         // Determine what this testimonial is for (must be at least one)
+        $validated['profile_id'] = $profileId ?: null;
+        $validated['is_approved'] = false;
+        $validated['is_featured'] = false;
         if ($serviceId) {
             $validated['testimonialable_type'] = Service::class;
             $validated['testimonialable_id'] = $serviceId;
@@ -142,9 +148,9 @@ class TestimonialController extends Controller
         //     ->send(new TestimonialSubmitted($testimonial));
 
         // Redirect back to service if provided, otherwise to services index
-        $redirectUrl = $serviceId 
-            ? route('services.show', Service::find($serviceId))
-            : route('services.index');
+        $redirectUrl = $serviceId
+            ? route('services.show', Service::find($serviceId)).($profileId ? '?profile='.$profileId : '')
+            : ($profileId ? route('profiles.show', $profileId).'#profile-reviews' : route('services.index'));
 
         return redirect($redirectUrl)
             ->with('success', 'Thank you! Your review has been submitted and will appear after admin approval.');

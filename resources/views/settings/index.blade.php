@@ -3,6 +3,10 @@
 @section('content')
 @php
     $cards = [
+        'statistics' => ['Company statistics', 'Figures shown across the public website. Enter numbers only; the site adds the plus sign.', [
+            'company_clients_served' => ['Clients served', 'number', '2500'],
+            'company_experience_years' => ['Years of experience', 'number', '20'],
+        ]],
         'contact' => ['Company & location', 'Details visitors see on the contact page.', [
             'company_email' => ['Company email', 'email', 'contact@tasmiya.com'],
             'company_whatsapp' => ['Company WhatsApp', 'tel', '+92 312 4246916'],
@@ -13,6 +17,10 @@
             'google_client_id' => ['OAuth web client ID', 'text', '...apps.googleusercontent.com'],
             'google_api_key' => ['Browser API key', 'text', 'AIza...'],
             'google_app_id' => ['Cloud project number', 'text', 'Numbers only, not the client ID'],
+        ]],
+        'reviews' => ['Google Reviews showcase', 'Optional live reviews from your verified Google Maps place. The homepage section is off until you enable it.', [
+            'google_reviews_place_id' => ['Google Place ID', 'text', 'ChIJ...'],
+            'google_reviews_api_key' => ['Places API key', 'password', 'Enter a server-side Places API key'],
         ]],
         'onedrive' => ['OneDrive image picker', 'Microsoft sign-in grants read-only access when an editor chooses an image.', [
             'onedrive_client_id' => ['Entra application (client) ID', 'text', 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'],
@@ -54,9 +62,9 @@
             'stripe_webhook_secret' => ['Webhook signing secret', 'password', 'Enter a new signing secret'],
         ]],
     ];
-    $switches = ['bank'=>'enable_bank_transfer', 'raast'=>'enable_raast', 'easypaisa'=>'enable_easypaisa', 'jazzcash'=>'enable_jazzcash', 'stripe'=>'enable_card'];
+    $switches = ['reviews'=>'enable_google_reviews', 'bank'=>'enable_bank_transfer', 'raast'=>'enable_raast', 'easypaisa'=>'enable_easypaisa', 'jazzcash'=>'enable_jazzcash', 'stripe'=>'enable_card'];
     $paymentCards = ['bank','raast','easypaisa','jazzcash','stripe'];
-    $secretFields = ['smtp_password','whatsapp_access_token','whatsapp_app_secret','whatsapp_verify_token','stripe_secret','stripe_webhook_secret'];
+    $secretFields = ['google_reviews_api_key','smtp_password','whatsapp_access_token','whatsapp_app_secret','whatsapp_verify_token','stripe_secret','stripe_webhook_secret'];
     $googleValid = preg_match('/^[0-9]+-[a-z0-9]+\.apps\.googleusercontent\.com$/i', (string) $settings['google_client_id']) && preg_match('/^AIza[0-9A-Za-z_-]+$/', (string) $settings['google_api_key']) && ctype_digit((string) $settings['google_app_id']);
 @endphp
 <style>
@@ -69,7 +77,7 @@
 @if(session('success'))<div class="ig-alert" role="status">{{ session('success') }}</div>@endif
 @if($errors->any())<div class="ig-alert error" role="alert"><strong>Changes were not saved.</strong><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
 <div class="ig-layout"><nav class="ig-nav" aria-label="Settings sections">
-@foreach(['contact'=>'Company & location','google'=>'Google Drive','onedrive'=>'OneDrive','email'=>'Inquiry email','whatsapp'=>'WhatsApp','bank'=>'Bank transfer','raast'=>'Raast','easypaisa'=>'Easypaisa','jazzcash'=>'JazzCash','stripe'=>'Stripe','social'=>'Social links'] as $id=>$label)
+@foreach(['statistics'=>'Company statistics','contact'=>'Company & location','google'=>'Google Drive','reviews'=>'Google Reviews','onedrive'=>'OneDrive','email'=>'Inquiry email','whatsapp'=>'WhatsApp','bank'=>'Bank transfer','raast'=>'Raast','easypaisa'=>'Easypaisa','jazzcash'=>'JazzCash','stripe'=>'Stripe','social'=>'Social links'] as $id=>$label)
 @if($id==='bank')<span class="ig-nav-label">PAYMENTS</span>@endif
 <a href="#ig-{{ $id }}">{{ $label }}</a>
 @endforeach
@@ -79,8 +87,10 @@
 @php
     $enabledKey = $switches[$id] ?? null;
     $configured = match($id) {
+        'statistics' => true,
         'contact' => filled($settings['company_email']) && filled($settings['company_whatsapp']) && filled($settings['company_address']),
         'google' => (bool) $googleValid,
+        'reviews' => filled($settings['google_reviews_place_id']) && filled($settings['google_reviews_api_key']),
         'onedrive' => filled($settings['onedrive_client_id']),
         'email' => filled($settings['smtp_host']) && filled($settings['smtp_from_email']),
         'whatsapp' => filled($settings['whatsapp_phone_id']) && filled($settings['whatsapp_access_token']) && filled($settings['whatsapp_template_name']),
@@ -120,8 +130,9 @@
 @endforeach
 @if($id==='email')<div class="ig-field"><label for="ig-smtp_encryption">Connection security</label><select id="ig-smtp_encryption" name="smtp_encryption"><option value="tls" @selected($settings['smtp_encryption']==='tls')>TLS</option><option value="ssl" @selected($settings['smtp_encryption']==='ssl')>SSL</option><option value="none" @selected($settings['smtp_encryption']==='none')>None</option></select></div>@endif
 </div>
-@if($enabledKey)<label class="ig-check"><input type="checkbox" name="{{ $enabledKey }}" value="1" @checked($enabled)> Show {{ $title }} as a payment option</label>@endif
+@if($enabledKey)<label class="ig-check"><input type="checkbox" name="{{ $enabledKey }}" value="1" @checked($enabled)> {{ $id === 'reviews' ? 'Show the Google Reviews section on the homepage' : 'Show '.$title.' as a payment option' }}</label>@endif
 @if($id==='google')<p class="ig-help">Enable both Google Picker API and Google Drive API in this Cloud project. For this local server, register <code>http://localhost:8000</code> as an Authorized JavaScript origin in the Google OAuth <strong>Web application</strong> client, then open the site using <strong>localhost</strong>, not 127.0.0.1. This JavaScript token flow does not need a redirect URI. The project number is digits only. If you restrict the API key to websites, also allow <code>http://localhost:8000/*</code> and <code>https://docs.google.com/*</code>; allow both Google Picker API and Drive API under API restrictions.</p>@endif
+@if($id==='reviews')<p class="ig-help">This uses the Google Places API (New) directly when a visitor reaches the section. Enable Places API (New) and billing in Google Cloud, then enter Tasmiya's Place ID and a server-side restricted key. Reviews are never copied into our database; Google attribution and source links appear with the cards. The section stays hidden if disabled or incomplete. Places API requests may incur charges.</p>@endif
 @if($id==='onedrive')<p class="ig-help">This client-side MSAL integration needs an Entra SPA registration with <code>http://localhost:8000/</code> as a redirect URI and delegated Files.Read permission. One application ID is enough in the portal; no client secret belongs in a browser app.</p>@endif
 @if($id==='whatsapp')<div class="ig-template-note">Templates are created, edited and approved in <a href="https://business.facebook.com/wa/manage/message-templates/" target="_blank" rel="noopener noreferrer">WhatsApp Manager ↗</a>. Save your WABA ID and access token, then load approved templates here. The alert template needs one body variable for the inquiry summary.</div>@endif
 @if(in_array($id,['raast','easypaisa','jazzcash']))<p class="ig-help">This card configures manual transfers only. Provider API credentials vary by merchant product and are not collected until an automatic gateway adapter is enabled.</p>@endif

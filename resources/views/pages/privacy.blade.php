@@ -14,7 +14,7 @@
             <a class="legal-back" href="{{ route('home') }}">← Back to Tasmiya</a>
             <h1>Privacy Policy</h1>
             <p>What we collect, why we need it, and how you can reach us about your information.</p>
-            <span class="legal-updated">Updated 28 September 2026</span>
+            <span class="legal-updated">Updated 5 October 2026</span>
         </div>
     </header>
 
@@ -43,7 +43,7 @@
 
             <section id="privacy-sharing" class="legal-section">
                 <h2>Sharing and security</h2>
-                <p>We do not sell your personal information. We may share only what is needed with people working on your request and with providers that support our website, email, messaging, cloud-image import, or payments, where those features are used. If you choose Google Drive or OneDrive, the relevant provider handles your sign-in under its own terms. We use access controls and reasonable safeguards, although no online system is entirely risk-free.</p>
+                <p>We do not sell your personal information. We may share only what is needed with people working on your request and with providers that support our website, email, messaging, cloud-image import, or payments, where those features are used. If you choose Google Drive or OneDrive, the relevant provider handles your sign-in under its own terms. If our Google Reviews showcase is enabled, public review content is requested from Google Maps when you view that section; see <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google's Privacy Policy</a>. We use access controls and reasonable safeguards, although no online system is entirely risk-free.</p>
             </section>
 
             <section id="privacy-choices" class="legal-section">

@@ -5,11 +5,12 @@
 @section('content')
 <style>
     .faq-page { background: #f8f6fc; color: #302853; min-height: 80vh; }
-    .faq-hero { position: relative; overflow: hidden; padding: clamp(104px, 10vw, 145px) 20px 95px; color: #fff; background: radial-gradient(circle at 83% 20%, rgba(184,151,252,.26), transparent 32%), linear-gradient(125deg, #211a50, #49348c 67%, #7755ac); }
+    .faq-hero { position: relative; overflow: hidden; padding: clamp(145px, 13vw, 195px) 24px clamp(100px, 10vw, 145px); color: #fff; background: linear-gradient(90deg,rgba(28,20,67,.96),rgba(49,31,99,.85) 47%,rgba(64,42,103,.38)),url('/images/legal/privacy-office.webp') center 58% / cover no-repeat; }
     .faq-hero::after { content: ''; position: absolute; right: -110px; bottom: -290px; width: 510px; height: 510px; border: 1px solid rgba(255,255,255,.2); border-radius: 50%; box-shadow: 0 0 0 70px rgba(255,255,255,.035), 0 0 0 140px rgba(255,255,255,.025); pointer-events: none; }
     .faq-hero__inner { width: min(1120px, 100%); margin: 0 auto; }
     .faq-hero h1 { max-width: 820px; color: #fff; font-size: clamp(2.5rem, 5.5vw, 4.5rem); line-height: 1.1; letter-spacing: -.05em; font-weight: 800; margin-bottom: 18px; }
     .faq-hero p { max-width: 620px; color: #e9e2f8; font-size: 1.12rem; line-height: 1.7; margin: 0; }
+    .faq-hero__eyebrow { display: inline-block; margin-bottom: 20px; color: #e4d8ff; font-size: .74rem; font-weight: 900; letter-spacing: .13em; text-transform: uppercase; }
     .faq-layout { width: min(1120px, calc(100% - 40px)); margin: 0 auto; padding: 70px 0 90px; display: grid; grid-template-columns: 230px minmax(0, 760px); gap: clamp(38px, 7vw, 90px); align-items: start; }
     .faq-jump { position: sticky; top: 105px; display: grid; gap: 14px; }
     .faq-jump span { color: #786e8d; font-size: .8rem; font-weight: 700; }
@@ -36,6 +37,7 @@
 
 <main class="faq-page">
     <header class="faq-hero"><div class="faq-hero__inner">
+        <span class="faq-hero__eyebrow">Answers before you begin</span>
         <h1>Questions, answered clearly.</h1>
         <p>Here are the things clients ask most often about our services, the portal, and payments.</p>
     </div></header>

@@ -143,16 +143,6 @@ class ServiceController extends Controller
             'division',
         ]);
 
-        // Get paginated testimonials separately (common for large review lists)
-        $testimonials = $service->testimonials()
-            ->where('is_approved', true)
-            ->orderBy('is_featured', 'desc')
-            ->orderBy('created_at', 'desc')
-            ->paginate(5);
-
-        // Calculate statistics for display
-        $averageRating = $service->getAverageRating();
-        $reviewCount = $service->getTestimonialCount();
         $visibleOfferings = $service->offerings()
             ->whereHas('profile', fn ($query) => $query->visible())
             ->with('profile.user')->get();
@@ -160,10 +150,20 @@ class ServiceController extends Controller
         $selectedOffering = $visibleOfferings->firstWhere('profile_id', (int) request()->query('profile'));
         $displayOffering = $selectedOffering ?? $visibleOfferings->sortBy(fn ($offering) => (float) $offering->price())->first();
 
+        $reviewsQuery = $service->testimonials()->approved();
+        if ($selectedOffering) {
+            $reviewsQuery->where('profile_id', $selectedOffering->profile_id);
+        }
+        $averageRating = (clone $reviewsQuery)->avg('rating') ?? 0;
+        $reviewCount = (clone $reviewsQuery)->count();
+        $ratingBreakdown = (clone $reviewsQuery)->selectRaw('rating, COUNT(*) as total')->groupBy('rating')->pluck('total', 'rating');
+        $testimonials = $reviewsQuery->orderByDesc('is_featured')->latest()->paginate(5);
+
         return view('services.show', [
             'service' => $service,
             'testimonials' => $testimonials,
             'averageRating' => $averageRating,
+            'ratingBreakdown' => $ratingBreakdown,
             'reviewCount' => $reviewCount,
             'specialistsCount' => $specialistsCount,
             'visibleOfferings' => $visibleOfferings,

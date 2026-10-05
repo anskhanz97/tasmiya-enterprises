@@ -1,0 +1,29 @@
+{
+  "tool": "Built-in image generation; edited from the existing profile photos",
+  "assets": [
+    {
+      "source": "public/images/profiles/atif/image.webp",
+      "output": "public/images/profiles/atif/avatar-team.webp",
+      "size": "512x512",
+      "prompt": "Extract Atif as a square head-and-shoulders cutout, preserve his face, hair, beard, smile, charcoal suit, white shirt and burgundy tie. Complete hair and shoulders visible, face centered in upper-middle, modest headroom. Genuine transparent background, clean natural edges, no text or watermark."
+    },
+    {
+      "source": "public/images/profiles/waseem/image.webp",
+      "output": "public/images/profiles/waseem/avatar-team.webp",
+      "size": "512x512",
+      "prompt": "Extract Waseem as a square head-and-shoulders cutout, preserve his face, hair, expression, skin tone, charcoal blazer and teal shirt. Complete hair and shoulders visible, face centered in upper-middle, modest headroom. Genuine transparent background, clean natural edges, no text or watermark."
+    },
+    {
+      "source": "public/images/profiles/waseem/image.webp",
+      "output": "public/images/profiles/waseem/banner-team.webp",
+      "size": "1200x400",
+      "prompt": "Recompose the same Waseem in a wide 3:1 photorealistic workstation banner. Entire head and upper torso inside the middle 65% of image height. Place him in right third, looking toward camera, same face, hair, expression, charcoal blazer and teal shirt. Coding monitors and desk stretch across left and center. Natural professional lighting, no text, logos or watermark."
+    },
+    {
+      "source": "public/images/profiles/nazim/banner.webp",
+      "output": "public/images/profiles/nazim/banner-team.webp",
+      "size": "1200x400",
+      "prompt": "Recompose the same Nazim in a wide 3:1 technical-support banner. Preserve face, beard, gray work jacket and blue shirt. Full head and upper torso in right third, with vertical breathing room to keep face visible in a wide card. Fingerprint access reader and CCTV equipment on left, realistic technical environment. No text, logos or watermark."
+    }
+  ]
+}

@@ -5,9 +5,9 @@
 @section('content')
 <style>
     .about-hero {
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-        padding: 100px 20px;
-        text-align: center;
+        background: linear-gradient(90deg, rgba(28,20,65,.98) 0%, rgba(39,27,80,.89) 42%, rgba(52,34,89,.28) 76%), url('/images/profiles/atif/banner.webp') center 42% / cover no-repeat;
+        padding: clamp(150px, 16vw, 220px) clamp(24px, 6vw, 90px);
+        text-align: left;
         color: white;
         position: relative;
         overflow: hidden;
@@ -20,29 +20,31 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
-                    radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.15) 0%, transparent 50%);
+        background: linear-gradient(90deg, rgba(46,26,104,.12), transparent 75%);
     }
     
     .about-hero-content {
         position: relative;
         z-index: 1;
-        max-width: 700px;
+        max-width: 1300px;
         margin: 0 auto;
     }
     
     .about-hero h1 {
-        font-size: clamp(2.5rem, 5vw, 3.5rem);
+        font-size: clamp(3.2rem, 5.4vw, 5rem);
         font-weight: 900;
         margin-bottom: 1rem;
         line-height: 1.1;
+        max-width: 11ch;
     }
     
     .about-hero p {
         font-size: 1.2rem;
         opacity: 0.9;
         line-height: 1.6;
+        max-width: 48ch;
     }
+    .about-hero-kicker { display: inline-block; margin-bottom: 22px; padding: 8px 13px; border: 1px solid rgba(255,255,255,.34); border-radius: 100px; color: #e7dcff; background: rgba(104,72,164,.27); font-size: .76rem; font-weight: 900; letter-spacing: .11em; text-transform: uppercase; }
     
     .about-wrapper {
         max-width: 1000px;
@@ -189,14 +191,16 @@
             grid-template-columns: 1fr;
         }
     }
+    @media (max-width: 700px) { .about-hero { padding: 150px 24px 105px; background: linear-gradient(90deg,rgba(28,20,65,.94),rgba(39,27,80,.72)),url('/images/profiles/atif/banner.webp') 62% center / cover no-repeat; } }
     @media (prefers-reduced-motion: reduce) { .story-image-icon { animation: none; } .value-card, .cta-button { transition: none; } }
 </style>
 
 <!-- Hero Section -->
 <div class="about-hero">
     <div class="about-hero-content">
+        <span class="about-hero-kicker">People-first expertise</span>
         <h1>About Tasmiya Enterprises</h1>
-        <p>Transforming businesses through specialized expertise, innovation, and professional excellence</p>
+        <p>Tax advice, digital solutions and dependable technical help—led by people who understand the work behind your business.</p>
     </div>
 </div>
 
@@ -212,9 +216,9 @@
                 every business has unique challenges requiring deep domain knowledge.
             </p>
             <p>
-                Today, through our three specialized divisions, we serve clients with excellence in taxation, technology, 
-                and technical support. Our team of certified professionals brings years of experience and a commitment to 
-                delivering results that exceed expectations.
+                With {{ $companyStats['experience_years'] }}+ years of experience and {{ $companyStats['clients_served'] }}+ clients served,
+                our three specialized divisions bring practical expertise in taxation, technology and technical support.
+                We focus on clear advice, dependable delivery and lasting client relationships.
             </p>
         </div>
         <div class="story-image" aria-label="Our three areas of work">
@@ -290,7 +294,7 @@
 </div>
 
 <!-- CTA Section -->
-<div class="cta-section">
+<div class="cta-section theme-glass">
     <div class="cta-section-content">
         <h2>Discover What We Can Do For You</h2>
         <p>Explore our services and meet our team of expert professionals</p>

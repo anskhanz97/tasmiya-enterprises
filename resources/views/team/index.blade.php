@@ -70,14 +70,17 @@
         line-height: 1.7;
         max-width: 53ch;
     }
-    .team-hero-portraits { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); align-items: end; gap: 10px; min-height: 390px; }
+    .team-hero-portraits { display: grid; grid-template-columns: minmax(0,.9fr) minmax(0,1.22fr) minmax(0,.9fr); align-items: end; gap: 10px; min-height: 410px; }
     .team-hero-portrait { position: relative; display: block; height: 320px; border: 1px solid rgba(255,255,255,.42); border-radius: 16px; overflow: hidden; box-shadow: 0 24px 44px rgba(16,10,52,.26); text-decoration: none; transition: transform .25s ease; }
-    .team-hero-portrait:nth-child(2) { height: 390px; }
+    .team-hero-portrait:nth-child(2) { height: 410px; }
     .team-hero-portrait:nth-child(3) { height: 345px; }
     .team-hero-portrait:hover { transform: translateY(-7px); }
     .team-hero-portrait img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
     .team-hero-portrait::after { content: ''; position: absolute; inset: 45% 0 0; background: linear-gradient(transparent, rgba(22,15,57,.78)); pointer-events: none; }
     .team-hero-portrait span { position: absolute; z-index: 1; bottom: 13px; left: 12px; right: 10px; color: #fff; font-size: .83rem; font-weight: 800; line-height: 1.25; }
+    .team-hero-portrait--ceo { border: 2px solid #e7d5ff; box-shadow: 0 26px 60px rgba(11,6,44,.48), 0 0 0 5px rgba(209,182,255,.18); }
+    .team-hero-portrait .team-hero-ceo-label { top: 12px; bottom: auto; right: auto; width: auto; padding: 6px 9px; border-radius: 6px; background: #fff; color: #39266f; font-size: .63rem; text-transform: uppercase; letter-spacing: .09em; }
+    .team-hero-portrait--ceo > span:last-child { font-size: 1rem; }
     
     .hero-stats {
         display: flex;
@@ -157,6 +160,8 @@
         perspective: 1500px;
         animation: slideIn 0.8s ease-out backwards;
     }
+    .team-member-wrapper--ceo .card-front { box-shadow: 0 22px 64px rgba(69,42,132,.28), 0 0 0 3px #b59be7; }
+    .member-ceo-badge { position: absolute; top: 18px; right: 18px; z-index: 3; padding: 7px 12px; border-radius: 8px; background: #fff; color: #493087; font-size: .7rem; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; box-shadow: 0 7px 20px rgba(27,18,74,.18); }
     
     .team-member-wrapper:nth-child(1) { animation-delay: 0.1s; }
     .team-member-wrapper:nth-child(2) { animation-delay: 0.2s; }
@@ -271,6 +276,7 @@
         object-fit: cover;
     }
     .member-profile-image { display: grid; place-items: center; }
+    .member-profile-image--cutout { background: radial-gradient(circle at 45% 28%, #fff 0%, #eee7fa 60%, #d5c7ec 100%); }
     .member-profile-image .member-initial { color: #fff; font-size: 4rem; font-weight: 800; }
     
     .member-info {
@@ -611,16 +617,20 @@
             <div class="hero-stats">
                 <div class="stat-box"><span class="stat-number">{{ $totalTeam }}</span><span class="stat-label">Team members</span></div>
                 <div class="stat-box"><span class="stat-number">{{ $totalDivisions }}</span><span class="stat-label">Divisions</span></div>
-                <div class="stat-box"><span class="stat-number">20+</span><span class="stat-label">Years' experience</span></div>
+                <div class="stat-box"><span class="stat-number">{{ $companyStats['experience_years'] }}+</span><span class="stat-label">Years' experience</span></div>
             </div>
         </div>
         <div class="team-hero-portraits" aria-label="Meet our specialists">
             @php
                 $heroProfiles = $profiles->unique(fn ($profile) => $profile->user->division_id)->take(3);
+                $ceoProfile = $heroProfiles->first(fn ($profile) => $profile->user->name === 'Atif Safdar');
+                $otherHeroProfiles = $heroProfiles->reject(fn ($profile) => $profile->user->name === 'Atif Safdar')->values();
+                $heroProfiles = collect([$otherHeroProfiles->get(0), $ceoProfile, $otherHeroProfiles->get(1)])->filter();
             @endphp
             @foreach($heroProfiles as $profile)
-                <a class="team-hero-portrait" href="{{ route('profiles.show', $profile) }}" aria-label="View {{ $profile->user->name }}'s profile">
-                    <img src="{{ $profile->displayImageUrl('profile') }}" alt="" width="260" height="390" @if(!$loop->first) loading="lazy" @endif decoding="async">
+                <a class="team-hero-portrait {{ $profile->user->name === 'Atif Safdar' ? 'team-hero-portrait--ceo' : '' }}" href="{{ route('profiles.show', $profile) }}" aria-label="View {{ $profile->user->name }}'s profile">
+                    <img src="{{ $profile->displayImageUrl('profile') }}" alt="" width="260" height="390" @if($profile->user->name !== 'Atif Safdar') loading="lazy" @endif decoding="async">
+                    @if($profile->user->name === 'Atif Safdar')<span class="team-hero-ceo-label">Chief Executive Officer</span>@endif
                     <span>{{ $profile->user->name }}</span>
                 </a>
             @endforeach
@@ -636,29 +646,23 @@
     <div class="team-grid">
         @foreach($profiles as $profile)
             @php
-                $firstName = \Illuminate\Support\Str::slug(\Illuminate\Support\Str::before($profile->user->name, ' '));
-                $bannerImage = $profile->getBannerImageUrl();
-                $profileImage = $profile->displayImageUrl('profile');
-                if (($profile->banner_image_url === null || $profile->banner_image_url === "/images/profiles/{$firstName}/banner.webp") && $bannerImage && is_file(public_path("images/profiles/{$firstName}/banner-card.webp"))) {
-                    $bannerImage = asset("images/profiles/{$firstName}/banner-card.webp");
-                }
-                if (($profile->profile_image_url === null || $profile->profile_image_url === "/images/profiles/{$firstName}/image.webp") && $profileImage && is_file(public_path("images/profiles/{$firstName}/image-card.webp"))) {
-                    $profileImage = asset("images/profiles/{$firstName}/image-card.webp");
-                }
+                $bannerImage = $profile->teamImageUrl('banner');
+                $profileImage = $profile->teamImageUrl('profile');
             @endphp
-                <div class="team-member-wrapper">
+                <div class="team-member-wrapper {{ $profile->user->name === 'Atif Safdar' ? 'team-member-wrapper--ceo' : '' }}">
                     <div class="team-member">
                         <!-- FRONT SIDE -->
                         <div class="card-front">
                             <!-- Banner Image -->
                             <div class="member-banner">
-                                @if($bannerImage)<img src="{{ $bannerImage }}" alt="" loading="lazy" decoding="async" width="960" height="360">@endif
+                                @if($bannerImage)<img src="{{ $bannerImage }}" alt="" loading="lazy" decoding="async" width="1200" height="400">@endif
                             </div>
+                            @if($profile->user->name === 'Atif Safdar')<span class="member-ceo-badge">CEO · Tasmiya</span>@endif
                             
                             <!-- Profile Image (Overlapping) -->
-                            <div class="member-profile-image">
+                            <div class="member-profile-image {{ str_ends_with($profileImage ?? '', '/avatar-team.webp') ? 'member-profile-image--cutout' : '' }}">
                                 @if($profileImage)
-                                    <img src="{{ $profileImage }}" alt="Portrait of {{ $profile->user->name }}" loading="lazy" decoding="async" width="480" height="480">
+                                    <img src="{{ $profileImage }}" alt="Portrait of {{ $profile->user->name }}" loading="lazy" decoding="async" width="512" height="512">
                                 @else
                                     <span class="member-initial" aria-hidden="true">{{ strtoupper(substr($profile->user->name, 0, 1)) }}</span>
                                 @endif

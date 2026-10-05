@@ -22,6 +22,8 @@ class DatabaseSeeder extends Seeder
             ProfileSeeder::class,
             ServiceSeeder::class,
             TestimonialSeeder::class,
+            ClientSeeder::class,
+            CompanyStatsSeeder::class,
         ]);
     }
 }

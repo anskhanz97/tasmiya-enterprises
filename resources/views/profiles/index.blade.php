@@ -212,7 +212,7 @@
                 $colors = $division->getThemeColors();
             @endphp
             
-            <div class="division-section">
+            <div class="division-section" data-theme-page-size="6">
                 <!-- Division Header -->
                 <div class="division-header" style="border-bottom-color: {{ $colors['primary'] }};">
                     <div class="division-icon" style="background: {{ $colors['light'] }}; color: {{ $colors['primary'] }};">
@@ -227,7 +227,7 @@
                 <!-- Profiles Grid -->
                 <div class="profiles-grid">
                     @foreach($divisionProfiles as $profile)
-                        <a href="{{ route('profiles.show', $profile) }}" class="profile-card">
+                        <a href="{{ route('profiles.show', $profile) }}" class="profile-card" data-page-item>
                             <!-- Profile Image -->
                             <img src="{{ $profile->getImageUrl() }}" alt="{{ $profile->user->name }}" class="profile-card-image">
                             
@@ -269,6 +269,7 @@
                         </a>
                     @endforeach
                 </div>
+                <x-theme-pagination :label="$division->name.' profile pages'" :hidden="true" />
             </div>
         @empty
             <!-- Empty State -->

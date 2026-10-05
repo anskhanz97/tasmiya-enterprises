@@ -422,11 +422,11 @@
         max-width: 900px;
         margin: 0 auto;
         position: relative;
-        height: 400px;
+        display: grid;
     }
     
     .testimonial-card {
-        position: absolute;
+        grid-area: 1 / 1;
         top: 0;
         left: 0;
         right: 0;
@@ -434,13 +434,14 @@
         border-radius: 30px;
         padding: 45px;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+        visibility: hidden;
         opacity: 0;
-        transform: translateX(100px);
-        transition: all 0.5s ease;
+        transition: opacity 0.3s ease;
         pointer-events: none;
     }
     
     .testimonial-card.active {
+        visibility: visible;
         opacity: 1;
         transform: translateX(0);
         pointer-events: auto;
@@ -699,10 +700,7 @@
                 </div>
             @endfor
         </div>
-        <div class="slider-controls">
-            <button class="slider-btn" onclick="scrollProjects('left')">‹</button>
-            <button class="slider-btn" onclick="scrollProjects('right')">›</button>
-        </div>
+        <x-theme-pagination id="projectsPager" label="Featured project pages" />
     </div>
 </div>
 @endif
@@ -724,30 +722,31 @@
 @endif
 
 <!-- TESTIMONIALS -->
+<style>
+.testimonials-section{background:radial-gradient(ellipse at 12% 30%,#ebe4fa,transparent 55%),linear-gradient(110deg,#f8f6fc,#f1edf8);padding:54px 22px}.profile-review-heading{max-width:900px;margin:0 auto 26px;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}.profile-review-heading .section-title{margin:0;text-align:left}.profile-review-heading .profile-service-manage{margin:0}.profile-review-heading>div{margin:0!important}.testimonials-section .testimonial-card{background:#fff;border:1px solid #e0d7ed;border-radius:22px;padding:32px 38px;box-shadow:0 14px 35px #30204b0b;scroll-margin-top:100px}.profile-review-meta{display:flex;align-items:center;gap:14px;margin-bottom:10px}.profile-review-meta time{margin-left:auto;color:#82738f;font-size:12px}.profile-review-quote{font-family:Georgia,serif;font-size:64px;line-height:1;color:#a18ac9;height:48px}.testimonials-section .testimonial-text{text-align:left;color:#382b51;font-size:clamp(17px,2vw,22px);font-style:normal;line-height:1.8;overflow-wrap:anywhere}.profile-review-person{display:flex;align-items:center;gap:12px;border-top:1px solid #eee8f5;padding-top:22px}.profile-review-avatar{display:grid;place-items:center;width:46px;height:46px;flex:none;background:#eee6fa;border-radius:50%;color:#624693;font-size:14px;font-weight:800}.testimonials-section .testimonial-author{text-align:left;color:#5e428f;font-size:14px}@media(max-width:600px){.testimonials-section .testimonial-card{padding:22px}.profile-review-heading{display:block}.profile-review-heading>div{margin-top:18px!important}}
+</style>
 @if($sections['testimonials']['visible'])
-<div class="testimonials-section" style="order: {{ $sections['testimonials']['order'] }};">
+<div id="profile-reviews" class="testimonials-section" style="order: {{ $sections['testimonials']['order'] }};">
+    <div class="profile-review-heading">
     <h2 class="section-title">{{ $sections['testimonials']['title'] }}</h2>
     @if($sections['testimonials']['description'])<p class="profile-section-intro">{{ $sections['testimonials']['description'] }}</p>@endif
+    @if($canEdit)<div style="text-align:center;margin-bottom:24px"><a class="profile-service-manage" href="{{ route('profiles.reviews.index', $profile) }}">Manage my reviews</a></div>@endif
+    </div>
+    @if($testimonials->isNotEmpty())
     <div class="testimonials-carousel">
-        @php
-            $testimonials = [
-                ["text" => "Outstanding professional who delivered exceptional results. Highly recommend for any project!", "author" => "— Sarah Johnson, CEO"],
-                ["text" => "The expertise and dedication shown throughout our collaboration was truly remarkable.", "author" => "— Michael Chen, Director"],
-                ["text" => "Transformed our business with innovative solutions and strategic insights.", "author" => "— Emily Parker, Founder"]
-            ];
-        @endphp
         @foreach($testimonials as $index => $testimonial)
-            <div class="testimonial-card {{ $index === 0 ? 'active' : '' }}">
-                <p class="testimonial-text">"{{ $testimonial['text'] }}"</p>
-                <div class="testimonial-author">{{ $testimonial['author'] }}</div>
+            <div id="review-{{ $testimonial->id }}" class="testimonial-card {{ $index === 0 ? 'active' : '' }}" aria-hidden="{{ $index === 0 ? 'false' : 'true' }}">
+                <div class="profile-review-meta"><span class="profile-review-quote" aria-hidden="true">“</span><span style="color:#bd8311" aria-label="{{ $testimonial->rating }} out of 5 stars">{{ $testimonial->getStars() }}</span><time datetime="{{ $testimonial->created_at->toDateString() }}">{{ $testimonial->created_at->format('M Y') }}</time></div>
+                <p class="testimonial-text">“{{ $testimonial->content }}”</p>
+                <div class="profile-review-person"><span class="profile-review-avatar" aria-hidden="true">{{ $testimonial->getInitials() }}</span><div class="testimonial-author">{{ $testimonial->getAuthorInfo() }}</div></div>
+                @if($testimonial->testimonialable_type === \App\Models\Service::class)<p style="text-align:center;color:#65748b;margin-top:10px">{{ $profile->serviceOfferings->firstWhere('service_id', $testimonial->testimonialable_id)?->title() }}</p>@endif
             </div>
         @endforeach
     </div>
-    <div class="testimonial-dots">
-        @foreach($testimonials as $index => $t)
-            <span class="dot {{ $index === 0 ? 'active' : '' }}" onclick="showTestimonial({{ $index }})"></span>
-        @endforeach
-    </div>
+    <x-theme-pagination id="reviewsPager" label="Client review pages" />
+    @else
+    <p class="profile-service-empty" style="max-width:900px;margin:0 auto">No published reviews yet.</p>
+    @endif
 </div>
 @endif
 </div>
@@ -796,23 +795,46 @@
     // Testimonials carousel
     let currentTestimonial = 0;
     const testimonials = document.querySelectorAll('.testimonial-card');
-    const dots = document.querySelectorAll('.dot');
+    const reviewPager = document.getElementById('reviewsPager');
+    let reviewControls;
     
     function showTestimonial(index) {
         if (!testimonials.length) return;
         testimonials[currentTestimonial].classList.remove('active');
-        dots[currentTestimonial].classList.remove('active');
+        testimonials[currentTestimonial].setAttribute('aria-hidden', 'true');
         
         currentTestimonial = index;
         
         testimonials[currentTestimonial].classList.add('active');
-        dots[currentTestimonial].classList.add('active');
+        testimonials[currentTestimonial].setAttribute('aria-hidden', 'false');
+    }
+    if (reviewPager) reviewControls = TasmiyaPager(reviewPager, {count:testimonials.length, onChange:showTestimonial});
+    function openLinkedReview() {
+        const index = [...testimonials].findIndex(card => '#'+card.id === location.hash);
+        if (index >= 0) { reviewControls.set(index); testimonials[index].scrollIntoView({block:'center'}); }
+    }
+    openLinkedReview(); window.addEventListener('hashchange', openLinkedReview);
+    const projectSlider = document.getElementById('projectsSlider');
+    if (projectSlider) {
+        const projectPager = TasmiyaPager(document.getElementById('projectsPager'), {
+            count:()=>Math.ceil(projectSlider.scrollWidth/projectSlider.clientWidth),
+            onChange:page=>{
+                const pages = Math.ceil(projectSlider.scrollWidth/projectSlider.clientWidth);
+                projectSlider.scrollTo({left:pages>1?page*(projectSlider.scrollWidth-projectSlider.clientWidth)/(pages-1):0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+            }
+        });
+        projectSlider.addEventListener('scroll',()=>{
+            const pages = Math.ceil(projectSlider.scrollWidth/projectSlider.clientWidth), maximum = projectSlider.scrollWidth-projectSlider.clientWidth;
+            projectPager.set(maximum>0?Math.round(projectSlider.scrollLeft/maximum*(pages-1)):0,false);
+        },{passive:true});
+        new ResizeObserver(()=>projectPager.set(projectPager.current(),false)).observe(projectSlider);
     }
     
     // Auto-advance testimonials
-    if (testimonials.length) setInterval(() => {
+    if (testimonials.length > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) setInterval(() => {
+        if (document.hidden || document.querySelector('.testimonials-section:hover, .testimonials-section:focus-within')) return;
         const next = (currentTestimonial + 1) % testimonials.length;
-        showTestimonial(next);
+        reviewControls.set(next);
     }, 5000);
 </script>
 

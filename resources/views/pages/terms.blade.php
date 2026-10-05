@@ -14,7 +14,7 @@
             <a class="legal-back" href="{{ route('home') }}">← Back to Tasmiya</a>
             <h1>Terms of Service</h1>
             <p>A clear starting point for using our website and working with our team.</p>
-            <span class="legal-updated">Updated 28 September 2026</span>
+            <span class="legal-updated">Updated 5 October 2026</span>
         </div>
     </header>
 
@@ -48,7 +48,7 @@
 
             <section id="terms-materials" class="legal-section">
                 <h2>Materials and third-party tools</h2>
-                <p>You remain responsible for the accuracy of information and files you provide and for your rights to share them. Our website content and branding belong to Tasmiya Enterprises unless stated otherwise. Optional tools such as Google Drive, OneDrive, and payment providers are also subject to their own terms and availability.</p>
+                <p>You remain responsible for the accuracy of information and files you provide and for your rights to share them. Our website content and branding belong to Tasmiya Enterprises unless stated otherwise. Optional tools such as Google Drive, OneDrive, Google Maps reviews, and payment providers are also subject to their own terms and availability. Google Maps content is subject to the <a href="https://maps.google.com/help/terms_maps/" target="_blank" rel="noopener noreferrer">Google Maps Terms of Service</a>.</p>
             </section>
 
             <section id="terms-contact" class="legal-section legal-section--last">

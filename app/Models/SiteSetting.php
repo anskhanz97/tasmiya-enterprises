@@ -29,6 +29,13 @@ class SiteSetting extends Model
         });
     }
 
+    public static function companyStats(): array
+    {
+        return collect(config('company'))->mapWithKeys(fn ($default, $key) => [
+            $key => (int) static::get('integration_company_'.$key, $default),
+        ])->all();
+    }
+
     /**
      * Set a setting value
      */

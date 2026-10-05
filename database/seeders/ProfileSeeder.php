@@ -72,7 +72,9 @@ class ProfileSeeder extends Seeder
             // Experience
             'experience_years' => 12,
             
-            // Optimized local defaults; admins can replace either image in the portal.
+            // Full portraits remain available; teamImageUrl resolves the dedicated
+            // avatar-team.webp and banner-team.webp derivatives for team cards.
+            // Admin-uploaded photos override these defaults.
             'profile_image_url' => '/images/profiles/atif/image.webp',
             'banner_image_url' => '/images/profiles/atif/banner.webp',
             

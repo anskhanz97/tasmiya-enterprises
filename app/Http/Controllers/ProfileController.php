@@ -147,9 +147,7 @@ class ProfileController extends Controller
         // This prevents showing hidden profiles to regular users
         /** @var \App\Models\User|null $authUser */
         $authUser = Auth::user();
-        if (! $profile->is_visible && ! $authUser?->isAdmin()) {
-            abort(403, 'This profile is not publicly visible');
-        }
+        $this->authorize('view', $profile);
 
         // Eager load relationships if not already loaded
         // (Route model binding may have already loaded them, but be safe)
@@ -174,6 +172,7 @@ class ProfileController extends Controller
         $authUser = Auth::user();
 
         return view('profiles.show', [
+            'testimonials' => \App\Models\Testimonial::forProfile($profile->id)->approved()->orderByDesc('is_featured')->latest()->get(),
             'profile' => $profile,
             'theme' => $theme,
             'division' => $division,

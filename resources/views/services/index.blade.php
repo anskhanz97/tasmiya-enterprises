@@ -6,7 +6,7 @@
 <style>
     /* The service index is the hero artwork: three clear routes into the catalogue. */
     .services-hero {
-        background: radial-gradient(circle at 83% 18%, rgba(176, 139, 255, .32), transparent 31%), linear-gradient(125deg, #1d194c 0%, #393078 48%, #7150aa 100%);
+        background: linear-gradient(90deg, rgba(29,22,72,.96) 0%, rgba(44,32,97,.90) 41%, rgba(53,37,103,.67) 75%, rgba(44,30,88,.55) 100%), url('/images/legal/terms-consultation.webp') center 48% / cover no-repeat;
         position: relative;
         overflow: hidden;
         padding: clamp(135px, 13vw, 180px) 24px 110px;
@@ -69,17 +69,24 @@
     @keyframes servicesEnter { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
     
     /* Main Content */
+    body:has(.services-layout) { overflow-x: clip; overflow-y: visible; }
+    .main-content:has(.services-layout) { overflow: visible; }
     .services-container {
         max-width: 1400px;
         margin: 0 auto;
         padding: 70px 20px;
     }
-    .services-container--catalogue { padding-bottom: 0; }
-    .services-container + .services-container { padding-top: 0; }
-    .services-jump { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 0 0 54px; padding: 15px 18px; border: 1px solid #dcd8ed; border-radius: 14px; background: #fff; box-shadow: 0 8px 26px rgba(43,35,99,.06); }
-    .services-jump__label { margin-right: 10px; color: #433776; font-weight: 800; }
-    .services-jump a { padding: 9px 13px; border-radius: 8px; color: #514688; font-size: .86rem; font-weight: 700; text-decoration: none; background: #f4f1fb; }
-    .services-jump a:hover, .services-jump a:focus-visible { background: #e8ddfa; color: #322569; }
+    .services-container--catalogue { max-width: 1660px; padding-bottom: 28px; }
+    .services-layout { display: grid; grid-template-columns: 205px minmax(0,1fr); align-items: start; gap: clamp(22px,3vw,46px); }
+    .services-sections { min-width: 0; }
+    .services-jump { position: sticky; top: 102px; z-index: 5; padding: 23px 16px 24px; border: 1px solid #e0d9ed; border-radius: 18px; background: #fff; box-shadow: 0 17px 40px rgba(43,35,99,.09); }
+    .services-jump__label { display: block; padding: 0 10px 19px; color: #342a6c; font-size: .75rem; font-weight: 900; text-transform: uppercase; letter-spacing: .12em; }
+    .services-jump__list { position: relative; display: grid; gap: 6px; padding-left: 9px; }
+    .services-jump__list::before { content: ''; position: absolute; top: 15px; bottom: 15px; left: 20px; width: 2px; background: #ddd5ef; }
+    .services-jump a { position: relative; display: flex; align-items: center; gap: 11px; min-height: 60px; padding: 10px 7px; border-radius: 10px; color: #615780; font-size: .82rem; font-weight: 800; text-decoration: none; line-height: 1.25; }
+    .services-jump a:hover, .services-jump a:focus-visible, .services-jump a.is-active { background: #f2edfb; color: #3d2c86; }
+    .services-jump__node { position: relative; z-index: 1; flex: 0 0 22px; height: 22px; border: 3px solid #cfc4e9; border-radius: 50%; background: #fff; box-shadow: 0 0 0 4px #fff; }
+    .services-jump a.is-active .services-jump__node { border-color: #7454bf; background: #7454bf; box-shadow: 0 0 0 4px #eee7fa; }
     
     /* Division Section */
     .division-section {
@@ -98,9 +105,11 @@
     }
     
     .division-header {
+        display: block;
         margin-bottom: 36px;
         position: relative;
     }
+    .division-header::before { content: none; }
     .division-breadcrumb { display: flex; align-items: center; gap: 9px; margin-bottom: 20px; color: #746a99; font-size: .82rem; font-weight: 700; }
     .division-breadcrumb a { color: #5e4eb0; text-decoration: none; }
     .division-breadcrumb a:hover { text-decoration: underline; }
@@ -173,17 +182,18 @@
     }
     .service-page-item { min-width: 0; }
     .service-page-item[hidden], .service-pager[hidden] { display: none; }
-    .service-pager { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 14px; margin-top: 32px; }
-    .service-pager button { border: 1px solid #c9bce9; background: #fff; color: #493799; border-radius: 9px; padding: 11px 17px; font-weight: 800; transition: background .2s ease, border-color .2s ease; }
+    .service-pager { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 34px; }
+    .service-pager > button { display: grid; place-items: center; width: 54px; height: 54px; padding: 0; border: 1px solid #ded7eb; background: #fff; color: #3e327e; border-radius: 50%; font-size: 1.45rem; box-shadow: 0 8px 22px rgba(45,31,94,.08); transition: background .2s ease, border-color .2s ease; }
     .service-pager button:not(:disabled):hover { background: #eee8fa; border-color: #8b6bdb; }
     .service-pager button:disabled { opacity: .42; cursor: not-allowed; }
-    .service-pager__status { min-width: 92px; text-align: center; color: #5b5570; font-size: .88rem; font-weight: 700; }
+    .service-pager__dots { display: flex; gap: 7px; align-items: center; }
+    .service-pager__dots button { width: 9px; height: 9px; padding: 0; border: 0; border-radius: 9px; background: #cfc8de; cursor: pointer; }
+    .service-pager__dots button[aria-current=true] { width: 30px; background: #7657c0; }
     
     /* A compact closing summary instead of three oversized statistic cards. */
     .stats-section {
-        background: linear-gradient(125deg, #241b59, #5f469c);
-        padding: clamp(38px, 5vw, 70px);
-        border-radius: 24px;
+        background: linear-gradient(100deg, #211852, #59408f 68%, #7752a5);
+        padding: clamp(75px, 8vw, 120px) clamp(22px, 5vw, 70px);
         position: relative;
         overflow: hidden;
     }
@@ -198,7 +208,7 @@
         border-radius: 50%;
         box-shadow: 0 0 0 65px rgba(255,255,255,.04), 0 0 0 130px rgba(255,255,255,.03);
     }
-    .stats-content { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(340px, .95fr); align-items: end; gap: 48px; }
+    .stats-content { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(340px, .95fr); align-items: end; gap: 48px; max-width: 1320px; margin: auto; }
     .stats-content h2 { max-width: 13ch; color: #fff; font-size: clamp(2rem, 3.4vw, 3.5rem); line-height: 1.1; letter-spacing: -.04em; font-weight: 900; }
     .stats-content p { max-width: 48ch; color: #e5dffa; line-height: 1.7; margin: 18px 0 22px; }
     .stats-content a { color: #fff; font-weight: 800; text-underline-offset: 5px; }
@@ -208,10 +218,18 @@
     .stats-metrics div:last-child { border-right: 0; }
     .stats-metrics strong { display: block; color: #fff; font-size: clamp(1.7rem, 3vw, 3rem); line-height: 1.15; font-weight: 900; }
     .stats-metrics span { display: block; margin-top: 8px; color: #e3dcf8; font-size: .78rem; line-height: 1.4; }
-    }
-    
     /* Service cards render immediately so the catalogue stays responsive. */
     
+    @media (max-width: 700px) {
+        .services-layout { grid-template-columns: 1fr; gap: 22px; }
+        .services-jump { top: 74px; padding: 10px 14px; }
+        .services-jump__label { padding: 0 0 7px; font-size: .68rem; }
+        .services-jump__list { display: flex; gap: 7px; overflow-x: auto; padding: 0 0 2px; scrollbar-width: thin; }
+        .services-jump__list::before { display: none; }
+        .services-jump a { min-height: 37px; padding: 7px 10px; white-space: nowrap; }
+        .services-jump__node { width: 11px; height: 11px; flex-basis: 11px; border-width: 2px; }
+        .division-section { scroll-margin-top: 160px; }
+    }
     @media (max-width: 768px) {
         .services-hero {
             padding: 105px 20px 58px;
@@ -303,15 +321,13 @@
         filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.3));
     }
     @media (max-width: 480px) {
-        .services-jump { align-items: stretch; }
-        .services-jump__label { flex-basis: 100%; }
-        .services-jump a { flex: 1 1 auto; text-align: center; }
-        .services-hero-guide__count { display: none; }
+        .services-jump a { font-size: .73rem; }
         .division-section { padding: 22px 16px; }
         .stats-section { padding: 34px 24px; }
         .stats-metrics { gap: 12px; }
         .stats-metrics div { padding-inline: 6px; }
     }
+    @media (max-width: 600px) { .services-hero-copy, .services-hero-guide { min-width: 0; } .services-hero-guide__count { display: none; } .services-hero-guide__link { grid-template-columns: 48px minmax(0,1fr); } }
     @media (prefers-reduced-motion: reduce) {
         .services-hero-copy, .services-hero-guide { animation: none; }
         .services-hero-cta, .services-hero-guide__link, .service-pager button { transition: none; }
@@ -344,17 +360,21 @@
 </div>
 
 <div class="services-container services-container--catalogue" id="services-catalogue">
+    <div class="services-layout">
     @if($servicesByDivision->isNotEmpty())
         <nav class="services-jump" aria-label="Browse service divisions">
             <span class="services-jump__label">Browse divisions</span>
+            <div class="services-jump__list">
             @foreach($servicesByDivision as $group)
                 @php
                     $navDivision = $group->first()->service->division;
                 @endphp
-                <a href="#division-{{ $navDivision->slug }}">{{ $navDivision->name }}</a>
+                <a href="#division-{{ $navDivision->slug }}"><span class="services-jump__node" aria-hidden="true"></span><span>{{ $navDivision->name }}</span></a>
             @endforeach
+            </div>
         </nav>
     @endif
+    <div class="services-sections">
     {{-- Services by Division --}}
     @forelse($servicesByDivision as $divisionId => $services)
         @php
@@ -379,11 +399,7 @@
                     <div class="service-page-item"><x-service-card :offering="$offering" /></div>
                 @endforeach
             </div>
-            <nav class="service-pager" aria-label="{{ $division->name }} service pages" hidden>
-                <button type="button" data-page-prev>← Previous</button>
-                <span class="service-pager__status" data-page-status aria-live="polite"></span>
-                <button type="button" data-page-next>Next →</button>
-            </nav>
+            <x-theme-pagination class="service-pager" :label="$division->name.' service pages'" :hidden="true" />
             
             {{-- WhatsApp CTA Section --}}
             <div class="whatsapp-cta-section" style="margin-top: 60px; position: relative;">
@@ -490,11 +506,12 @@
             <p class="mb-0 text-muted">Please check back soon for our professional services.</p>
         </div>
     @endforelse
+    </div>
+    </div>
 </div>
 
 {{-- Stats Section --}}
-<div class="services-container">
-    <div class="stats-section">
+    <div class="stats-section theme-glass">
         <div class="stats-content">
             <div>
                 <h2>One team. Several ways forward.</h2>
@@ -502,13 +519,12 @@
                 <a href="{{ route('team.index') }}">Meet the team ↗</a>
             </div>
             <div class="stats-metrics" aria-label="Services at a glance">
-                <div><strong>{{ $totalServices }}</strong><span>Services</span></div>
-                <div><strong>{{ $totalReviews }}</strong><span>Client reviews</span></div>
-                <div><strong>{{ $servicesByDivision->count() }}</strong><span>Divisions</span></div>
+                <div><strong data-theme-counter="{{ $totalServices }}" aria-label="{{ $totalServices }}">{{ $totalServices }}</strong><span>Services</span></div>
+                <div><strong data-theme-counter="{{ $totalReviews }}" aria-label="{{ $totalReviews }}">{{ $totalReviews }}</strong><span>Client reviews</span></div>
+                <div><strong data-theme-counter="{{ $servicesByDivision->count() }}" aria-label="{{ $servicesByDivision->count() }}">{{ $servicesByDivision->count() }}</strong><span>Divisions</span></div>
             </div>
         </div>
     </div>
-</div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -519,28 +535,28 @@ document.addEventListener('DOMContentLoaded', () => {
         if (items.length <= pageSize || !pager) continue;
 
         const pageCount = Math.ceil(items.length / pageSize);
-        const previous = pager.querySelector('[data-page-prev]');
-        const next = pager.querySelector('[data-page-next]');
-        const status = pager.querySelector('[data-page-status]');
-        let page = 0;
-
-        function showPage() {
-            items.forEach((item, index) => { item.hidden = Math.floor(index / pageSize) !== page; });
-            previous.disabled = page === 0;
-            next.disabled = page === pageCount - 1;
-            status.textContent = `Page ${page + 1} of ${pageCount}`;
-        }
-
-        function changePage(direction) {
-            page += direction;
-            showPage();
-            section.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
-        }
-
-        previous.addEventListener('click', () => changePage(-1));
-        next.addEventListener('click', () => changePage(1));
         pager.hidden = false;
-        showPage();
+        let initialized = false;
+        TasmiyaPager(pager, {count:pageCount,onChange:page=>{
+            items.forEach((item,index)=>item.hidden=Math.floor(index/pageSize)!==page);
+            if(initialized) section.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
+            initialized = true;
+        }});
+    }
+
+    const divisionLinks = [...document.querySelectorAll('.services-jump a[href^="#division-"]')];
+    const divisions = [...document.querySelectorAll('[data-service-section]')];
+    if (divisionLinks.length && divisions.length && 'IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(entries => {
+            const visible = entries.filter(entry => entry.isIntersecting).sort((a,b) => b.intersectionRatio - a.intersectionRatio);
+            if (!visible.length) return;
+            divisionLinks.forEach(link => {
+                const active = link.hash === `#${visible[0].target.id}`;
+                link.classList.toggle('is-active', active);
+                if (active) link.setAttribute('aria-current', 'location'); else link.removeAttribute('aria-current');
+            });
+        }, { rootMargin: '-15% 0px -60% 0px', threshold: [0, .1, .35, .6] });
+        divisions.forEach(division => observer.observe(division));
     }
 });
 </script>

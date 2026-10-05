@@ -35,6 +35,7 @@ class Testimonial extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'profile_id',
         'content',
         'rating',
         'author_name',
@@ -203,9 +204,13 @@ class Testimonial extends Model
      */
     public function scopeForProfile($query, $profileId)
     {
-        return $query
-            ->where('testimonialable_type', Profile::class)
-            ->where('testimonialable_id', $profileId);
+        return $query->where(function ($query) use ($profileId) {
+            $query->where('profile_id', $profileId)
+                ->orWhere(function ($query) use ($profileId) {
+                    $query->where('testimonialable_type', Profile::class)
+                        ->where('testimonialable_id', $profileId);
+                });
+        });
     }
 
     /**

@@ -144,6 +144,27 @@ class Profile extends Model
         return null;
     }
 
+    /** Dedicated card crops for seeded photos; uploaded images keep the owner's choice. */
+    public function teamImageUrl(string $kind): ?string
+    {
+        $image = $this->displayImageUrl($kind);
+        if (! $image) return null;
+
+        $firstName = Str::slug(Str::before($this->user->name, ' '));
+        $base = "/images/profiles/{$firstName}/";
+        $original = $kind === 'banner' ? 'banner' : 'image';
+        $saved = $this->{"{$kind}_image_url"};
+        if ($saved && ! in_array($saved, [$base.$original.'.webp', $base.$original.'.png', asset(ltrim($base.$original.'.webp', '/')), asset(ltrim($base.$original.'.png', '/'))], true)) {
+            return $image;
+        }
+
+        foreach ([$kind === 'banner' ? 'banner-team.webp' : 'avatar-team.webp', $original.'-card.webp'] as $file) {
+            if (is_file(public_path(ltrim($base.$file, '/')))) return asset(ltrim($base.$file, '/'));
+        }
+
+        return $image;
+    }
+
     /**
      * Relationship: User
      * 

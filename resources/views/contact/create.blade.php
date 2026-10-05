@@ -289,6 +289,16 @@
             font-size: 2rem;
         }
     }
+    .contact-hero { padding: clamp(120px,12vw,180px) clamp(24px,5vw,80px); text-align: left; border-radius: 0; background: linear-gradient(90deg,rgba(29,21,70,.97),rgba(48,32,101,.84) 50%,rgba(54,37,93,.38)),url('/images/legal/terms-consultation.webp') center 45% / cover no-repeat; }
+    .contact-hero::before { background: linear-gradient(90deg,rgba(31,21,77,.12),transparent); opacity: 1; }
+    .contact-hero__inner { position: relative; z-index: 1; max-width: 1200px; margin: auto; }
+    .contact-hero__eyebrow { display: inline-block; margin-bottom: 16px; color: #ebe2ff; font-size: .72rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+    .contact-hero h1 { max-width: 12ch; font-size: clamp(3rem,6vw,5.4rem); letter-spacing: -.05em; text-shadow: none; }
+    .contact-hero p { max-width: 44ch; line-height: 1.65; }
+    @media (max-width: 650px) { .contact-hero { background: linear-gradient(90deg,rgba(29,21,70,.94),rgba(48,32,101,.77)),url('/images/legal/terms-consultation.webp') 64% center / cover no-repeat; } }
+</style>
+<style>
+.contact-hero{aspect-ratio:16/9;min-height:520px;padding:0;display:flex;align-items:center;background-position:center top;background-image:linear-gradient(90deg,rgba(29,21,70,.96),rgba(48,32,101,.74) 48%,rgba(54,37,93,.12)),url('/images/legal/terms-consultation.webp')}.contact-hero__inner{width:100%;box-sizing:border-box;padding:60px clamp(24px,5vw,80px)}@media(max-width:650px){.contact-hero{aspect-ratio:auto;min-height:580px;align-items:flex-end;background:linear-gradient(0deg,rgba(29,21,70,.98),rgba(48,32,101,.82) 42%,rgba(54,37,93,.16)),url('/images/legal/terms-consultation.webp') 82% top / cover no-repeat}.contact-hero__inner{padding:180px 24px 48px}.contact-hero h1{font-size:clamp(40px,10vw,58px)}}
 </style>
 
 @php
@@ -299,8 +309,7 @@
     $mapSearchUrl = 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode($companyAddress);
 @endphp
 <div class="contact-hero">
-    <h1>✨ Get in Touch</h1>
-    <p>We'd love to hear from you! Let's start a conversation.</p>
+    <div class="contact-hero__inner"><span class="contact-hero__eyebrow">Start a conversation</span><h1>Let's get to work.</h1><p>Tell us what your business needs. We'll connect you with the right specialist and a clear next step.</p></div>
 </div>
 
 <div class="container mx-auto px-4 pb-12">

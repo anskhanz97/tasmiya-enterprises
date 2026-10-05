@@ -27,10 +27,19 @@ Route::get('/', function () {
         $services->first(fn ($offering) => $offering->service->division?->slug === 'fbr-taxation'),
         $services->first(fn ($offering) => $offering->service->division?->slug === 'tech-support'),
     ])->merge($services->filter(fn ($offering) => $offering->service->division?->slug === 'it-digital')->take(2))->filter();
-    $featuredTeam = \App\Models\Profile::with('user.division')->visible()->limit(6)->get();
+    $featuredTeam = \App\Models\Profile::with('user.division')->visible()->limit(6)->get()
+        ->sortBy(fn ($profile) => $profile->user->name === 'Atif Safdar' ? 0 : 1)->values();
+    $clients = json_decode(\App\Models\SiteSetting::get('home_clients', 'null'), true);
+    if (! is_array($clients)) $clients = config('clients');
+    $showGoogleReviews = \App\Models\SiteSetting::get('integration_enable_google_reviews') === '1'
+        && filled(\App\Models\SiteSetting::get('integration_google_reviews_place_id'))
+        && filled(\App\Models\SiteSetting::get('integration_google_reviews_api_key'));
 
-    return view('home', compact('divisions', 'featuredServices', 'featuredTeam'));
+    return view('home', compact('divisions', 'featuredServices', 'featuredTeam', 'clients', 'showGoogleReviews'));
 })->name('home');
+
+Route::get('/api/google-reviews', [\App\Http\Controllers\GoogleReviewsController::class, 'index'])
+    ->middleware('throttle:10,1')->name('google-reviews.index');
 
 /**
  * Static Pages
@@ -462,6 +471,13 @@ Route::get('/api/services/search', [ServiceController::class, 'search'])
  */
 Route::get('/testimonials/create', [TestimonialController::class, 'create'])
     ->name('testimonials.create');
+
+Route::middleware('auth')->prefix('profiles/{profile}/reviews')->name('profiles.reviews.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\ProfileReviewController::class, 'index'])->name('index');
+    Route::post('/', [\App\Http\Controllers\ProfileReviewController::class, 'store'])->name('store');
+    Route::put('/{testimonial}', [\App\Http\Controllers\ProfileReviewController::class, 'update'])->name('update');
+    Route::delete('/{testimonial}', [\App\Http\Controllers\ProfileReviewController::class, 'destroy'])->name('destroy');
+});
 
 /**
  * Store new testimonial

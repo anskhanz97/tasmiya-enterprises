@@ -661,6 +661,8 @@
             .user-dropdown { min-width: 200px; }
         }
     </style>
+    <link rel="stylesheet" href="{{ asset('css/theme-interactions.css') }}">
+    <script src="{{ asset('js/theme-interactions.js') }}"></script>
 </head>
 <body>
     {{-- Navigation Bar --}}

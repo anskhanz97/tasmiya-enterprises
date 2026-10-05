@@ -93,11 +93,13 @@ class StoreTestimonialRequest extends FormRequest
             // Testimonial Target (must be for service or profile or both)
             'service_id' => [
                 'nullable',
+                'integer',
                 'exists:services,id',
             ],
 
             'profile_id' => [
                 'nullable',
+                'integer',
                 'exists:profiles,id',
             ],
 
@@ -191,8 +193,13 @@ class StoreTestimonialRequest extends FormRequest
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
+            if ($validator->errors()->isNotEmpty()) return;
             $serviceId = $this->input('service_id');
             $profileId = $this->input('profile_id');
+
+            if ($serviceId && $profileId && ! \App\Models\ServiceOffering::where('service_id', $serviceId)->where('profile_id', $profileId)->exists()) {
+                $validator->errors()->add('profile_id', 'This specialist does not offer the selected service.');
+            }
 
             // Must have at least service_id OR profile_id
             if (empty($serviceId) && empty($profileId)) {

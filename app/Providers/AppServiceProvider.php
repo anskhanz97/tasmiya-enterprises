@@ -62,6 +62,9 @@ class AppServiceProvider extends ServiceProvider
          * Makes code more discoverable
          */
         $this->registerPolicies();
+        \Illuminate\Support\Facades\View::composer(['home', 'team.index', 'pages.about'], function ($view) {
+            $view->with('companyStats', \App\Models\SiteSetting::companyStats());
+        });
     }
 
     /**
@@ -98,4 +101,3 @@ class AppServiceProvider extends ServiceProvider
         \Illuminate\Support\Facades\Gate::policy(Project::class, ProjectPolicy::class);
     }
 }
-

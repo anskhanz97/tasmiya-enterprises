@@ -10,8 +10,10 @@ use Illuminate\Validation\Rule;
 class SettingsController extends Controller
 {
     private const SECTIONS = [
+        'statistics' => ['company_clients_served', 'company_experience_years'],
         'contact' => ['company_email', 'company_whatsapp', 'company_address', 'map_embed_url'],
         'google' => ['google_client_id', 'google_api_key', 'google_app_id'],
+        'reviews' => ['google_reviews_place_id', 'google_reviews_api_key', 'enable_google_reviews'],
         'onedrive' => ['onedrive_client_id'],
         'email' => ['smtp_host', 'smtp_port', 'smtp_username', 'smtp_password', 'smtp_encryption', 'smtp_from_email'],
         'whatsapp' => ['whatsapp_business_account_id', 'whatsapp_phone_id', 'whatsapp_access_token', 'whatsapp_template_name', 'whatsapp_app_secret', 'whatsapp_verify_token'],
@@ -22,7 +24,7 @@ class SettingsController extends Controller
         'stripe' => ['stripe_public', 'stripe_secret', 'stripe_webhook_secret', 'enable_card'],
     ];
 
-    private const SECRETS = ['smtp_password', 'whatsapp_access_token', 'whatsapp_app_secret', 'whatsapp_verify_token', 'stripe_secret', 'stripe_webhook_secret'];
+    private const SECRETS = ['google_reviews_api_key', 'smtp_password', 'whatsapp_access_token', 'whatsapp_app_secret', 'whatsapp_verify_token', 'stripe_secret', 'stripe_webhook_secret'];
 
     private function requireAdmin(): void
     {
@@ -37,6 +39,10 @@ class SettingsController extends Controller
             foreach ($fields as $field) {
                 $settings[$field] = SiteSetting::get('integration_'.$field);
             }
+        }
+
+        foreach (config('company') as $name => $default) {
+            $settings['company_'.$name] ??= (string) $default;
         }
 
         return view('settings.index', [
@@ -84,6 +90,8 @@ class SettingsController extends Controller
         abort_unless(is_string($section) && isset(self::SECTIONS[$section]), 422, 'Choose a settings section.');
 
         $rules = [
+            'company_clients_served' => ['required', 'integer', 'between:0,100000000'],
+            'company_experience_years' => ['required', 'integer', 'between:0,200'],
             'company_email' => ['nullable', 'email', 'max:255'],
             'company_whatsapp' => ['nullable', 'regex:/^\+?[0-9\s()-]{7,25}$/'],
             'company_address' => ['nullable', 'string', 'max:500'],
@@ -95,6 +103,9 @@ class SettingsController extends Controller
             'google_client_id' => ['nullable', 'string', 'max:255', 'regex:/^[0-9]+-[a-z0-9]+\.apps\.googleusercontent\.com$/i'],
             'google_api_key' => ['nullable', 'string', 'max:255', 'regex:/^AIza[0-9A-Za-z_-]+$/'],
             'google_app_id' => ['nullable', 'string', 'regex:/^[0-9]+$/', 'max:30'],
+            'google_reviews_place_id' => ['nullable', 'string', 'max:255', 'regex:/^[A-Za-z0-9_-]+$/'],
+            'google_reviews_api_key' => ['nullable', 'string', 'max:255', 'regex:/^AIza[0-9A-Za-z_-]+$/'],
+            'enable_google_reviews' => ['nullable', 'boolean'],
             'onedrive_client_id' => ['nullable', 'uuid'],
             'smtp_host' => ['nullable', 'string', 'max:255'],
             'smtp_port' => ['nullable', 'integer', 'between:1,65535'],

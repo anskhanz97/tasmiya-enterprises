@@ -241,7 +241,7 @@
     .content-hub {
         max-width: 1300px;
         margin: 0 auto;
-        padding: 100px 20px;
+        padding: 88px 20px 1px;
         position: relative;
     }
     
@@ -296,6 +296,10 @@
     .section.team-section, .section.clients-section, .section.home-cta-section {
         margin-bottom: 0;
     }
+    .content-hub > .section:last-child { margin-bottom: 68px; }
+    .team-section .section-header { margin-bottom: 12px; }
+    .team-section .team-carousel-wrapper { padding-top: 14px; }
+    .home-ceo-label { display: inline-block; margin-bottom: 8px; color: #392a78; font-size: .68rem; font-weight: 900; letter-spacing: .11em; text-transform: uppercase; }
     
     .team-section::before {
         content: '';
@@ -1140,6 +1144,47 @@
         filter: grayscale(0%);
         transform: scale(1.1);
     }
+    .client-logo--viatech { gap: 6px; }
+    .client-logo--viatech img { width: 62px; max-height: 58px; }
+    .client-logo--viatech .viatech-wordmark { position: relative; z-index: 2; color: #144b94; font-size: 1.08rem; font-weight: 900; letter-spacing: -.05em; }
+    .client-logo--viatech .viatech-wordmark span { color: #505666; }
+
+    .google-reviews { position: relative; overflow: hidden; isolation: isolate; padding: clamp(74px, 8vw, 120px) 20px; background: radial-gradient(circle at 18% 12%, #e9e8fc 0, transparent 36%), radial-gradient(circle at 86% 87%, #f0e8fb 0, transparent 34%), #fbfaff; }
+    .google-reviews__inner { position: relative; z-index: 1; max-width: 1300px; margin: auto; }
+    .google-reviews__head { display: flex; justify-content: space-between; align-items: end; gap: 30px; margin-bottom: 38px; }
+    .google-reviews__eyebrow { display: inline-flex; align-items: center; gap: 12px; padding: 8px 13px; background: #fff; border: 1px solid #e5e1f1; border-radius: 100px; color: #53458d; font-size: .78rem; font-weight: 800; box-shadow: 0 9px 25px #392e7120; }
+    .google-reviews__eyebrow img { width: 76px; height: auto; }
+    .google-reviews h2 { margin: 18px 0 8px; color: #1d1a3a; font-size: clamp(2.4rem, 5vw, 4.5rem); line-height: 1.04; letter-spacing: -.055em; font-weight: 900; }
+    .google-reviews__head p { max-width: 50ch; margin: 0; color: #6d6887; }
+    .google-reviews__score { white-space: nowrap; color: #392a79; font-size: 1rem; font-weight: 800; }
+    .google-reviews__score strong { font-size: 3rem; line-height: 1; letter-spacing: -.07em; }
+    .google-reviews__score span { display: block; color: #f3aa10; letter-spacing: .1em; font-size: 1.35rem; }
+    .google-reviews__grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 20px; min-height: 300px; }
+    .google-review-card { display: flex; flex-direction: column; min-width: 0; min-height: 300px; padding: 28px; border-radius: 22px; border: 1px solid #e5e0f0; background: #fff; box-shadow: 0 20px 55px #322b6020; }
+    .google-review-card__head { display: flex; gap: 12px; align-items: center; }
+    .google-review-card__avatar { width: 46px; height: 46px; flex: none; border-radius: 50%; object-fit: cover; background: #eae5fa; color: #4c3b8e; display: grid; place-items: center; font-weight: 900; }
+    .google-review-card__author { display: block; color: #201b49; font-weight: 800; text-decoration: none; }
+    .google-review-card__date { display: block; color: #817b9a; font-size: .76rem; }
+    .google-review-card__stars { margin: 19px 0 12px; color: #f3ae16; letter-spacing: .11em; }
+    .google-review-card__text { color: #514d68; line-height: 1.65; margin-bottom: 20px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; }
+    .google-review-card__source { margin-top: auto; border-top: 1px solid #e9e5f2; padding-top: 14px; color: #5747a2; font-size: .82rem; font-weight: 800; text-decoration: none; }
+    .google-reviews__controls { display: flex; gap: 15px; align-items: center; justify-content: center; margin-top: 30px; }
+    .google-reviews__controls button { width: 48px; height: 48px; display: grid; place-items: center; border-radius: 50%; border: 1px solid #ddd6ec; background: #fff; color: #4c3b8e; box-shadow: 0 8px 20px #31266312; cursor: pointer; font-size: 1.4rem; }
+    .google-reviews__controls button:hover { background: #f1ecfc; }
+    .google-reviews__dots { display: flex; gap: 6px; align-items: center; }
+    .google-reviews__dots button { width: 9px; height: 9px; padding: 0; border: 0; border-radius: 9px; background: #d1c9e4; box-shadow: none; }
+    .google-reviews__dots button[aria-current=true] { width: 28px; background: #7657c0; }
+    .google-reviews__empty { grid-column: 1/-1; place-self: center; max-width: 46ch; text-align: center; color: #665f83; }
+    .google-reviews__credits { margin: 20px 0 0; text-align: center; font-size: .75rem; color: #77708f; }
+    .google-reviews__credits a { color: #5747a2; }
+    .google-reviews__particle { position: absolute; width: 9px; height: 9px; border-radius: 50%; opacity: .66; animation: reviewDrift 9s ease-in-out infinite alternate; }
+    .google-reviews__particle:nth-child(1) { top: 16%; left: 7%; background: #6ca9f4; }
+    .google-reviews__particle:nth-child(2) { top: 30%; right: 9%; background: #f5bd41; animation-delay: -4s; }
+    .google-reviews__particle:nth-child(3) { bottom: 14%; left: 12%; background: #62bc80; animation-delay: -2s; }
+    .google-reviews__particle:nth-child(4) { bottom: 24%; right: 5%; background: #f08190; animation-delay: -6s; }
+    @keyframes reviewDrift { to { transform: translate3d(18px,-20px,0); } }
+    @media (max-width: 820px) { .google-reviews__grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+    @media (max-width: 590px) { .google-reviews__head { display: block; } .google-reviews__score { margin-top: 20px; } .google-reviews__grid { grid-template-columns: 1fr; } .google-review-card { min-height: 270px; } }
     
     /* Duplicate clients for infinite scroll */
     @media (min-width: 768px) {
@@ -1170,29 +1215,42 @@
     @media (prefers-reduced-motion: reduce) {
         .hero-content, .hero h1, .hero .subtitle, .hero-buttons, .stat-item, .scroll-indicator,
         .why-card-icon, .carousel-btn, .carousel-item.active .team-member-card,
-        .clients-slider { animation: none !important; }
+        .clients-slider, .google-reviews__particle { animation: none !important; }
     }
+    /* A real workplace image gives the landing page the same depth as the legal heroes. */
+    .hero { min-height: min(94vh, 850px); padding: 120px 20px 100px; text-align: left; background: linear-gradient(90deg, rgba(22,16,57,.98) 0%, rgba(36,25,81,.92) 43%, rgba(48,35,96,.57) 72%, rgba(37,25,80,.33) 100%), url('/images/legal/privacy-office.webp') center / cover no-repeat; }
+    .hero::before { background: linear-gradient(90deg, rgba(28,19,68,.13), transparent 75%); }
+    .hero::after { display: none; }
+    .hero-content { max-width: 1300px; width: 100%; }
+    .hero-kicker { display: inline-block; margin-bottom: 22px; padding: 8px 12px; border: 1px solid rgba(255,255,255,.35); border-radius: 100px; color: #efe7ff; background: rgba(111,77,182,.23); font-size: .72rem; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+    .hero h1 { max-width: 11ch; font-size: clamp(3.3rem,7vw,6.2rem); background-image: linear-gradient(135deg,#fff,#f0eaff 72%,#cdbdff); text-shadow: none; }
+    .hero .subtitle { max-width: 620px; margin-left: 0; margin-right: 0; }
+    .hero-stats, .hero-buttons { justify-content: flex-start; }
+    .hero-stats { gap: clamp(22px,4vw,54px); }
+    .hero .hero-stats { margin: 31px 0; }
+    @media (max-width: 768px) { .hero { min-height: 87vh; background: linear-gradient(90deg,rgba(23,16,57,.95),rgba(33,25,77,.78)),url('/images/legal/privacy-office.webp') 65% center / cover no-repeat; } .hero-buttons { margin-left: 0; margin-right: 0; } .hero-kicker { font-size: .59rem; } }
 
 </style>
 
 <!-- HERO SECTION -->
 <div class="hero">
     <div class="hero-content">
+        <span class="hero-kicker">Taxation · Digital services · Technical support</span>
         <h1>Transform Your Business</h1>
-        <p class="subtitle">Expert solutions across taxation, technology, and technical support. We empower businesses of all sizes to achieve their full potential with innovative strategies and dedicated service.</p>
+        <p class="subtitle">From tax compliance to digital platforms and dependable technical support, our specialists help your business move forward.</p>
         
         <!-- Hero Stats -->
         <div class="hero-stats">
             <div class="stat-item">
-                <span class="stat-number" data-target="15">0</span>
+                <span class="stat-number" data-target="{{ $companyStats['experience_years'] }}" aria-label="{{ $companyStats['experience_years'] }} plus">{{ $companyStats['experience_years'] }}+</span>
                 <span class="stat-label">Years Experience</span>
             </div>
             <div class="stat-item">
-                <span class="stat-number" data-target="500">0</span>
+                <span class="stat-number" data-target="{{ $companyStats['clients_served'] }}" aria-label="{{ $companyStats['clients_served'] }} plus">{{ $companyStats['clients_served'] }}+</span>
                 <span class="stat-label">Happy Clients</span>
             </div>
             <div class="stat-item">
-                <span class="stat-number" data-target="3">0</span>
+                <span class="stat-number" data-target="3" aria-label="3 plus">3+</span>
                 <span class="stat-label">Divisions</span>
             </div>
         </div>
@@ -1307,6 +1365,7 @@
                                         @endif
                                     </div>
                                     <div class="team-info">
+                                        @if($profile->user->name === 'Atif Safdar')<span class="home-ceo-label">Chief Executive Officer</span>@endif
                                         <h3>{{ $profile->user->name }}</h3>
                                         <p class="role" style="display: inline-block; background: {{ $divisionColors['primary'] }}15; color: {{ $divisionColors['primary'] }}; font-weight: 700; padding: 8px 20px; border-radius: 20px; border: 2px solid {{ $divisionColors['primary'] }}30;">{{ $profile->user->division->name }}</p>
                                         <div class="division-name" style="color: {{ $divisionColors['primary'] }};">
@@ -1339,32 +1398,17 @@
         
         <div class="clients-slider-wrapper">
             <div class="clients-slider">
-                @php
-                    $clients = [
-                        ['name' => 'IT Lifee', 'logo' => '/images/clients/itlifee.svg', 'url' => 'https://itlifee.net'],
-                        ['name' => 'Bang.pk', 'logo' => '/images/clients/bang.svg', 'url' => 'https://bang.pk'],
-                        ['name' => 'Masalaa Magic', 'logo' => '/images/clients/masalaa-magic.svg', 'url' => 'https://masalaamagic.com'],
-                        ['name' => 'Allied Bahrain', 'logo' => '/images/clients/allied-bahrain.svg', 'url' => 'https://alliedbahrain.com/'],
-                        ['name' => 'Techno One', 'logo' => '/images/clients/techno-one.svg', 'url' => 'https://www.technoone.pk/'],
-                        ['name' => 'MSL', 'logo' => '/images/clients/msl.svg', 'url' => null],
-                        ['name' => 'Fast Security', 'logo' => '/images/clients/fast-security.svg', 'url' => 'https://fastsec.itlifee.net'],
-                        ['name' => 'DeSOM', 'logo' => '/images/clients/desom.svg', 'url' => null],
-                        ['name' => 'Shalimar Plastic', 'logo' => '/images/clients/shalimar-plastic.svg', 'url' => 'https://erp.itlifee.net'],
-                    ];
-
-                    $clients = array_slice($clients, 0, 9);
-                @endphp
-                
                 {{-- Render clients twice for seamless infinite scroll --}}
                 @for($i = 0; $i < 2; $i++)
                     @foreach($clients as $client)
                         @if($client['url'])
-                            <a href="{{ $client['url'] }}" target="_blank" class="client-logo" title="{{ $client['name'] }}">
-                                <img src="{{ $client['logo'] }}" alt="{{ $client['name'] }}" decoding="async" width="200" height="100">
+                            <a href="{{ $client['url'] }}" target="_blank" rel="noopener noreferrer" class="client-logo {{ $client['name'] === 'ViaTech' ? 'client-logo--viatech' : '' }}" title="{{ $client['name'] }}">
+                                <img src="{{ $client['logo'] }}" alt="{{ $client['name'] }}" loading="lazy" decoding="async" width="200" height="100">
+                                @if($client['name'] === 'ViaTech')<span class="viatech-wordmark"><span>VIA</span>TECH</span>@endif
                             </a>
                         @else
                             <div class="client-logo" title="{{ $client['name'] }}">
-                                <img src="{{ $client['logo'] }}" alt="{{ $client['name'] }}" decoding="async" width="200" height="100">
+                                <img src="{{ $client['logo'] }}" alt="{{ $client['name'] }}" loading="lazy" decoding="async" width="200" height="100">
                             </div>
                         @endif
                     @endforeach
@@ -1372,6 +1416,21 @@
             </div>
         </div>
     </div>
+
+    @if($showGoogleReviews)
+    <section class="google-reviews" id="google-reviews" data-google-reviews data-endpoint="{{ route('google-reviews.index') }}" aria-labelledby="google-reviews-title">
+        <i class="google-reviews__particle" aria-hidden="true"></i><i class="google-reviews__particle" aria-hidden="true"></i><i class="google-reviews__particle" aria-hidden="true"></i><i class="google-reviews__particle" aria-hidden="true"></i>
+        <div class="google-reviews__inner">
+            <div class="google-reviews__head">
+                <div><span class="google-reviews__eyebrow"><img src="{{ asset('images/google-maps-logo.svg') }}" alt="Google Maps"> REVIEWS</span><h2 id="google-reviews-title">Words from our clients.</h2><p>Real experiences, shared on Google Maps.</p></div>
+                <div class="google-reviews__score" hidden><strong data-review-rating></strong> / 5 <span aria-label="five stars">★★★★★</span><small data-review-count></small></div>
+            </div>
+            <div class="google-reviews__grid" data-review-grid><p class="google-reviews__empty">Loading recent Google reviews…</p></div>
+            <nav class="google-reviews__controls" aria-label="Review pages" hidden><button type="button" data-review-prev aria-label="Previous reviews">‹</button><span class="google-reviews__dots" data-review-dots></span><button type="button" data-review-next aria-label="Next reviews">›</button></nav>
+            <p class="google-reviews__credits" data-review-credits></p>
+        </div>
+    </section>
+    @endif
     
     <!-- CTA SECTION -->
     <div class="section home-cta-section">
@@ -1384,32 +1443,33 @@
 <script>
 // Animated Counter for Hero Stats
 document.addEventListener('DOMContentLoaded', function() {
-    const stats = document.querySelectorAll('.stat-number');
+    const stats = document.querySelectorAll('.stat-number[data-target]');
     
     const animateCounter = (element) => {
-        const target = parseInt(element.getAttribute('data-target'));
+        const target = Number(element.dataset.target);
+        if (!Number.isFinite(target) || target < 0) return;
         const duration = 2000;
-        const increment = target / (duration / 16);
-        let current = 0;
-        
-        const updateCounter = () => {
-            current += increment;
-            if (current < target) {
-                element.textContent = Math.floor(current) + '+';
-                requestAnimationFrame(updateCounter);
-            } else {
-                element.textContent = target + '+';
-            }
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            element.textContent = target + '+';
+            return;
+        }
+        let start;
+        element.textContent = '0+';
+        const updateCounter = (timestamp) => {
+            start ??= timestamp;
+            const progress = Math.min((timestamp - start) / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            element.textContent = Math.floor(target * eased) + '+';
+            if (progress < 1) requestAnimationFrame(updateCounter);
         };
-        
-        updateCounter();
+        requestAnimationFrame(updateCounter);
     };
     
     // Intersection Observer for scroll animations
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                if (entry.target.classList.contains('stat-number') && entry.target.textContent === '0') {
+                if (entry.target.classList.contains('stat-number')) {
                     animateCounter(entry.target);
                 }
                 observer.unobserve(entry.target);
@@ -1532,6 +1592,143 @@ document.addEventListener('DOMContentLoaded', function() {
             clientsSlider.classList.toggle('is-offscreen', !entry.isIntersecting);
         });
         sliderVisibility.observe(clientsSlider);
+    }
+
+    const reviewSection = document.querySelector('[data-google-reviews]');
+    if (reviewSection) {
+        const grid = reviewSection.querySelector('[data-review-grid]');
+        const controls = reviewSection.querySelector('.google-reviews__controls');
+        const dots = reviewSection.querySelector('[data-review-dots]');
+        const prefersLessMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+        let reviews = [];
+        let page = 0;
+        let timer;
+        let inView = false;
+        let loaded = false;
+        const safeUrl = url => typeof url === 'string' && /^https:\/\//i.test(url) ? url : null;
+        const pageSize = () => window.innerWidth < 590 ? 1 : window.innerWidth < 820 ? 2 : 3;
+
+        function reviewCard(review) {
+            const article = document.createElement('article');
+            article.className = 'google-review-card';
+            const head = document.createElement('div');
+            head.className = 'google-review-card__head';
+            let avatar;
+            if (safeUrl(review.author_photo)) {
+                avatar = document.createElement('img');
+                avatar.src = review.author_photo;
+                avatar.alt = '';
+                avatar.referrerPolicy = 'no-referrer';
+            } else {
+                avatar = document.createElement('span');
+                avatar.textContent = (review.author || 'G').charAt(0).toUpperCase();
+            }
+            avatar.className = 'google-review-card__avatar';
+            head.appendChild(avatar);
+            const identity = document.createElement('div');
+            const authorUrl = safeUrl(review.author_url);
+            const author = document.createElement(authorUrl ? 'a' : 'span');
+            author.className = 'google-review-card__author';
+            author.textContent = review.author || 'Google reviewer';
+            if (authorUrl) { author.href = authorUrl; author.target = '_blank'; author.rel = 'noopener noreferrer'; }
+            identity.appendChild(author);
+            if (review.date) { const date = document.createElement('span'); date.className = 'google-review-card__date'; date.textContent = review.date; identity.appendChild(date); }
+            head.appendChild(identity);
+            article.appendChild(head);
+            const stars = document.createElement('div');
+            stars.className = 'google-review-card__stars';
+            const rating = Math.max(0, Math.min(5, Math.round(Number(review.rating) || 0)));
+            stars.textContent = '★'.repeat(rating) + '☆'.repeat(5 - rating);
+            stars.setAttribute('aria-label', `${review.rating || 0} out of 5 stars`);
+            article.appendChild(stars);
+            const quote = document.createElement('p');
+            quote.className = 'google-review-card__text';
+            quote.textContent = review.text || 'Rating shared on Google Maps.';
+            article.appendChild(quote);
+            const sourceUrl = safeUrl(review.url);
+            if (sourceUrl) { const source = document.createElement('a'); source.className = 'google-review-card__source'; source.href = sourceUrl; source.target = '_blank'; source.rel = 'noopener noreferrer'; source.textContent = 'View on Google Maps ↗'; article.appendChild(source); }
+            return article;
+        }
+
+        function renderReviews() {
+            const size = pageSize();
+            const pages = Math.ceil(reviews.length / size);
+            page = Math.min(page, Math.max(0, pages - 1));
+            grid.replaceChildren(...reviews.slice(page * size, (page + 1) * size).map(reviewCard));
+            dots.replaceChildren();
+            for (let index = 0; index < pages; index++) {
+                const dot = document.createElement('button');
+                dot.type = 'button';
+                dot.setAttribute('aria-label', `Review page ${index + 1}`);
+                dot.setAttribute('aria-current', String(index === page));
+                dot.addEventListener('click', () => { page = index; renderReviews(); restartReviewTimer(); });
+                dots.appendChild(dot);
+            }
+            controls.hidden = pages <= 1;
+        }
+
+        function restartReviewTimer() {
+            clearInterval(timer);
+            if (prefersLessMotion.matches || !inView || document.hidden || reviews.length <= pageSize()) return;
+            timer = setInterval(() => { page = (page + 1) % Math.ceil(reviews.length / pageSize()); renderReviews(); }, 6500);
+        }
+
+        reviewSection.querySelector('[data-review-prev]').addEventListener('click', () => { page = (page - 1 + Math.ceil(reviews.length / pageSize())) % Math.ceil(reviews.length / pageSize()); renderReviews(); restartReviewTimer(); });
+        reviewSection.querySelector('[data-review-next]').addEventListener('click', () => { page = (page + 1) % Math.ceil(reviews.length / pageSize()); renderReviews(); restartReviewTimer(); });
+        reviewSection.addEventListener('mouseenter', () => clearInterval(timer));
+        reviewSection.addEventListener('mouseleave', restartReviewTimer);
+        document.addEventListener('visibilitychange', restartReviewTimer);
+        window.addEventListener('resize', () => { if (reviews.length) { renderReviews(); restartReviewTimer(); } });
+        prefersLessMotion.addEventListener('change', restartReviewTimer);
+
+        async function loadReviews() {
+            if (loaded) return;
+            loaded = true;
+            try {
+                const response = await fetch(reviewSection.dataset.endpoint, { cache: 'no-store', headers: { Accept: 'application/json' } });
+                if (!response.ok) throw new Error('Reviews unavailable');
+                const result = await response.json();
+                reviews = Array.isArray(result.reviews) ? result.reviews : [];
+                if (!reviews.length) { grid.innerHTML = '<p class="google-reviews__empty">No public Google reviews are available yet.</p>'; return; }
+                const score = reviewSection.querySelector('.google-reviews__score');
+                if (result.rating) {
+                    score.hidden = false;
+                    score.querySelector('[data-review-rating]').textContent = Number(result.rating).toFixed(1);
+                    score.querySelector('span').textContent = '★'.repeat(Math.round(result.rating)) + '☆'.repeat(5 - Math.round(result.rating));
+                    score.querySelector('[data-review-count]').textContent = `${result.count || 0} Google ratings`;
+                }
+                const credits = reviewSection.querySelector('[data-review-credits]');
+                credits.textContent = 'Review content provided by Google Maps';
+                const policyLink = document.createElement('a');
+                policyLink.href = 'https://support.google.com/contributionpolicy/answer/7422880';
+                policyLink.target = '_blank';
+                policyLink.rel = 'noopener noreferrer';
+                policyLink.textContent = ' · Google review policy';
+                credits.appendChild(policyLink);
+                if (safeUrl(result.maps_url)) { const link = document.createElement('a'); link.href = result.maps_url; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.textContent = ' · View this place on Google Maps'; credits.appendChild(link); }
+                for (const attribution of result.attributions || []) {
+                    if (!attribution.name) continue;
+                    if (safeUrl(attribution.url)) {
+                        const link = document.createElement('a');
+                        link.href = attribution.url;
+                        link.target = '_blank';
+                        link.rel = 'noopener noreferrer';
+                        link.textContent = ` · ${attribution.name}`;
+                        credits.appendChild(link);
+                    } else {
+                        credits.appendChild(document.createTextNode(` · ${attribution.name}`));
+                    }
+                }
+                renderReviews(); restartReviewTimer();
+            } catch (error) {
+                grid.innerHTML = '<p class="google-reviews__empty">Google reviews are temporarily unavailable. Please check again later.</p>';
+            }
+        }
+
+        if ('IntersectionObserver' in window) {
+            const observer = new IntersectionObserver(([entry]) => { inView = entry.isIntersecting; if (inView) loadReviews(); restartReviewTimer(); }, { rootMargin: '300px' });
+            observer.observe(reviewSection);
+        } else { inView = true; loadReviews(); }
     }
 });
 </script>
