@@ -353,7 +353,7 @@ class AuthController extends Controller
      * 1. Destroys session
      * 2. Clears auth cookies
      * 3. Invalidates session data
-     * 4. Redirects to login page with success message
+     * 4. Redirects to the website homepage with success message
      * 
      * Why POST instead of GET:
      * - Logout should not be bookmarkable
@@ -371,14 +371,14 @@ class AuthController extends Controller
      * - Request $request: HTTP request object (needed for session)
      * 
      * Returns: RedirectResponse
-     *   - Redirects to login page with success message after successful logout
+     *   - Redirects to the website homepage after successful logout
      * 
      * What happens:
      * 1. auth()->logout() ends session
      * 2. $request->session()->invalidate() destroys session data
      * 3. $request->session()->regenerateToken() creates new CSRF token
      *    (New token is for future requests, old session token is gone)
-     * 4. Redirect to login page with success message
+     * 4. Redirect to the website homepage with success message
      * 
      * Browser behavior:
      * - Session cookie is cleared/expired
@@ -404,8 +404,8 @@ class AuthController extends Controller
         // Old CSRF token is invalid (security measure)
         $request->session()->regenerateToken();
 
-        // Redirect to login page with success message
-        return redirect()->route('login')
+        // Return visitors to the public website after ending their session.
+        return redirect()->route('home')
             ->with('status', 'You have been successfully logged out.');
     }
 

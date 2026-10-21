@@ -7,7 +7,6 @@ use App\Models\ContactInquiry;
 use App\Models\SiteSetting;
 use App\Services\WhatsAppService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
@@ -19,7 +18,11 @@ class ContactInquiryController extends Controller
      */
     public function create()
     {
-        return view('contact.create');
+        $divisions = \App\Models\Division::whereHas('users', fn ($q) => $q->publicInquiryRecipients())
+            ->with(['users' => fn ($q) => $q->publicInquiryRecipients()->orderBy('name')->select('id', 'name', 'division_id')])
+            ->get(['id', 'name']);
+
+        return view('contact.create', compact('divisions'));
     }
 
     /**
@@ -30,17 +33,7 @@ class ContactInquiryController extends Controller
     {
         $validated = $request->validated();
 
-        // Create inquiry
-        $inquiry = ContactInquiry::create([
-            'user_id' => Auth::id(),
-            'email' => $validated['email'],
-            'phone' => $validated['phone'],
-            'name' => $validated['name'],
-            'subject' => $validated['subject'],
-            'message' => $validated['message'],
-            'source' => 'website',
-            'status' => 'new',
-        ]);
+        $inquiry = app(\App\Services\LeadWorkflow::class)->website($validated);
 
         $email = SiteSetting::get('integration_company_email');
         $smtpHost = SiteSetting::get('integration_smtp_host');
@@ -68,7 +61,7 @@ class ContactInquiryController extends Controller
         }
 
         if (SiteSetting::get('integration_company_whatsapp') && SiteSetting::get('integration_whatsapp_template_name')) {
-            $inquiry->whatsapp_delivery_status = (new WhatsAppService())->notifyCompanyAboutInquiry($inquiry) ? 'sent' : 'failed';
+            $inquiry->whatsapp_delivery_status = (new WhatsAppService)->notifyCompanyAboutInquiry($inquiry) ? 'sent' : 'failed';
         }
         $inquiry->save();
 
@@ -85,7 +78,7 @@ class ContactInquiryController extends Controller
     {
         $this->authorize('view', $inquiry);
 
-        return view('admin.contact-inquiries.show', ['inquiry' => $inquiry]);
+        return redirect()->route('leads.index', ['lead' => $inquiry->lead_id]);
     }
 
     /**
@@ -96,11 +89,7 @@ class ContactInquiryController extends Controller
     {
         $this->authorize('viewAny', ContactInquiry::class);
 
-        $inquiries = ContactInquiry::with(['user', 'assignedTo'])
-            ->latest()
-            ->paginate(15);
-
-        return view('admin.contact-inquiries.index', ['inquiries' => $inquiries]);
+        return redirect()->route('leads.index');
     }
 
     /**
@@ -145,7 +134,13 @@ class ContactInquiryController extends Controller
             'assigned_to' => ['required', 'exists:users,id'],
         ]);
 
-        $inquiry->update(['assigned_to' => $validated['assigned_to']]);
+        $lead = $inquiry->lead;
+        abort_unless($lead && $request->user()->isAdmin(), 403);
+        $request->validate(['version' => 'required|integer|min:1']);
+        app(\App\Services\LeadWorkflow::class)->activity($lead, [
+            'version' => $request->integer('version'), 'lead_status' => $lead->lead_status,
+            'activity_type' => 'Note', 'assigned_to' => (int) $validated['assigned_to'], 'remarks' => 'Inquiry reassigned.',
+        ]);
 
         return redirect()
             ->back()
@@ -168,12 +163,10 @@ class ContactInquiryController extends Controller
             return back()->with('error', 'WhatsApp could not send this reply. Check the Cloud API configuration and the customer conversation window.');
         }
 
-        // Update inquiry status
-        $inquiry->update([
-            'status' => 'contacted',
-            'responded_at' => now(),
-            'notes' => ($inquiry->notes ? $inquiry->notes . "\n\n" : '') . 
-                      "Replied via WhatsApp: " . $validated['message'],
+        $lead = $inquiry->lead;
+        app(\App\Services\LeadWorkflow::class)->activity($lead, [
+            'version' => $lead->version, 'lead_status' => 'Contacted',
+            'activity_type' => 'WhatsApp', 'remarks' => 'Replied via WhatsApp: '.$validated['message'],
         ]);
 
         return redirect()

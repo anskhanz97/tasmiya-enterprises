@@ -16,6 +16,7 @@ class SettingsController extends Controller
         'reviews' => ['google_reviews_place_id', 'google_reviews_api_key', 'enable_google_reviews'],
         'onedrive' => ['onedrive_client_id'],
         'email' => ['smtp_host', 'smtp_port', 'smtp_username', 'smtp_password', 'smtp_encryption', 'smtp_from_email'],
+        'reminders' => ['enable_lead_reminders', 'lead_reminder_time', 'lead_upcoming_days'],
         'whatsapp' => ['whatsapp_business_account_id', 'whatsapp_phone_id', 'whatsapp_access_token', 'whatsapp_template_name', 'whatsapp_app_secret', 'whatsapp_verify_token'],
         'bank' => ['bank_name', 'bank_account_title', 'bank_iban', 'enable_bank_transfer'],
         'raast' => ['raast_id', 'enable_raast'],
@@ -44,6 +45,10 @@ class SettingsController extends Controller
         foreach (config('company') as $name => $default) {
             $settings['company_'.$name] ??= (string) $default;
         }
+        $reminders = app(\App\Services\LeadReminderService::class)->settings();
+        $settings['enable_lead_reminders'] ??= $reminders['enabled'] ? '1' : '0';
+        $settings['lead_reminder_time'] ??= $reminders['time'];
+        $settings['lead_upcoming_days'] ??= (string) $reminders['upcoming_days'];
 
         return view('settings.index', [
             'settings' => $settings,
@@ -113,6 +118,9 @@ class SettingsController extends Controller
             'smtp_password' => ['nullable', 'string', 'max:255'],
             'smtp_encryption' => ['nullable', Rule::in(['tls', 'ssl', 'none'])],
             'smtp_from_email' => ['nullable', 'email', 'max:255'],
+            'enable_lead_reminders' => ['nullable', 'boolean'],
+            'lead_reminder_time' => ['required', 'date_format:H:i'],
+            'lead_upcoming_days' => ['required', 'integer', 'between:1,30'],
             'whatsapp_phone_id' => ['nullable', 'string', 'regex:/^[0-9]+$/', 'max:100'],
             'whatsapp_business_account_id' => ['nullable', 'string', 'regex:/^[0-9]+$/', 'max:100'],
             'whatsapp_access_token' => ['nullable', 'string', 'max:2000'],

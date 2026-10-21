@@ -4,6 +4,8 @@ A Laravel website and team workspace for Tasmiya Enterprises' taxation, IT and d
 
 ## What is included
 
+- Lead management with department/specialist inquiry routing, the crm-itlife follow-up calendar and activity timeline, staff ownership, customer conversion/reopening, and grouped WhatsApp text intake. See [the lead management guide](docs/LEAD_MANAGEMENT.md).
+
 - Responsive Home, Services, Team, About, FAQ, Contact, Privacy Policy, and Terms of Service pages, with optimized WebP imagery and a shared visual theme.
 - Team profiles with editable presentation details and images, plus profile-owned service cards. Each specialist can add or remove cards and set their own title, description, tags, icon, currency, and starting price without changing another specialist's listing.
 - An authenticated dashboard and per-card admin settings for company contact details, social links, inquiry email, cloud image pickers, WhatsApp notifications, and payment destinations.

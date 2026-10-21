@@ -9,9 +9,16 @@ class ContactInquiryStoreRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         if ($this->filled('phone')) {
-            $this->merge(['phone' => preg_replace('/[^0-9+]/', '', $this->input('phone'))]);
+            $this->merge(['phone' => \App\Support\LeadPhone::normalize($this->input('phone'))]);
+        }
+        if ($this->filled('division_id') && ! $this->filled('assigned_to')) {
+            $recipients = \App\Models\User::publicInquiryRecipients()->where('division_id', $this->input('division_id'))->pluck('id');
+            if ($recipients->count() === 1) {
+                $this->merge(['assigned_to' => $recipients->first()]);
+            }
         }
     }
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -26,6 +33,10 @@ class ContactInquiryStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'division_id' => ['required', 'integer', 'exists:divisions,id'],
+            'assigned_to' => ['required', 'integer', \Illuminate\Validation\Rule::in(
+                \App\Models\User::publicInquiryRecipients()->where('division_id', $this->input('division_id'))->pluck('id')->all()
+            )],
             'name' => ['required', 'string', 'max:100'],
             'email' => ['required', 'email', 'max:100'],
             'phone' => ['required', 'string', 'regex:/^\+?[1-9]\d{1,14}$/'],
@@ -40,6 +51,9 @@ class ContactInquiryStoreRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'division_id.required' => 'Please choose a department.',
+            'assigned_to.required' => 'Please choose a specialist.',
+            'assigned_to.in' => 'Choose an available specialist in this department.',
             'name.required' => 'Please provide your name.',
             'email.required' => 'Please provide your email address.',
             'email.email' => 'Please provide a valid email address.',

@@ -1,0 +1,9 @@
+simulation: tasmiya-whatsapp-error
+routing: path
+mocks:
+  - routeKey: whatsapp
+    path: ../mocks/whatsapp/config.yaml
+    scenarios:
+      - overrides:
+          conditions:
+            error: { status_code: 503 }

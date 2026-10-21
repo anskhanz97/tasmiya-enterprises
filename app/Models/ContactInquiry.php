@@ -11,6 +11,9 @@ class ContactInquiry extends Model
      * The attributes that are mass assignable.
      */
     protected $fillable = [
+        'lead_id',
+        'division_id',
+        'external_message_id',
         'user_id',
         'email',
         'phone',
@@ -32,6 +35,7 @@ class ContactInquiry extends Model
      * The attributes that should be cast.
      */
     protected $casts = [
+        'lead_id' => 'integer',
         'responded_at' => 'datetime',
         'resolved_at' => 'datetime',
         'created_at' => 'datetime',
@@ -44,6 +48,11 @@ class ContactInquiry extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function lead(): BelongsTo
+    {
+        return $this->belongsTo(Lead::class);
     }
 
     /**
@@ -83,9 +92,9 @@ class ContactInquiry extends Model
      */
     public function markAsContacted(): void
     {
-        $this->update([
-            'status' => 'contacted',
-            'responded_at' => now(),
+        $lead = $this->lead ?? app(\App\Services\LeadWorkflow::class)->fromInquiry($this);
+        app(\App\Services\LeadWorkflow::class)->activity($lead, [
+            'version' => $lead->version, 'lead_status' => 'Contacted', 'activity_type' => 'Note', 'remarks' => 'Marked as contacted.',
         ]);
     }
 
@@ -94,9 +103,9 @@ class ContactInquiry extends Model
      */
     public function markAsResolved(): void
     {
-        $this->update([
-            'status' => 'resolved',
-            'resolved_at' => now(),
+        $lead = $this->lead ?? app(\App\Services\LeadWorkflow::class)->fromInquiry($this);
+        app(\App\Services\LeadWorkflow::class)->activity($lead, [
+            'version' => $lead->version, 'lead_status' => 'Lost', 'activity_type' => 'Note', 'remarks' => 'Closed without customer conversion.',
         ]);
     }
 

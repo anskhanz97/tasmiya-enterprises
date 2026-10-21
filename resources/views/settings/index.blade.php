@@ -25,14 +25,18 @@
         'onedrive' => ['OneDrive image picker', 'Microsoft sign-in grants read-only access when an editor chooses an image.', [
             'onedrive_client_id' => ['Entra application (client) ID', 'text', 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'],
         ]],
-        'email' => ['Inquiry email', 'Send new contact inquiries using your SMTP account.', [
+        'email' => ['Email delivery', 'Use this SMTP account for company inquiry notices and assigned-person follow-up summaries.', [
             'smtp_host' => ['SMTP host', 'text', 'smtp.example.com'],
             'smtp_port' => ['SMTP port', 'number', '587'],
             'smtp_username' => ['SMTP username', 'text', ''],
             'smtp_password' => ['SMTP password', 'password', 'Enter a new SMTP password'],
             'smtp_from_email' => ['From email', 'email', 'no-reply@example.com'],
         ]],
-        'whatsapp' => ['WhatsApp notifications', 'Meta Cloud API can notify the company when an inquiry arrives.', [
+        'reminders' => ['Lead reminders', 'One daily summary for each assigned person. Times use Asia/Karachi.', [
+            'lead_reminder_time' => ['Daily summary time', 'time', '09:00'],
+            'lead_upcoming_days' => ['Upcoming follow-up window (days)', 'number', '7'],
+        ]],
+        'whatsapp' => ['WhatsApp messaging', 'Receive text inquiries and reply from lead details. Company alerts also need an approved template.', [
             'whatsapp_business_account_id' => ['Business account ID (WABA)', 'text', 'From WhatsApp Manager'],
             'whatsapp_phone_id' => ['Phone number ID', 'text', 'From WhatsApp Manager'],
             'whatsapp_access_token' => ['Meta access token', 'password', 'Enter a new access token'],
@@ -62,7 +66,7 @@
             'stripe_webhook_secret' => ['Webhook signing secret', 'password', 'Enter a new signing secret'],
         ]],
     ];
-    $switches = ['reviews'=>'enable_google_reviews', 'bank'=>'enable_bank_transfer', 'raast'=>'enable_raast', 'easypaisa'=>'enable_easypaisa', 'jazzcash'=>'enable_jazzcash', 'stripe'=>'enable_card'];
+    $switches = ['reminders'=>'enable_lead_reminders', 'reviews'=>'enable_google_reviews', 'bank'=>'enable_bank_transfer', 'raast'=>'enable_raast', 'easypaisa'=>'enable_easypaisa', 'jazzcash'=>'enable_jazzcash', 'stripe'=>'enable_card'];
     $paymentCards = ['bank','raast','easypaisa','jazzcash','stripe'];
     $secretFields = ['google_reviews_api_key','smtp_password','whatsapp_access_token','whatsapp_app_secret','whatsapp_verify_token','stripe_secret','stripe_webhook_secret'];
     $googleValid = preg_match('/^[0-9]+-[a-z0-9]+\.apps\.googleusercontent\.com$/i', (string) $settings['google_client_id']) && preg_match('/^AIza[0-9A-Za-z_-]+$/', (string) $settings['google_api_key']) && ctype_digit((string) $settings['google_app_id']);
@@ -77,7 +81,7 @@
 @if(session('success'))<div class="ig-alert" role="status">{{ session('success') }}</div>@endif
 @if($errors->any())<div class="ig-alert error" role="alert"><strong>Changes were not saved.</strong><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
 <div class="ig-layout"><nav class="ig-nav" aria-label="Settings sections">
-@foreach(['statistics'=>'Company statistics','contact'=>'Company & location','google'=>'Google Drive','reviews'=>'Google Reviews','onedrive'=>'OneDrive','email'=>'Inquiry email','whatsapp'=>'WhatsApp','bank'=>'Bank transfer','raast'=>'Raast','easypaisa'=>'Easypaisa','jazzcash'=>'JazzCash','stripe'=>'Stripe','social'=>'Social links'] as $id=>$label)
+@foreach(['statistics'=>'Company statistics','contact'=>'Company & location','google'=>'Google Drive','reviews'=>'Google Reviews','onedrive'=>'OneDrive','email'=>'Email delivery','reminders'=>'Lead reminders','whatsapp'=>'WhatsApp','bank'=>'Bank transfer','raast'=>'Raast','easypaisa'=>'Easypaisa','jazzcash'=>'JazzCash','stripe'=>'Stripe','social'=>'Social links'] as $id=>$label)
 @if($id==='bank')<span class="ig-nav-label">PAYMENTS</span>@endif
 <a href="#ig-{{ $id }}">{{ $label }}</a>
 @endforeach
@@ -88,12 +92,13 @@
     $enabledKey = $switches[$id] ?? null;
     $configured = match($id) {
         'statistics' => true,
+        'reminders' => true,
         'contact' => filled($settings['company_email']) && filled($settings['company_whatsapp']) && filled($settings['company_address']),
         'google' => (bool) $googleValid,
         'reviews' => filled($settings['google_reviews_place_id']) && filled($settings['google_reviews_api_key']),
         'onedrive' => filled($settings['onedrive_client_id']),
         'email' => filled($settings['smtp_host']) && filled($settings['smtp_from_email']),
-        'whatsapp' => filled($settings['whatsapp_phone_id']) && filled($settings['whatsapp_access_token']) && filled($settings['whatsapp_template_name']),
+        'whatsapp' => filled($settings['whatsapp_phone_id']) && filled($settings['whatsapp_access_token']) && filled($settings['whatsapp_app_secret']) && filled($settings['whatsapp_verify_token']),
         'bank' => filled($settings['bank_iban']),
         'raast' => filled($settings['raast_id']),
         'easypaisa' => filled($settings['easypaisa_number']),
@@ -113,7 +118,7 @@
 @endphp
 <div class="ig-value"><span>{{ $label }}</span><strong class="{{ blank($settings[$key]) ? 'missing' : '' }}">{{ $displayValue }}</strong></div>
 @endforeach
-@if($enabledKey)<div class="ig-value"><span>Customer-facing option</span><strong>{{ $enabled ? 'Enabled' : 'Disabled' }}</strong></div>@endif
+@if($enabledKey)<div class="ig-value"><span>{{ $id === 'reminders' ? 'Daily summaries' : 'Customer-facing option' }}</span><strong>{{ $enabled ? 'Enabled' : 'Disabled' }}</strong></div>@endif
 </div>
 <form method="POST" action="{{ route('settings.integrations.update') }}" class="ig-editor" id="ig-editor-{{ $id }}" hidden autocomplete="off">@csrf @method('PUT')<input type="hidden" name="section" value="{{ $id }}">
 <div class="ig-fields">
@@ -130,7 +135,8 @@
 @endforeach
 @if($id==='email')<div class="ig-field"><label for="ig-smtp_encryption">Connection security</label><select id="ig-smtp_encryption" name="smtp_encryption"><option value="tls" @selected($settings['smtp_encryption']==='tls')>TLS</option><option value="ssl" @selected($settings['smtp_encryption']==='ssl')>SSL</option><option value="none" @selected($settings['smtp_encryption']==='none')>None</option></select></div>@endif
 </div>
-@if($enabledKey)<label class="ig-check"><input type="checkbox" name="{{ $enabledKey }}" value="1" @checked($enabled)> {{ $id === 'reviews' ? 'Show the Google Reviews section on the homepage' : 'Show '.$title.' as a payment option' }}</label>@endif
+@if($enabledKey)<label class="ig-check"><input type="checkbox" name="{{ $enabledKey }}" value="1" @checked($enabled)> {{ $id === 'reminders' ? 'Enable daily website and email follow-up summaries' : ($id === 'reviews' ? 'Show the Google Reviews section on the homepage' : 'Show '.$title.' as a payment option') }}</label>@endif
+@if($id==='reminders')<p class="ig-help">Summaries go only to the assigned person and include overdue follow-ups plus the upcoming window. Website notifications work before SMTP is configured. <a href="{{ route('notifications.index', ['view'=>'deliveries']) }}">Check email delivery and scheduler status</a> or <a href="{{ route('notifications.email-preview') }}" target="_blank" rel="noopener">preview the email template</a>.</p>@endif
 @if($id==='google')<p class="ig-help">Enable both Google Picker API and Google Drive API in this Cloud project. For this local server, register <code>http://localhost:8000</code> as an Authorized JavaScript origin in the Google OAuth <strong>Web application</strong> client, then open the site using <strong>localhost</strong>, not 127.0.0.1. This JavaScript token flow does not need a redirect URI. The project number is digits only. If you restrict the API key to websites, also allow <code>http://localhost:8000/*</code> and <code>https://docs.google.com/*</code>; allow both Google Picker API and Drive API under API restrictions.</p>@endif
 @if($id==='reviews')<p class="ig-help">This uses the Google Places API (New) directly when a visitor reaches the section. Enable Places API (New) and billing in Google Cloud, then enter Tasmiya's Place ID and a server-side restricted key. Reviews are never copied into our database; Google attribution and source links appear with the cards. The section stays hidden if disabled or incomplete. Places API requests may incur charges.</p>@endif
 @if($id==='onedrive')<p class="ig-help">This client-side MSAL integration needs an Entra SPA registration with <code>http://localhost:8000/</code> as a redirect URI and delegated Files.Read permission. One application ID is enough in the portal; no client secret belongs in a browser app.</p>@endif

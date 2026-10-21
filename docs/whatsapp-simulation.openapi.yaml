@@ -1,0 +1,51 @@
+openapi: 3.0.3
+info:
+  title: WhatsApp outbound messages used by Tasmiya
+  version: 1.0.0
+  description: Local verification subset of the Meta Cloud API; no production credentials or messages.
+servers:
+  - url: https://graph.facebook.com/v23.0
+paths:
+  /{phoneNumberId}/messages:
+    post:
+      operationId: sendWhatsAppMessage
+      parameters:
+        - in: path
+          name: phoneNumberId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [messaging_product, to, type]
+              properties:
+                messaging_product: { type: string, enum: [whatsapp] }
+                to: { type: string }
+                type: { type: string, enum: [text, template] }
+                text:
+                  type: object
+                  properties:
+                    body: { type: string }
+            example:
+              messaging_product: whatsapp
+              to: '+923001234567'
+              type: text
+              text: { body: 'Local simulation acknowledgement.' }
+      responses:
+        '200':
+          description: Message accepted
+          content:
+            application/json:
+              example:
+                messaging_product: whatsapp
+                contacts: [{ input: '923001234567', wa_id: '923001234567' }]
+                messages: [{ id: 'wamid.local-simulation' }]
+        '503':
+          description: Upstream temporarily unavailable
+          content:
+            application/json:
+              example:
+                error: { message: 'Service temporarily unavailable', type: OAuthException, code: 2 }

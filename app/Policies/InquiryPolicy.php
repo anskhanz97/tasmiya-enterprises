@@ -2,7 +2,6 @@
 
 namespace App\Policies;
 
-use Illuminate\Auth\Access\Response;
 use App\Models\ContactInquiry;
 use App\Models\User;
 
@@ -13,7 +12,7 @@ class InquiryPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return (new LeadPolicy)->viewAny($user);
     }
 
     /**
@@ -21,7 +20,7 @@ class InquiryPolicy
      */
     public function view(User $user, ContactInquiry $contactInquiry): bool
     {
-        return false;
+        return $contactInquiry->lead && (new LeadPolicy)->view($user, $contactInquiry->lead);
     }
 
     /**
@@ -29,7 +28,7 @@ class InquiryPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return (new LeadPolicy)->create($user);
     }
 
     /**
@@ -37,7 +36,7 @@ class InquiryPolicy
      */
     public function update(User $user, ContactInquiry $contactInquiry): bool
     {
-        return false;
+        return $this->view($user, $contactInquiry);
     }
 
     /**

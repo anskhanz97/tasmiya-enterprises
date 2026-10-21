@@ -1,4 +1,7 @@
+import { initializeNotifications } from './notifications';
+
 function initializeLayoutInteractions() {
+    initializeNotifications();
     const navbar = document.getElementById('navbar');
     const scrollToTop = document.getElementById('scrollToTop');
     const menu = document.getElementById('userDropdown');

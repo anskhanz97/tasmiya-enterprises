@@ -1,0 +1,9 @@
+simulation: tasmiya-whatsapp-timeout
+routing: path
+mocks:
+  - routeKey: whatsapp
+    path: ../mocks/whatsapp/config.yaml
+    scenarios:
+      - overrides:
+          conditions:
+            latency: { delay_ms: 9000 }

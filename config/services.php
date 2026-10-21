@@ -42,6 +42,7 @@ return [
     ],
 
     'whatsapp' => [
+        'api_base_url' => env('WHATSAPP_API_BASE_URL', 'https://graph.facebook.com/v23.0'),
         'business_account_id' => env('WHATSAPP_BUSINESS_ACCOUNT_ID'),
         'business_phone_id' => env('WHATSAPP_BUSINESS_PHONE_ID'),
         'api_token' => env('WHATSAPP_BUSINESS_API_TOKEN'),

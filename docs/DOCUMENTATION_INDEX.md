@@ -8,6 +8,9 @@
 
 ## 🎯 START HERE
 
+- **[Lead management](LEAD_MANAGEMENT.md)** — Contact Us routing, CRM workflow, WhatsApp intake, API contract, migration/backfill, rollback, and verification.
+- **[Lead notifications and email setup](LEAD_NOTIFICATIONS.md)** — Returning inquiries, bell/inbox, daily summaries, SMTP configuration, scheduler, WhatsApp replies, delivery history, and transport tests.
+
 **New to the project?** Read in this order:
 
 1. **[README.md](README.md)** ⭐ (5 minutes)

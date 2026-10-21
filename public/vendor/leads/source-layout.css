@@ -1,0 +1,10 @@
+/* Lead-relevant rules from crm-itlife/resources/resources/views/app.blade.php. */
+.select2>.selection>.select2-selection>.select2-selection__rendered { position: relative; top: 5px; }
+.mt-1 { margin-top: 10px !important; }
+.mt-2 { margin-top: 20px !important; }
+.mt-3 { margin-top: 30px !important; }
+.mt-4 { margin-top: 40px !important; }
+.mt-5 { margin-top: 50px !important; }
+.table-bordered, .table-bordered thead tr th, .table-bordered tbody tr td, .table-bordered tfoot tr td { border: 1px solid rgb(174,170,170) !important; }
+.table-bordered thead tr th, .table-bordered tbody tr td, .table-bordered tfoot tr td { color: black !important; }
+.modal.show .modal-dialog { max-width: 80% !important; }

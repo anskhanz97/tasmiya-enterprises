@@ -1,0 +1,5 @@
+simulation: tasmiya-whatsapp
+routing: path
+mocks:
+  - routeKey: whatsapp
+    path: ../mocks/whatsapp/config.yaml

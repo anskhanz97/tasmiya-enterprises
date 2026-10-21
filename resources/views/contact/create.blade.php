@@ -77,7 +77,8 @@
     }
     
     .form-input-group input,
-    .form-input-group textarea {
+    .form-input-group textarea,
+    .form-input-group select {
         width: 100%;
         padding: 0.75rem 1rem;
         border: 2px solid #e5e7eb;
@@ -88,7 +89,8 @@
     }
     
     .form-input-group input:focus,
-    .form-input-group textarea:focus {
+    .form-input-group textarea:focus,
+    .form-input-group select:focus {
         outline: none;
         border-color: #667eea;
         background: white;
@@ -389,6 +391,22 @@
             </div>
 
             <!-- Subject -->
+            <div class="form-input-group @error('division_id') error @enderror">
+                <label for="division_id">Department <span style="color: #ef4444;">*</span></label>
+                <select id="division_id" name="division_id" required>
+                    <option value="">Choose a department</option>
+                    @foreach($divisions as $division)
+                        <option value="{{ $division->id }}" @selected((string) old('division_id') === (string) $division->id)>{{ $division->name }}</option>
+                    @endforeach
+                </select>
+                @error('division_id')<p class="contact-field-error">{{ $message }}</p>@enderror
+            </div>
+            <div class="form-input-group @error('assigned_to') error @enderror" id="specialist-group" hidden>
+                <label for="assigned_to">Specialist <span style="color: #ef4444;">*</span></label>
+                <select id="assigned_to" name="assigned_to" required aria-describedby="specialist-help"></select>
+                <p id="specialist-help" style="font-size:.875rem;color:#6b7280;margin-top:.5rem" aria-live="polite"></p>
+                @error('assigned_to')<p class="contact-field-error">{{ $message }}</p>@enderror
+            </div>
             <div class="form-input-group @error('subject') error @enderror">
                 <label for="subject">
                     💼 Subject <span style="color: #ef4444;">*</span>
@@ -489,6 +507,21 @@
 </div>
 
 <script>
+    const inquiryDivisions = @json($divisions);
+    const divisionSelect = document.getElementById('division_id');
+    const specialistSelect = document.getElementById('assigned_to');
+    const specialistGroup = document.getElementById('specialist-group');
+    function updateSpecialists(selected = '') {
+        const people = inquiryDivisions.find(item => String(item.id) === divisionSelect.value)?.users || [];
+        specialistSelect.replaceChildren(new Option('Choose a specialist', ''));
+        people.forEach(person => specialistSelect.add(new Option(person.name, person.id)));
+        specialistSelect.value = people.length === 1 ? String(people[0].id) : String(selected);
+        specialistGroup.hidden = people.length < 2;
+        specialistSelect.required = people.length > 1;
+        document.getElementById('specialist-help').textContent = people.length > 1 ? 'Your inquiry will go to this specialist.' : '';
+    }
+    divisionSelect.addEventListener('change', () => updateSpecialists());
+    updateSpecialists(@json(old('assigned_to', '')));
     // Character counter
     const messageInput = document.getElementById('message');
     const charCount = document.getElementById('charCount');

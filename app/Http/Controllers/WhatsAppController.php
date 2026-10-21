@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\WhatsAppService;
 use App\Models\SiteSetting;
-use Illuminate\Http\Request;
+use App\Services\WhatsAppService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class WhatsAppController extends Controller
@@ -13,7 +13,7 @@ class WhatsAppController extends Controller
     /**
      * Handle incoming WhatsApp webhook
      * POST /webhooks/whatsapp
-     * 
+     *
      * WhatsApp sends:
      * - Incoming messages
      * - Message delivery status updates
@@ -31,28 +31,39 @@ class WhatsAppController extends Controller
 
             Log::info('WhatsApp webhook received', ['entries' => count($payload['entry'] ?? [])]);
 
-            // Extract messages from webhook
-            $messages = $payload['entry'][0]['changes'][0]['value']['messages'] ?? [];
-            $statuses = $payload['entry'][0]['changes'][0]['value']['statuses'] ?? [];
-
-            // Handle incoming messages
-            foreach ($messages as $message) {
-                $whatsapp->handleIncomingMessage($message);
-            }
-
-            // Handle delivery/read statuses
-            foreach ($statuses as $status) {
-                $this->handleStatusUpdate($status);
+            $request->validate([
+                'entry' => 'required|array', 'entry.*.changes' => 'required|array',
+                'entry.*.changes.*.value' => 'required|array',
+                'entry.*.changes.*.value.messages' => 'sometimes|array',
+                'entry.*.changes.*.value.messages.*' => 'array',
+                'entry.*.changes.*.value.messages.*.id' => 'required|string|max:191',
+                'entry.*.changes.*.value.messages.*.from' => 'required|string|max:40',
+                'entry.*.changes.*.value.messages.*.type' => 'required|string',
+                'entry.*.changes.*.value.statuses' => 'sometimes|array',
+            ]);
+            foreach ($payload['entry'] as $entry) {
+                foreach ($entry['changes'] as $change) {
+                    $value = $change['value'];
+                    foreach ($value['messages'] ?? [] as $message) {
+                        $sender = collect($value['contacts'] ?? [])->firstWhere('wa_id', $message['from'] ?? '');
+                        $whatsapp->handleIncomingMessage($message, $sender['profile']['name'] ?? null);
+                    }
+                    foreach ($value['statuses'] ?? [] as $status) {
+                        $this->handleStatusUpdate($status);
+                    }
+                }
             }
 
             return response()->json(['status' => 'received']);
-        } catch (\Exception $e) {
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json(['message' => $e->getMessage(), 'errors' => $e->errors()], 422);
+        } catch (\Throwable $e) {
             Log::error('WhatsApp webhook error', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
 
-            return response()->json(['error' => 'Webhook processing failed'], 400);
+            return response()->json(['error' => 'Webhook processing failed; retry delivery.'], 500);
         }
     }
 
@@ -68,6 +79,7 @@ class WhatsAppController extends Controller
 
         if ($token && $request->query('hub_mode', $request->query('hub.mode')) === 'subscribe' && is_string($verify_token) && hash_equals($token, $verify_token)) {
             Log::info('WhatsApp webhook verified');
+
             return response((string) $challenge, 200)->header('Content-Type', 'text/plain');
         }
 
@@ -81,6 +93,7 @@ class WhatsAppController extends Controller
      */
     private function handleStatusUpdate(array $status): void
     {
+        app(\App\Services\WhatsAppConversation::class)->receipt($status);
         $messageId = $status['id'] ?? null;
         $statusType = $status['status'] ?? null; // 'sent', 'delivered', 'read'
         $timestamp = $status['timestamp'] ?? null;
@@ -99,7 +112,7 @@ class WhatsAppController extends Controller
     /**
      * Send WhatsApp message to a user
      * POST /api/whatsapp/send
-     * 
+     *
      * Authenticated request from admin panel to send messages
      */
     public function sendMessage(Request $request, WhatsAppService $whatsapp)
@@ -127,11 +140,12 @@ class WhatsAppController extends Controller
      * Get WhatsApp message history
      * GET /api/whatsapp/history/{phone}
      */
-    public function getHistory(string $phone)
+    public function getHistory(Request $request, string $phone)
     {
         $this->authorize('viewAny', \App\Models\ContactInquiry::class);
 
         $inquiries = \App\Models\ContactInquiry::where('phone', $phone)
+            ->whereHas('lead', fn ($query) => $query->visibleTo($request->user()))
             ->where('source', 'whatsapp')
             ->latest()
             ->limit(50)

@@ -35,11 +35,11 @@ class WhatsAppService
 
     /**
      * Send a WhatsApp message to a phone number
-     * 
-     * @param string $toNumber Phone number with country code (e.g., +923001234567)
-     * @param string $message Message text
-     * @param string|null $templateName Name of pre-approved template
-     * @param array $templateParameters Template variables
+     *
+     * @param  string  $toNumber  Phone number with country code (e.g., +923001234567)
+     * @param  string  $message  Message text
+     * @param  string|null  $templateName  Name of pre-approved template
+     * @param  array  $templateParameters  Template variables
      * @return bool Success status
      */
     public function sendMessage(
@@ -48,9 +48,15 @@ class WhatsAppService
         ?string $templateName = null,
         array $templateParameters = []
     ): bool {
-        if (!$this->isConfigured()) {
+        return $this->sendMessageResult($toNumber, $message, $templateName, $templateParameters)['accepted'];
+    }
+
+    public function sendMessageResult(string $toNumber, string $message, ?string $templateName = null, array $templateParameters = []): array
+    {
+        if (! $this->isConfigured()) {
             Log::warning('WhatsApp service not configured');
-            return false;
+
+            return ['accepted' => false, 'id' => null, 'error_code' => 'configuration', 'uncertain' => false];
         }
 
         try {
@@ -68,8 +74,8 @@ class WhatsAppService
                         'code' => 'en_US',
                     ],
                 ];
-                
-                if (!empty($templateParameters)) {
+
+                if (! empty($templateParameters)) {
                     $payload['template']['components'] = [
                         [
                             'type' => 'body',
@@ -86,48 +92,51 @@ class WhatsAppService
 
             $response = Http::timeout(8)->withToken($this->accessToken)
                 ->post(
-                    self::API_BASE_URL . "/{$this->phoneNumberId}/messages",
+                    rtrim(config('services.whatsapp.api_base_url', self::API_BASE_URL), '/')."/{$this->phoneNumberId}/messages",
                     $payload
                 );
 
             /** @var \Illuminate\Http\Client\Response $response */
             $responseData = $response->json() ?? [];
 
-            if ($response->status() === 200) {
+            if ($response->successful() && is_string($responseData['messages'][0]['id'] ?? null)) {
                 Log::info('WhatsApp message sent', [
                     'to' => $toNumber,
                     'message_id' => $responseData['messages'][0]['id'] ?? null,
                 ]);
-                return true;
+
+                return ['accepted' => true, 'id' => $responseData['messages'][0]['id'], 'error_code' => null, 'uncertain' => false];
             }
 
             Log::error('WhatsApp message failed', [
                 'to' => $toNumber,
                 'response' => $responseData,
             ]);
-            return false;
+
+            return ['accepted' => false, 'id' => null, 'error_code' => (string) ($responseData['error']['code'] ?? $response->status()), 'uncertain' => $response->successful()];
         } catch (\Exception $e) {
             Log::error('WhatsApp message exception', [
                 'to' => $toNumber,
                 'error' => $e->getMessage(),
             ]);
-            return false;
+
+            return ['accepted' => false, 'id' => null, 'error_code' => 'connection', 'uncertain' => true];
         }
     }
 
     /**
      * Send message to user (from User model)
-     * 
-     * @param mixed $user User model or user ID
-     * @param string $message Message text
-     * @return bool
+     *
+     * @param  mixed  $user  User model or user ID
+     * @param  string  $message  Message text
      */
     public function sendToUser($user, string $message): bool
     {
         $phoneNumber = $user->whatsapp_number ?? $user->phone;
 
-        if (!$phoneNumber) {
+        if (! $phoneNumber) {
             Log::warning('User has no WhatsApp number', ['user_id' => $user->id]);
+
             return false;
         }
 
@@ -138,49 +147,22 @@ class WhatsAppService
      * Handle incoming WhatsApp webhook message
      * Called by webhook controller
      */
-    public function handleIncomingMessage(array $message): void
+    public function handleIncomingMessage(array $message, ?string $senderName = null): void
     {
-        try {
-            $phoneNumber = $message['from'] ?? null;
-            $messageBody = $message['text']['body'] ?? null;
-            $messageType = $message['type'] ?? 'text';
-
-            if (!$phoneNumber || !$messageBody) {
-                Log::warning('Invalid WhatsApp message format', $message);
-                return;
-            }
-
-            // Create contact inquiry from WhatsApp message
-            $inquiry = ContactInquiry::create([
-                'phone' => $phoneNumber,
-                'message' => $messageBody,
-                'source' => 'whatsapp',
-                'source_type' => $messageType,
-            ]);
-
-            Log::info('WhatsApp inquiry created', [
-                'inquiry_id' => $inquiry->id,
-                'phone' => $phoneNumber,
-            ]);
-
-            // Send acknowledgment
-            $this->sendMessage(
-                $phoneNumber,
-                'Thank you for reaching out! We will respond to your inquiry shortly.'
-            );
-        } catch (\Exception $e) {
-            Log::error('Failed to handle WhatsApp message', [
-                'error' => $e->getMessage(),
-            ]);
+        $result = app(LeadWorkflow::class)->whatsapp($message, $senderName);
+        if (! $result || ! $result['new_case'] || $result['duplicate']) {
+            return;
         }
+        $inquiry = $result['inquiry'];
+        // Persistence is committed before any network call. A retry must not send twice.
+        app(WhatsAppConversation::class)->acknowledge($inquiry, $this);
     }
 
     /**
      * Verify webhook signature (for security)
-     * 
-     * @param string $payload Request payload
-     * @param string $signature Signature header value
-     * @return bool
+     *
+     * @param  string  $payload  Request payload
+     * @param  string  $signature  Signature header value
      */
     public function verifyWebhookSignature(string $payload, string $signature): bool
     {
@@ -208,8 +190,8 @@ class WhatsAppService
         $phone = preg_replace('/[^\d+]/', '', $phone);
 
         // Ensure it starts with +
-        if (!str_starts_with($phone, '+')) {
-            $phone = '+' . $phone;
+        if (! str_starts_with($phone, '+')) {
+            $phone = '+'.$phone;
         }
 
         return $phone;
@@ -218,18 +200,21 @@ class WhatsAppService
     /**
      * Check if WhatsApp service is properly configured
      */
-    private function isConfigured(): bool
+    public function isConfigured(): bool
     {
-        return !empty($this->phoneNumberId) && !empty($this->accessToken);
+        return ! empty($this->phoneNumberId) && ! empty($this->accessToken);
     }
 
     public function notifyCompanyAboutInquiry(ContactInquiry $inquiry): bool
     {
         $number = SiteSetting::get('integration_company_whatsapp');
         $template = SiteSetting::get('integration_whatsapp_template_name');
-        if (! $number || ! $template || ! $this->isConfigured()) return false;
+        if (! $number || ! $template || ! $this->isConfigured()) {
+            return false;
+        }
 
         $summary = "{$inquiry->name}: {$inquiry->subject} (inquiry #{$inquiry->id})";
+
         return $this->sendMessage($number, $summary, $template, [
             ['type' => 'text', 'text' => mb_substr($summary, 0, 500)],
         ]);
@@ -242,7 +227,7 @@ class WhatsAppService
     {
         try {
             $message = "New inquiry from {$inquiry->phone}:\n{$inquiry->message}";
-            
+
             // Get all admin WhatsApp numbers
             $admins = \App\Models\User::where('role', 'admin')->get();
 
@@ -255,6 +240,7 @@ class WhatsAppService
             return true;
         } catch (\Exception $e) {
             Log::error('Failed to notify admins', ['error' => $e->getMessage()]);
+
             return false;
         }
     }

@@ -30,7 +30,9 @@ Route::get('/', function () {
     $featuredTeam = \App\Models\Profile::with('user.division')->visible()->limit(6)->get()
         ->sortBy(fn ($profile) => $profile->user->name === 'Atif Safdar' ? 0 : 1)->values();
     $clients = json_decode(\App\Models\SiteSetting::get('home_clients', 'null'), true);
-    if (! is_array($clients)) $clients = config('clients');
+    if (! is_array($clients)) {
+        $clients = config('clients');
+    }
     $showGoogleReviews = \App\Models\SiteSetting::get('integration_enable_google_reviews') === '1'
         && filled(\App\Models\SiteSetting::get('integration_google_reviews_place_id'))
         && filled(\App\Models\SiteSetting::get('integration_google_reviews_api_key'));
@@ -67,7 +69,7 @@ Route::get('/terms', function () {
  * ========== AUTHENTICATION ROUTES ==========
  * Middleware 'guest': Only non-authenticated users can access
  * These are HIDDEN routes (no public links, only admin shares URL)
- * 
+ *
  * Security rationale:
  * - No public sign-up for random users
  * - Admin controls who gets registration access
@@ -90,7 +92,7 @@ Route::get('/login', [AuthController::class, 'showLogin'])
  * User submits: Email + password
  * Server checks: Email exists + password matches
  * Result: Creates session + redirects to dashboard
- * 
+ *
  * Middleware:
  * - 'guest': Already logged-in users redirected to dashboard
  * - 'throttle:5,1': Max 5 login attempts per minute per IP
@@ -104,13 +106,13 @@ Route::post('/login', [AuthController::class, 'store'])
  * Show registration form
  * GET /register
  * User sees: Name + email + password + role + division form
- * 
+ *
  * HIDDEN ROUTE:
  * - No link in navigation
  * - Admin must share direct URL with new team members
  * - Example: admin sends email with link to /register
  * - Only the person with the link can register
- * 
+ *
  * Could add: Registration token verification
  * To be even more secure: Each registration link is one-time-use
  * For now: Just hidden URL is sufficient for small team
@@ -125,7 +127,7 @@ Route::get('/register', [AuthController::class, 'showRegister'])
  * User submits: Name + email + password + role + division
  * Server checks: All fields valid + email unique + password strong
  * Result: Creates user account + fires Registered event (email verification)
- * 
+ *
  * Post-registration:
  * - User must verify email (click link in email)
  * - Admin must activate account (sets is_active = true)
@@ -145,14 +147,15 @@ Route::post('/register', [AuthController::class, 'register'])
  * Logout user
  * POST /logout
  * Destroys session + clears cookies + redirects to home
- * 
+ *
  * Why POST not GET:
  * - State-changing operation should use POST
  * - Prevents accidental logouts from link clicks
  * - Requires CSRF token (prevents logout via malicious images)
- * 
+ *
  * Usage in view:
  *   <form action="{{ route('logout') }}" method="POST">
+ *
  *       @csrf
  *       <button type="submit">Log Out</button>
  *   </form>
@@ -179,12 +182,22 @@ Route::put('/password/update', [AuthController::class, 'updatePassword'])
  * GET /dashboard
  * User sees: Their main page after login
  * Shows: Quick stats, recent activity, navigation
- * 
+ *
  * Will be replaced in Phase 3 with full admin dashboard
  */
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware('auth')->name('dashboard');
+
+Route::middleware('auth')->prefix('notifications')->name('notifications.')->controller(\App\Http\Controllers\LeadNotificationController::class)->group(function () {
+    Route::get('', 'index')->name('index');
+    Route::get('feed', 'feed')->name('feed');
+    Route::get('email-preview', 'emailPreview')->name('email-preview');
+    Route::post('test-email', 'testEmail')->middleware('throttle:3,1')->name('test-email');
+    Route::post('read-all', 'readAll')->name('read-all');
+    Route::post('deliveries/{delivery}/retry', 'retry')->name('retry');
+    Route::post('{notification}/open', 'open')->name('open');
+});
 
 /**
  * Site Settings Management
@@ -212,19 +225,19 @@ Route::post('/settings/google/verify', [\App\Http\Controllers\SettingsController
 /**
  * ========== PROFILE ROUTES ==========
  * Routes for viewing and managing user profiles
- * 
+ *
  * Resource routing creates standard RESTful routes automatically:
  * - GET /profiles (index) - List all profiles
  * - GET /profiles/{profile} (show) - View one profile
  * - GET /profiles/{profile}/edit (edit) - Show edit form
  * - PUT /profiles/{profile} (update) - Save changes
  * - DELETE /profiles/{profile} (destroy) - Delete profile
- * 
+ *
  * Route model binding:
  * {profile} parameter automatically resolved to Profile model
  * Example: /profiles/1 → Profile::find(1)
  * If not found, Laravel returns 404 automatically
- * 
+ *
  * Authorization:
  * - Index/Show: Public (everyone can view team showcase)
  * - Edit/Update: Auth middleware (must be logged in)
@@ -252,7 +265,7 @@ Route::get('/profiles/{profile}', [ProfileController::class, 'show'])
  * Show edit form for profile
  * GET /profiles/{profile}/edit
  * Authenticated route - owner or admin only (checked in controller via policy)
- * 
+ *
  * Middleware: auth ensures user is logged in
  * Policy check: Owner or admin (in ProfilePolicy@update)
  * If unauthorized: 403 Forbidden thrown
@@ -265,13 +278,13 @@ Route::get('/profiles/{profile}/edit', [ProfileController::class, 'edit'])
  * Update profile
  * PUT /profiles/{profile}
  * Authenticated route - accepts validated profile data
- * 
+ *
  * Process:
  * 1. ProfileUpdateRequest validates input
  * 2. ProfileUpdateRequest checks authorization
  * 3. ProfileController@update saves changes
  * 4. Redirect to profile view with success message
- * 
+ *
  * Security:
  * - CSRF token required (included in form)
  * - Validation ensures data integrity
@@ -293,10 +306,10 @@ Route::middleware('auth')->group(function () {
  * Delete profile
  * DELETE /profiles/{profile}
  * Admin route - only admins can delete profiles
- * 
+ *
  * Note: Deletes profile but not user account
  * User still exists in system (can be re-profiled)
- * 
+ *
  * Alternative approach: Set is_visible = false (soft delete)
  * Not implemented yet, but planned for future
  */
@@ -344,12 +357,12 @@ Route::get('/profiles/{profile}', [ProfileController::class, 'show'])
  * List all services - Team service showcase
  * GET /services
  * Public route - shows all active services grouped by division
- * 
+ *
  * Example displays:
  * FBR Taxation Division
  *   - Tax Consultation (4.8★ from 12 reviews)
  *   - Compliance Audit (4.9★ from 8 reviews)
- * 
+ *
  * IT & Digital Division
  *   - Web Development (4.7★ from 15 reviews)
  *   - Cloud Solutions (4.8★ from 10 reviews)
@@ -372,7 +385,7 @@ Route::get('/services/create', [ServiceController::class, 'create'])
  *   - List of experts who provide it
  *   - Client testimonials and ratings
  *   - Rating breakdown chart
- * 
+ *
  * Route model binding: {service} auto-resolved by slug
  * Example: /services/tax-consultation resolves to Service with slug='tax-consultation'
  */
@@ -383,14 +396,14 @@ Route::get('/services/{service}', [ServiceController::class, 'show'])
  * Create new service form (Admin only)
  * GET /services/create
  * Admin route - shows form to create new service
- * 
+ *
  * Authorization: Must be admin (checked in controller via policy)
  */
 /**
  * Store new service (Admin only)
  * POST /services
  * Admin route - accepts validated service data
- * 
+ *
  * Process:
  * 1. StoreServiceRequest validates input
  * 2. StoreServiceRequest checks authorization
@@ -406,7 +419,7 @@ Route::post('/services', [ServiceController::class, 'store'])
  * Edit service form (Admin only)
  * GET /services/{service}/edit
  * Admin route - shows form pre-filled with current service data
- * 
+ *
  * Authorization: Must be admin
  */
 Route::get('/services/{service}/edit', [ServiceController::class, 'edit'])
@@ -417,7 +430,7 @@ Route::get('/services/{service}/edit', [ServiceController::class, 'edit'])
  * Update service (Admin only)
  * PUT /services/{service}
  * Admin route - accepts validated updated service data
- * 
+ *
  * Process:
  * 1. UpdateServiceRequest validates input
  * 2. ServiceController@update saves changes
@@ -432,7 +445,7 @@ Route::put('/services/{service}', [ServiceController::class, 'update'])
  * Delete service (Admin only)
  * DELETE /services/{service}
  * Admin route - permanently removes service
- * 
+ *
  * Cascade deletes: All associated pivot records and testimonials
  */
 Route::delete('/services/{service}', [ServiceController::class, 'destroy'])
@@ -443,10 +456,10 @@ Route::delete('/services/{service}', [ServiceController::class, 'destroy'])
  * Search services API endpoint
  * GET /services/search
  * Public API endpoint - search services by name/description
- * 
+ *
  * Parameters:
  * - query: Search string (min 2 chars)
- * 
+ *
  * Returns JSON with matching services
  */
 Route::get('/api/services/search', [ServiceController::class, 'search'])
@@ -462,11 +475,11 @@ Route::get('/api/services/search', [ServiceController::class, 'search'])
  * Show testimonial submission form
  * GET /testimonials/create
  * Public route - shows form to submit review
- * 
+ *
  * Query parameters:
  * - type: 'service' or 'profile' (what is being reviewed)
  * - id: ID of service or profile being reviewed
- * 
+ *
  * Example: /testimonials/create?type=service&id=1
  */
 Route::get('/testimonials/create', [TestimonialController::class, 'create'])
@@ -483,13 +496,13 @@ Route::middleware('auth')->prefix('profiles/{profile}/reviews')->name('profiles.
  * Store new testimonial
  * POST /testimonials
  * Public route - accepts validated review data
- * 
+ *
  * Process:
  * 1. StoreTestimonialRequest validates input
  * 2. TestimonialController@store creates testimonial
  * 3. Set is_approved = false (awaiting admin approval)
  * 4. Redirect to referring page with "Thank you" message
- * 
+ *
  * Workflow:
  * - User submits → is_approved = false
  * - Email notification sent to admin
@@ -513,7 +526,7 @@ Route::get('/testimonials/{testimonial}', [TestimonialController::class, 'show']
  * Admin: Approve testimonial
  * POST /testimonials/{testimonial}/approve
  * Admin route - mark testimonial as approved for public display
- * 
+ *
  * Sets is_approved = true
  */
 Route::post('/testimonials/{testimonial}/approve', [TestimonialController::class, 'approve'])
@@ -524,7 +537,7 @@ Route::post('/testimonials/{testimonial}/approve', [TestimonialController::class
  * Admin: Reject testimonial
  * POST /testimonials/{testimonial}/reject
  * Admin route - mark testimonial as rejected (hidden)
- * 
+ *
  * Sets is_approved = false
  */
 Route::post('/testimonials/{testimonial}/reject', [TestimonialController::class, 'reject'])
@@ -535,7 +548,7 @@ Route::post('/testimonials/{testimonial}/reject', [TestimonialController::class,
  * Admin: Mark testimonial as featured
  * POST /testimonials/{testimonial}/feature
  * Admin route - highlight special/excellent reviews
- * 
+ *
  * Featured testimonials appear first on service pages
  * Sets is_featured = true
  */
@@ -547,7 +560,7 @@ Route::post('/testimonials/{testimonial}/feature', [TestimonialController::class
  * Admin: Unmark testimonial as featured
  * POST /testimonials/{testimonial}/unfeature
  * Admin route - remove featured status
- * 
+ *
  * Sets is_featured = false
  */
 Route::post('/testimonials/{testimonial}/unfeature', [TestimonialController::class, 'unfeature'])
@@ -567,13 +580,13 @@ Route::delete('/testimonials/{testimonial}', [TestimonialController::class, 'des
  * Get testimonials for service API endpoint
  * GET /api/testimonials/service/{service_id}
  * Public API endpoint - get approved testimonials for a service
- * 
+ *
  * Parameters:
  * - service_id: ID of service
  * - page: Page number (default 1)
  * - per_page: Results per page (default 5)
  * - sort: 'recent' or 'rating' (default 'recent')
- * 
+ *
  * Returns JSON with paginated testimonials
  */
 Route::get('/api/testimonials/service', [TestimonialController::class, 'getForService'])
@@ -583,13 +596,13 @@ Route::get('/api/testimonials/service', [TestimonialController::class, 'getForSe
  * Get testimonials for profile API endpoint
  * GET /api/testimonials/profile/{profile_id}
  * Public API endpoint - get approved testimonials for a profile
- * 
+ *
  * Parameters:
  * - profile_id: ID of profile
  * - page: Page number (default 1)
  * - per_page: Results per page (default 5)
  * - sort: 'recent' or 'rating' (default 'recent')
- * 
+ *
  * Returns JSON with paginated testimonials
  */
 Route::get('/api/testimonials/profile', [TestimonialController::class, 'getForProfile'])
@@ -658,6 +671,25 @@ Route::post('/webhooks/whatsapp', [\App\Http\Controllers\WhatsAppController::cla
  */
 
 // Show contact form
+Route::middleware('auth')->prefix('leads')->name('leads.')->controller(\App\Http\Controllers\LeadController::class)->group(function () {
+    Route::get('/', 'index')->name('index');
+    Route::post('/', 'store')->name('store');
+    Route::get('/data', 'data')->name('data');
+    Route::get('/events', 'events')->name('events');
+    Route::get('/duplicates', 'duplicates')->name('duplicates');
+    Route::get('/{lead}/previous-inquiries', 'previousInquiries')->name('previous-inquiries');
+    Route::get('/{lead}', 'show')->name('show');
+    Route::patch('/{lead}', 'update')->name('update');
+    Route::post('/{lead}/follow-ups', 'followUp')->name('follow-ups.store');
+    Route::post('/{lead}/convert', 'convert')->name('convert');
+    Route::post('/{lead}/reopen', 'reopen')->name('reopen');
+});
+
+Route::middleware('auth')->prefix('leads/{lead}/whatsapp')->name('leads.whatsapp.')->controller(\App\Http\Controllers\LeadWhatsAppController::class)->group(function () {
+    Route::get('', 'index')->name('index');
+    Route::post('', 'store')->middleware('throttle:10,1')->name('store');
+});
+
 Route::get('/contact', [\App\Http\Controllers\ContactInquiryController::class, 'create'])
     ->name('contact.create');
 
@@ -677,15 +709,15 @@ Route::post('/contact', [\App\Http\Controllers\ContactInquiryController::class, 
 /**
  * ========== ROUTE GROUPS (Useful for organizing) ==========
 
- * 
+ *
  * Example (not implemented yet):
- * 
+ *
  * Route::middleware('auth')->group(function () {
  *     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
  *     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
  *     Route::post('/profile/{id}', [ProfileController::class, 'update'])->name('profile.update');
  * });
- * 
+ *
  * Route::middleware(['auth', 'admin'])->group(function () {
  *     Route::get('/admin', [AdminController::class, 'dashboard'])->name('admin.dashboard');
  *     Route::resource('/admin/users', AdminUserController::class);
